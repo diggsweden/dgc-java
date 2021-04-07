@@ -4,25 +4,17 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>se.digg.hcert</groupId>
-  <artifactId>hcert</artifactId>
+  <artifactId>hcert-create-validate</artifactId>
   <version>1.0.0-SNAPSHOT</version>
 
-  <name>DIGG :: Vaccine Certificate :: CWT and COSE</name>
-  <description>CWT and COSE support for the Vaccine Certificate Issuance Service</description>
-  <url>https://github.com/DIGGSweden/vaccinationsbevis-poc</url>
-
-  <licenses>
-    <license>
-      <name>The Apache Software License, Version 2.0</name>
-      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-      <distribution>repo</distribution>
-    </license>
-  </licenses>
+  <name>DIGG :: Digital Green Certificate :: Issuance and Validation</name>
+  <description>Issuance and validation of Digital Green Certificate</description>
+  <url>https://github.com/diggsweden/hcert-impl</url>
 
   <scm>
-    <connection>scm:https://github.com/DIGGSweden/vaccinationsbevis-poc.git</connection>
-    <developerConnection>scm:https://github.com/DIGGSweden/vaccinationsbevis-poc.git</developerConnection>
-    <url>https://github.com/DIGGSweden/vaccinationsbevis-poc/tree/master</url>
+    <connection>scm:https://github.com/diggsweden/hcert-impl.git</connection>
+    <developerConnection>scm:https://github.com/diggsweden/hcert-impl.git</developerConnection>
+    <url>https://github.com/diggsweden/hcert-impl/tree/master</url>
   </scm>
 
   <developers>
@@ -40,104 +32,97 @@
     </developer>
   </developers>
 
-  <properties>    
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <java.version>11</java.version>
+
+    <!-- Versions on dependencies -->
+    <jackson.version>2.11.4</jackson.version>
+    <bouncy-castle.version>1.68</bouncy-castle.version>
+    <xmlsec.version>2.2.1</xmlsec.version>
+    <credentials-support.version>1.0.1</credentials-support.version>
+
+    <slf4j.version>1.7.30</slf4j.version>
+    <junit.version>4.13.1</junit.version>
   </properties>
 
   <dependencies>
 
-    <!-- Java -->
-    <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>javax.servlet-api</artifactId>
-    </dependency>
-
-    <!-- Spring -->
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot</artifactId>
-    </dependency>
-    
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-autoconfigure</artifactId>
-    </dependency>    
-
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-configuration-processor</artifactId>
-      <optional>true</optional>
-    </dependency>
-
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-test</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.springframework.security</groupId>
-      <artifactId>spring-security-test</artifactId>
-      <scope>test</scope>
-    </dependency>
-    
     <!-- Jackson -->
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
+      <version>${jackson.version}</version>
     </dependency>
-  
+
     <dependency>
       <groupId>com.fasterxml.jackson.dataformat</groupId>
       <artifactId>jackson-dataformat-cbor</artifactId>
-    </dependency>    
-    
+      <version>${jackson.version}</version>
+    </dependency>
+
+    <!-- CBOR and COSE -->
     <dependency>
       <groupId>com.upokecenter</groupId>
       <artifactId>cbor</artifactId>
       <version>4.3.0</version>
     </dependency>
 
+    <dependency>
+      <groupId>com.nimbusds</groupId>
+      <artifactId>nimbus-jose-jwt</artifactId>
+      <version>8.20.2</version>
+    </dependency>
+
     <!-- Security -->
+    <dependency>
+      <groupId>org.apache.santuario</groupId>
+      <artifactId>xmlsec</artifactId>
+      <version>${xmlsec.version}</version>
+    </dependency>
+
     <dependency>
       <groupId>org.bouncycastle</groupId>
       <artifactId>bcprov-jdk15on</artifactId>
+      <version>${bouncy-castle.version}</version>
     </dependency>
-          
+
     <dependency>
       <groupId>se.swedenconnect.security</groupId>
       <artifactId>credentials-support</artifactId>
+      <version>${credentials-support.version}</version>
     </dependency>
 
     <!-- Utilities -->
     <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
+      <version>1.18.18</version>
+      <scope>provided</scope>
     </dependency>
 
     <!-- For testing -->
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
+      <version>${junit.version}</version>
+      <scope>test</scope>
     </dependency>
 
     <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-test</artifactId>
-      <scope>test</scope>
-    </dependency> 
-        
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-logging</artifactId>
-      <scope>test</scope>    
-    </dependency>
-    
-    <dependency>
       <groupId>com.nimbusds</groupId>
       <artifactId>oauth2-oidc-sdk</artifactId>
+      <version>8.36.1</version>
       <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>com.nimbusds</groupId>
+          <artifactId>nimbus-jose-jwt</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
-    
+
   </dependencies>
 
   <build>
@@ -145,23 +130,49 @@
     <plugins>
 
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.8.1</version>
+        <configuration>
+          <source>${java.version}</source>
+          <target>${java.version}</target>
+        </configuration>
       </plugin>
 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
+        <version>3.2.0</version>
       </plugin>
 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-clean-plugin</artifactId>
+        <version>3.1.0</version>
       </plugin>
 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-project-info-reports-plugin</artifactId>
+        <version>2.9</version>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <version>3.0.0-M3</version>
+        <executions>
+          <execution>
+            <id>enforce</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <configuration>
+              <rules>
+                <dependencyConvergence />
+              </rules>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
 
     </plugins>
