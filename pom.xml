@@ -42,12 +42,19 @@
     <bouncy-castle.version>1.68</bouncy-castle.version>
     <xmlsec.version>2.2.1</xmlsec.version>
     <credentials-support.version>1.0.1</credentials-support.version>
+    <zxing.version>3.4.1</zxing.version>
 
     <slf4j.version>1.7.30</slf4j.version>
     <junit.version>4.13.1</junit.version>
   </properties>
 
   <dependencies>
+  
+    <dependency>
+      <groupId>javax.validation</groupId>
+      <artifactId>validation-api</artifactId>
+      <version>2.0.0.Final</version>
+    </dependency>
 
     <!-- Jackson -->
     <dependency>
@@ -74,6 +81,19 @@
       <artifactId>nimbus-jose-jwt</artifactId>
       <version>8.20.2</version>
     </dependency>
+    
+    <!-- Barcodes -->
+    <dependency>
+      <groupId>com.google.zxing</groupId>
+      <artifactId>core</artifactId>
+      <version>${zxing.version}</version>
+    </dependency>
+    
+    <dependency>
+      <groupId>com.google.zxing</groupId>
+      <artifactId>javase</artifactId>
+      <version>${zxing.version}</version>
+    </dependency>    
 
     <!-- Security -->
     <dependency>
@@ -174,6 +194,28 @@
           </execution>
         </executions>
       </plugin>
+      
+      <plugin>
+        <groupId>org.jsonschema2pojo</groupId>
+        <artifactId>jsonschema2pojo-maven-plugin</artifactId>
+        <version>1.1.0</version>
+        <configuration>
+          <sourceDirectory>${basedir}/src/main/resources/schema</sourceDirectory>
+          <targetPackage>se.digg.hcert.eu_hcert.v1</targetPackage>
+          <includeAdditionalProperties>false</includeAdditionalProperties>
+          <includeJsr303Annotations>true</includeJsr303Annotations>
+          <includeConstructors>true</includeConstructors>
+          <useTitleAsClassname>true</useTitleAsClassname>
+          <outputDirectory>${project.build.directory}/generated-sources/schema</outputDirectory>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>generate</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>      
 
     </plugins>
 
