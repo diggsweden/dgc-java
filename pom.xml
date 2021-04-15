@@ -19,12 +19,12 @@
 
   <developers>
     <developer>
-      <name>Henrik Bengtsson</name>
-      <email>extern.henrik.bengtsson@digg.se</email>
-    </developer>
-    <developer>
       <name>Martin Lindström</name>
       <email>martin.lindstrom@idsec.se</email>
+    </developer>
+    <developer>
+      <name>Henrik Bengtsson</name>
+      <email>extern.henrik.bengtsson@digg.se</email>
     </developer>
     <developer>
       <name>Henric Norlander</name>
@@ -118,14 +118,6 @@
       <groupId>se.swedenconnect.security</groupId>
       <artifactId>credentials-support</artifactId>
       <version>${credentials-support.version}</version>
-    </dependency>
-
-    <!-- Utilities -->
-    <dependency>
-      <groupId>org.projectlombok</groupId>
-      <artifactId>lombok</artifactId>
-      <version>1.18.18</version>
-      <scope>provided</scope>
     </dependency>
     
     <!-- For testing -->
