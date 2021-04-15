@@ -32,7 +32,7 @@ The code is structured into the following parts:
 
 - Base45 implementation
 
-- Aztec code generation - Support for creating an Aztec code.
+- QR code generation - Support for creating/reading QR-codes.
 
 - Service layer - A service that ties all the above components together and presents high-level methods for creating and validating HCERT:s.
 
