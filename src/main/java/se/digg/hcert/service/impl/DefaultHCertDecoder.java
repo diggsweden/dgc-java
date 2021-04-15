@@ -14,13 +14,13 @@ import java.util.Optional;
 import com.upokecenter.cbor.CBORException;
 
 import lombok.extern.slf4j.Slf4j;
+import se.digg.dgc.payload.v1.DGCSchemaException;
+import se.digg.dgc.payload.v1.DigitalGreenCertificate;
+import se.digg.dgc.payload.v1.MapperUtils;
 import se.digg.hcert.encoding.BarcodeDecoder;
 import se.digg.hcert.encoding.BarcodeException;
 import se.digg.hcert.encoding.Zlib;
 import se.digg.hcert.encoding.impl.DefaultBarcodeDecoder;
-import se.digg.hcert.eu_hcert.v1.DigitalGreenCertificate;
-import se.digg.hcert.eu_hcert.v1.HCertSchemaException;
-import se.digg.hcert.eu_hcert.v1.MapperUtils;
 import se.digg.hcert.service.HCertDecoder;
 import se.digg.hcert.signatures.CertificateProvider;
 import se.digg.hcert.signatures.HCertSignatureVerifier;
@@ -57,7 +57,7 @@ public class DefaultHCertDecoder implements HCertDecoder {
   /** {@inheritDoc} */
   @Override
   public DigitalGreenCertificate decode(final byte[] image)
-      throws HCertSchemaException, SignatureException, CertificateExpiredException, BarcodeException, IOException {
+      throws DGCSchemaException, SignatureException, CertificateExpiredException, BarcodeException, IOException {
 
     return MapperUtils.toDigitalGreenCertificate(this.decodeToEncodedHcert(image));
   }
@@ -92,7 +92,7 @@ public class DefaultHCertDecoder implements HCertDecoder {
   /** {@inheritDoc} */
   @Override
   public DigitalGreenCertificate decodeRaw(final byte[] cwt)
-      throws HCertSchemaException, SignatureException, CertificateExpiredException, IOException {
+      throws DGCSchemaException, SignatureException, CertificateExpiredException, IOException {
 
     return MapperUtils.toDigitalGreenCertificate(this.decodeRawToEncodedHcert(cwt));
   }

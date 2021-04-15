@@ -11,9 +11,9 @@ import java.time.Instant;
 import org.junit.Test;
 import org.springframework.core.io.ClassPathResource;
 
+import se.digg.dgc.payload.v1.DigitalGreenCertificate;
+import se.digg.dgc.payload.v1.Sub;
 import se.digg.hcert.encoding.Barcode;
-import se.digg.hcert.eu_hcert.v1.DigitalGreenCertificate;
-import se.digg.hcert.eu_hcert.v1.Sub;
 import se.digg.hcert.signatures.HCertSigner;
 import se.digg.hcert.signatures.impl.DefaultHCertSigner;
 import se.swedenconnect.security.credential.KeyStoreCredential;

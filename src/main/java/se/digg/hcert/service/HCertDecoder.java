@@ -9,9 +9,9 @@ import java.io.IOException;
 import java.security.SignatureException;
 import java.security.cert.CertificateExpiredException;
 
+import se.digg.dgc.payload.v1.DGCSchemaException;
+import se.digg.dgc.payload.v1.DigitalGreenCertificate;
 import se.digg.hcert.encoding.BarcodeException;
-import se.digg.hcert.eu_hcert.v1.DigitalGreenCertificate;
-import se.digg.hcert.eu_hcert.v1.HCertSchemaException;
 
 /**
  * Service for decoding a HCERT from its image representation into the actual HCERT payload.
@@ -28,7 +28,7 @@ public interface HCertDecoder {
    * @param image
    *          the barcode image holding the signed HCERT
    * @return the HCERT payload
-   * @throws HCertSchemaException
+   * @throws DGCSchemaException
    *           for HCERT schema errors
    * @throws SignatureException
    *           for signature verification errors
@@ -39,7 +39,7 @@ public interface HCertDecoder {
    * @throws IOException
    *           for errors decoding data, for example CBOR related errors
    */
-  DigitalGreenCertificate decode(final byte[] image) throws HCertSchemaException, SignatureException, CertificateExpiredException,
+  DigitalGreenCertificate decode(final byte[] image) throws DGCSchemaException, SignatureException, CertificateExpiredException,
       BarcodeException, IOException;
 
   /**
@@ -66,7 +66,7 @@ public interface HCertDecoder {
    * @param cwt
    *          the signed CWT holding the HCERT
    * @return the HCERT payload
-   * @throws HCertSchemaException
+   * @throws DGCSchemaException
    *           for HCERT schema errors
    * @throws SignatureException
    *           for signature verification errors
@@ -75,7 +75,7 @@ public interface HCertDecoder {
    * @throws IOException
    *           for errors decoding data, for example CBOR related errors
    */
-  DigitalGreenCertificate decodeRaw(final byte[] cwt) throws HCertSchemaException, SignatureException, CertificateExpiredException, IOException;
+  DigitalGreenCertificate decodeRaw(final byte[] cwt) throws DGCSchemaException, SignatureException, CertificateExpiredException, IOException;
 
   /**
    * Decodes a "raw" HCERT (i.e., a signed CWT holding the HCERT) into the binary CBOR representation of the HCERT.

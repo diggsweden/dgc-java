@@ -3,7 +3,7 @@
  *
  * Copyright 2021 Myndigheten för digital förvaltning (DIGG)
  */
-package se.digg.hcert.eu_hcert.v1;
+package se.digg.dgc.payload.v1;
 
 import java.io.IOException;
 
@@ -42,15 +42,15 @@ public class MapperUtils {
    * @param dgc
    *          the HCERT/DGC payload to encode
    * @return the CBOR encoding
-   * @throws HCertSchemaException
+   * @throws DGCSchemaException
    *           for encoding errors
    */
-  public static byte[] toCBOREncoding(final DigitalGreenCertificate dgc) throws HCertSchemaException {
+  public static byte[] toCBOREncoding(final DigitalGreenCertificate dgc) throws DGCSchemaException {
     try {
       return cborMapper.writeValueAsBytes(dgc);
     }
     catch (final JsonProcessingException e) {
-      throw new HCertSchemaException("Failed to serialize to CBOR", e);
+      throw new DGCSchemaException("Failed to serialize to CBOR", e);
     }
   }
 
@@ -63,15 +63,15 @@ public class MapperUtils {
    * @param dgc
    *          the HCERT/DGC payload to encode
    * @return JSON string
-   * @throws HCertSchemaException
+   * @throws DGCSchemaException
    *           fort encoding errors
    */
-  public static String toJSONString(final DigitalGreenCertificate dgc) throws HCertSchemaException {
+  public static String toJSONString(final DigitalGreenCertificate dgc) throws DGCSchemaException {
     try {
       return jsonMapper.writeValueAsString(dgc);
     }
     catch (final JsonProcessingException e) {
-      throw new HCertSchemaException("Failed to serialize to JSON", e);
+      throw new DGCSchemaException("Failed to serialize to JSON", e);
     }
   }
 
@@ -81,15 +81,15 @@ public class MapperUtils {
    * @param cbor
    *          the CBOR encoding
    * @return a DigitalGreenCertificate
-   * @throws HCertSchemaException
+   * @throws DGCSchemaException
    *           for decoding errors
    */
-  public static DigitalGreenCertificate toDigitalGreenCertificate(final byte[] cbor) throws HCertSchemaException {
+  public static DigitalGreenCertificate toDigitalGreenCertificate(final byte[] cbor) throws DGCSchemaException {
     try {
       return cborMapper.readValue(cbor, DigitalGreenCertificate.class);
     }
     catch (final IOException e) {
-      throw new HCertSchemaException("Failed to decode HCERT from CBOR encoding", e);
+      throw new DGCSchemaException("Failed to decode HCERT from CBOR encoding", e);
     }
   }
 
@@ -99,15 +99,15 @@ public class MapperUtils {
    * @param json
    *          the JSON representation
    * @return a DigitalGreenCertificate
-   * @throws HCertSchemaException
+   * @throws DGCSchemaException
    *           for decoding errors
    */
-  public static DigitalGreenCertificate toDigitalGreenCertificate(final String json) throws HCertSchemaException {
+  public static DigitalGreenCertificate toDigitalGreenCertificate(final String json) throws DGCSchemaException {
     try {
       return jsonMapper.readValue(json, DigitalGreenCertificate.class);
     }
     catch (final IOException e) {
-      throw new HCertSchemaException("Failed to decode HCERT from JSON", e);
+      throw new DGCSchemaException("Failed to decode HCERT from JSON", e);
     }
   }
 

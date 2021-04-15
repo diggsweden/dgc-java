@@ -14,15 +14,15 @@ import java.util.Optional;
 import com.upokecenter.cbor.CBORException;
 
 import lombok.extern.slf4j.Slf4j;
+import se.digg.dgc.payload.v1.DGCSchemaException;
+import se.digg.dgc.payload.v1.DigitalGreenCertificate;
+import se.digg.dgc.payload.v1.MapperUtils;
 import se.digg.hcert.encoding.Barcode;
 import se.digg.hcert.encoding.BarcodeCreator;
 import se.digg.hcert.encoding.BarcodeException;
 import se.digg.hcert.encoding.Base45;
 import se.digg.hcert.encoding.Zlib;
 import se.digg.hcert.encoding.impl.DefaultBarcodeCreator;
-import se.digg.hcert.eu_hcert.v1.DigitalGreenCertificate;
-import se.digg.hcert.eu_hcert.v1.HCertSchemaException;
-import se.digg.hcert.eu_hcert.v1.MapperUtils;
 import se.digg.hcert.service.HCertEncoder;
 import se.digg.hcert.signatures.HCertSigner;
 
@@ -69,7 +69,7 @@ public class DefaultHCertEncoder implements HCertEncoder {
   /** {@inheritDoc} */
   @Override
   public Barcode encode(final DigitalGreenCertificate dgc, final Instant expiration)
-      throws HCertSchemaException, IOException, SignatureException, BarcodeException {
+      throws DGCSchemaException, IOException, SignatureException, BarcodeException {
 
     // Get the raw encoding of the signed HCERT ...
     //
@@ -97,7 +97,7 @@ public class DefaultHCertEncoder implements HCertEncoder {
   /** {@inheritDoc} */
   @Override
   public byte[] encodeRaw(final DigitalGreenCertificate dgc, final Instant expiration) 
-      throws HCertSchemaException, IOException, SignatureException {
+      throws DGCSchemaException, IOException, SignatureException {
     
     // Transform the HCERT payload into its CBOR encoding ...
     final byte[] cborProof = MapperUtils.toCBOREncoding(dgc);

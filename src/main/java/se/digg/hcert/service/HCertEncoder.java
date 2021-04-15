@@ -9,10 +9,10 @@ import java.io.IOException;
 import java.security.SignatureException;
 import java.time.Instant;
 
+import se.digg.dgc.payload.v1.DGCSchemaException;
+import se.digg.dgc.payload.v1.DigitalGreenCertificate;
 import se.digg.hcert.encoding.Barcode;
 import se.digg.hcert.encoding.BarcodeException;
-import se.digg.hcert.eu_hcert.v1.DigitalGreenCertificate;
-import se.digg.hcert.eu_hcert.v1.HCertSchemaException;
 
 /**
  * Service for creating HCERT:s/Digital Green Certificates.
@@ -31,7 +31,7 @@ public interface HCertEncoder {
    * @param expiration
    *          the expiration of the HCERT
    * @return a barcode containing the signed HCERT
-   * @throws HCertSchemaException
+   * @throws DGCSchemaException
    *           for HCERT schema errors
    * @throws IOException
    *           for errors encoding data, for example CBOR related errors
@@ -41,7 +41,7 @@ public interface HCertEncoder {
    *           errors creating the barcode
    */
   Barcode encode(final DigitalGreenCertificate dgc, final Instant expiration)
-      throws HCertSchemaException, IOException, SignatureException, BarcodeException;
+      throws DGCSchemaException, IOException, SignatureException, BarcodeException;
 
   /**
    * Based on the HCERT payload (in its CBOR encoding) and a expiration time, the method creates a HCERT/DGC and
@@ -74,14 +74,14 @@ public interface HCertEncoder {
    * @param expiration
    *          the expiration of the HCERT
    * @return the CBOR encoding of the signed HCERT
-   * @throws HCertSchemaException
+   * @throws DGCSchemaException
    *           for HCERT schema errors
    * @throws IOException
    *           for errors encoding data, for example CBOR related errors
    * @throws SignatureException
    *           errors concerning signing the HCERT
    */
-  byte[] encodeRaw(final DigitalGreenCertificate dgc, final Instant expiration) throws HCertSchemaException, IOException, SignatureException;
+  byte[] encodeRaw(final DigitalGreenCertificate dgc, final Instant expiration) throws DGCSchemaException, IOException, SignatureException;
 
   /**
    * Performs a "raw" encode of the supplied HCERT payload meaning that the method creates a signed CWT holding the

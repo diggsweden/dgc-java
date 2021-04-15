@@ -3,7 +3,7 @@
  *
  * Copyright 2021 Myndigheten för digital förvaltning (DIGG)
  */
-package se.digg.hcert.eu_hcert.v1;
+package se.digg.dgc.payload.v1;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -53,6 +53,9 @@ public class MapperUtilsTest {
   
   /**
    * Tests where we make sure that {@link Instant} works for date-time.
+   * 
+   * <p>Note important anymore since we represent date-times using seconds since epoch.</p>
+   * 
    * @throws Exception for test errors
    */
   @Test
@@ -61,7 +64,7 @@ public class MapperUtilsTest {
     final String dateTime = "2021-04-14T14:17:50.525450Z";
     
     // Encode 
-    final Tst tst = new Tst();
+    final Tst2 tst = new Tst2();
     tst.setTna("Acme");
     tst.setDtr(Instant.parse(dateTime));
     final byte[] cbor = MapperUtils.getCBORMapper().writeValueAsBytes(tst);
@@ -83,7 +86,7 @@ public class MapperUtilsTest {
     Assert.assertEquals(dateTime, dateObject.AsString());
     
     // Decode
-    final Tst tst2 = MapperUtils.getCBORMapper().readValue(cbor, Tst.class);
+    final Tst2 tst2 = MapperUtils.getCBORMapper().readValue(cbor, Tst2.class);
     Assert.assertEquals(dateTime, tst2.getDtr().toString());
   }
   
@@ -104,7 +107,7 @@ public class MapperUtilsTest {
     Assert.assertEquals(dateTime, dtrObject.AsString());
     
     // Decode using FasterXML
-    final Tst tst = MapperUtils.getCBORMapper().readValue(object.EncodeToBytes(), Tst.class);
+    final Tst2 tst = MapperUtils.getCBORMapper().readValue(object.EncodeToBytes(), Tst2.class);
     Assert.assertEquals(dateTime, tst.getDtr().toString());
   }
   
@@ -126,9 +129,27 @@ public class MapperUtilsTest {
     Assert.assertEquals(seconds, dtrObject2.AsInt32Value());
     
     // Decode using FasterXML
-    final Tst tst = MapperUtils.getCBORMapper().readValue(object.EncodeToBytes(), Tst.class);
+    final Tst2 tst = MapperUtils.getCBORMapper().readValue(object.EncodeToBytes(), Tst2.class);
     Assert.assertEquals((long) seconds, tst.getDtr().getEpochSecond());
-  }  
+  }
+  
+  public static class Tst2 {
+    private Instant dtr;
+    private String tna;
+    
+    public Instant getDtr() {
+      return this.dtr;
+    }
+    public void setDtr(final Instant dtr) {
+      this.dtr = dtr;
+    }
+    public String getTna() {
+      return this.tna;
+    }
+    public void setTna(final String tna) {
+      this.tna = tna;
+    }
+  }
   
 
 }
