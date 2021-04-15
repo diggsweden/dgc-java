@@ -10,12 +10,15 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.Provider;
 import java.security.PublicKey;
+import java.security.Security;
 import java.security.Signature;
 import java.security.SignatureException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Optional;
 
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+
+import com.nimbusds.jose.JOSEException;
+import com.nimbusds.jose.crypto.impl.ECDSA;
 import com.upokecenter.cbor.CBORException;
 import com.upokecenter.cbor.CBORObject;
 import com.upokecenter.cbor.CBORType;
@@ -57,6 +60,11 @@ public class CoseSign1_Object {
 
   /** The COSE_Sign1 context string. */
   private static final String contextString = "Signature1";
+    
+  static {
+    // Make sure Bouncy Castle is present - needed for SHAxxxwithRSA/PSS support.
+    ensureBouncyCastlePresent();
+  }
 
   /**
    * Default constructor.
@@ -256,19 +264,19 @@ public class CoseSign1_Object {
       // For ECDSA, process the signature according to section 8.1 of RFC8152.
       //
       if (algorithm == SignatureAlgorithm.ES256) {
-        this.signature = convertFromDer(result, 32);
+        this.signature = ECDSA.transcodeSignatureToConcat(result, 32 * 2);
       }
       else if (algorithm == SignatureAlgorithm.ES384) {
-        this.signature = convertFromDer(result, 48);
+        this.signature = ECDSA.transcodeSignatureToConcat(result, 48 * 2);
       }
       else if (algorithm == SignatureAlgorithm.ES512) {
-        this.signature = convertFromDer(result, 66);
+        this.signature = ECDSA.transcodeSignatureToConcat(result, 66 * 2);
       }
       else {
         this.signature = result;
       }
     }
-    catch (NoSuchAlgorithmException | InvalidKeyException e) {
+    catch (NoSuchAlgorithmException | InvalidKeyException | JOSEException e) {
       throw new SignatureException("Failed to sign - " + e.getMessage(), e);
     }
   }
@@ -342,15 +350,16 @@ public class CoseSign1_Object {
 
     byte[] signatureToVerify = this.signature;
 
-    // For ECDSA, convert the signature according to section 8.1 of RFC8152.
-    //
-    if (algorithm == SignatureAlgorithm.ES256
-        || algorithm == SignatureAlgorithm.ES384
-        || algorithm == SignatureAlgorithm.ES512) {
-
-      signatureToVerify = convertToDer(this.signature);
-    }
     try {
+      // For ECDSA, convert the signature according to section 8.1 of RFC8152.
+      //
+      if (algorithm == SignatureAlgorithm.ES256
+          || algorithm == SignatureAlgorithm.ES384
+          || algorithm == SignatureAlgorithm.ES512) {
+
+        signatureToVerify = ECDSA.transcodeSignatureToDER(this.signature);
+      }
+
       final Signature verifier = Signature.getInstance(algorithm.getJcaAlgorithmName());
       verifier.initVerify(publicKey);
       verifier.update(signedData);
@@ -359,7 +368,7 @@ public class CoseSign1_Object {
         throw new SignatureException("Signature did not verify correctly");
       }
     }
-    catch (NoSuchAlgorithmException | InvalidKeyException e) {
+    catch (NoSuchAlgorithmException | InvalidKeyException | JOSEException e) {
       throw new SignatureException("Failed to verify signature - " + e.getMessage(), e);
     }
   }
@@ -447,79 +456,13 @@ public class CoseSign1_Object {
   }
 
   /**
-   * Given a ECDSA signature created using a Java security provider the method converts the result into the format given
-   * in section 8.1 in RFC8152.
-   * 
-   * @param derEncodedSignature
-   *          the signature
-   * @param signatureLength
-   *          the signature length
-   * @return a concatenated signature according to RFC8152
-   * @throws SignatureException
-   *           for errors
+   * Ensures that the Bouncy Castle security provider is installed, and if not, installs it. This provider is needed to
+   * handle {@link SignatureAlgorithm#PS256}, {@link SignatureAlgorithm#PS384} and {@link SignatureAlgorithm#PS512}.
    */
-  private static byte[] convertFromDer(final byte[] derEncodedSignature, final int signatureLength) throws SignatureException {
-
-    final byte[] result = new byte[signatureLength * 2];
-
-    // SEQUENCE is "R + S"
-    int kLen = 4;
-    if (derEncodedSignature[0] != 0x30) {
-      throw new SignatureException("Unexpected ECDSA signature");
+  private static void ensureBouncyCastlePresent() {
+    if (Security.getProvider(BouncyCastleProvider.PROVIDER_NAME) == null) {
+      Security.addProvider(new BouncyCastleProvider());
     }
-    if ((derEncodedSignature[1] & 0x80) != 0) {
-      // Offset actually 4 + (7-bits of byte 1)
-      kLen = 4 + (derEncodedSignature[1] & 0x7f);
-    }
-
-    // Calculate start/end of R.
-    int rOff = kLen;
-    int rLen = derEncodedSignature[rOff - 1];
-    int rPad = 0;
-    if (rLen > signatureLength) {
-      rOff += (rLen - signatureLength);
-      rLen = signatureLength;
-    }
-    else {
-      rPad = (signatureLength - rLen);
-    }
-    // copy R
-    System.arraycopy(derEncodedSignature, rOff, result, rPad, rLen);
-
-    // Calculate start/end of S.
-    int sOff = rOff + rLen + 2;
-    int sLen = derEncodedSignature[sOff - 1];
-    int sPad = 0;
-    if (sLen > signatureLength) {
-      sOff += (sLen - signatureLength);
-      sLen = signatureLength;
-    }
-    else {
-      sPad = (signatureLength - sLen);
-    }
-    // Copy S.
-    System.arraycopy(derEncodedSignature, sOff, result, signatureLength + sPad, sLen);
-
-    return result;
-  }
-
-  /**
-   * Given a signature according to section 8.1 in RFC8152 its corresponding DER encoding is returned.
-   * 
-   * @param rsConcat
-   *          the ECDSA signature
-   * @return DER-encoded signature
-   */
-  private static byte[] convertToDer(final byte[] rsConcat) {
-    final int len = rsConcat.length / 2;
-    final byte[] r = Arrays.copyOfRange(rsConcat, 0, len);
-    final byte[] s = Arrays.copyOfRange(rsConcat, len, rsConcat.length);
-
-    final ArrayList<byte[]> seq = new ArrayList<>();
-    seq.add(ASN1.toUnsignedInteger(r));
-    seq.add(ASN1.toUnsignedInteger(s));
-
-    return ASN1.toSequence(seq);
   }
 
   /**
