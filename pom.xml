@@ -3,9 +3,9 @@
 
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>se.digg.hcert</groupId>
-  <artifactId>hcert-create-validate</artifactId>
-  <version>1.0.0-SNAPSHOT</version>
+  <groupId>se.digg.dgc</groupId>
+  <artifactId>dgc-create-validate</artifactId>
+  <version>0.9.0-SNAPSHOT</version>
 
   <name>DIGG :: Digital Green Certificate :: Issuance and Validation</name>
   <description>Issuance and validation of Digital Green Certificate</description>
