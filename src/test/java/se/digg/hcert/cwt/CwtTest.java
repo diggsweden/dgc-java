@@ -5,10 +5,13 @@
  */
 package se.digg.hcert.cwt;
 
+import java.time.Duration;
 import java.time.Instant;
 
 import org.junit.Assert;
 import org.junit.Test;
+
+import com.upokecenter.cbor.CBORObject;
 
 import se.digg.hcert.signatures.cwt.Cwt;
 
@@ -27,17 +30,22 @@ public class CwtTest {
     final Instant now = Instant.now(); 
     final long seconds = now.getEpochSecond();
     
+    final CBORObject object = CBORObject.FromObject("value");
+    
     Cwt cwt = Cwt.builder()
       .issuer("Kalle")
       .issuedAt(now)
-      .claim(99, "value".getBytes())
+      .expiration(now.plus(Duration.ofDays(30)))
+      .claim("98", object.EncodeToBytes())
+      .claim(99, object)
       .build();
     
     Cwt cwt2 = Cwt.decode(cwt.encode());
     
     Assert.assertEquals("Kalle", cwt2.getIssuer());
     Assert.assertEquals(seconds, cwt2.getIssuedAt().getEpochSecond());
-    Assert.assertArrayEquals("value".getBytes(), cwt2.getClaim(99)); 
+    Assert.assertEquals("value", cwt2.getClaim("98").AsString());
+    Assert.assertEquals("value", cwt2.getClaim(99).AsString());
   }
   
 }

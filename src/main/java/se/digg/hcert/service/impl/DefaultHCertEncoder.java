@@ -11,9 +11,6 @@ import java.security.SignatureException;
 import java.time.Instant;
 import java.util.Optional;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.cbor.databind.CBORMapper;
 import com.upokecenter.cbor.CBORException;
 
 import lombok.extern.slf4j.Slf4j;
@@ -23,9 +20,10 @@ import se.digg.hcert.encoding.BarcodeException;
 import se.digg.hcert.encoding.Base45;
 import se.digg.hcert.encoding.Zlib;
 import se.digg.hcert.encoding.impl.DefaultBarcodeCreator;
-import se.digg.hcert.eu_hcert.v1.VaccinationProof;
+import se.digg.hcert.eu_hcert.v1.DigitalGreenCertificate;
+import se.digg.hcert.eu_hcert.v1.HCertSchemaException;
+import se.digg.hcert.eu_hcert.v1.MapperUtils;
 import se.digg.hcert.service.HCertEncoder;
-import se.digg.hcert.service.HCertSchemaException;
 import se.digg.hcert.signatures.HCertSigner;
 
 /**
@@ -70,12 +68,12 @@ public class DefaultHCertEncoder implements HCertEncoder {
 
   /** {@inheritDoc} */
   @Override
-  public Barcode encode(final VaccinationProof proof, final Instant expiration) 
+  public Barcode encode(final DigitalGreenCertificate dgc, final Instant expiration)
       throws HCertSchemaException, IOException, SignatureException, BarcodeException {
 
     // Get the raw encoding of the signed HCERT ...
     //
-    byte[] hcert = this.encodeRaw(proof, expiration);
+    byte[] hcert = this.encodeRaw(dgc, expiration);
 
     // Compression and Base45 encoding ...
     //
@@ -98,20 +96,13 @@ public class DefaultHCertEncoder implements HCertEncoder {
 
   /** {@inheritDoc} */
   @Override
-  public byte[] encodeRaw(final VaccinationProof proof, final Instant expiration) throws HCertSchemaException, IOException, SignatureException {
-    try {
-      // Transform the HCERT payload into its CBOR encoding ...
-      //
-      final ObjectMapper cborMapper = new CBORMapper();
-      final byte[] cborProof = cborMapper.writeValueAsBytes(proof);
+  public byte[] encodeRaw(final DigitalGreenCertificate dgc, final Instant expiration) 
+      throws HCertSchemaException, IOException, SignatureException {
+    
+    // Transform the HCERT payload into its CBOR encoding ...
+    final byte[] cborProof = MapperUtils.toCBOREncoding(dgc);
 
-      return this.encodeRaw(cborProof, expiration);
-    }
-    catch (final JsonProcessingException e) {
-      final String msg = String.format("Failed to transform HCERT payload into CBOR - %s", e.getMessage());
-      log.info("{}", msg, e);
-      throw new HCertSchemaException(msg, e);
-    }
+    return this.encodeRaw(cborProof, expiration);
   }
 
   /** {@inheritDoc} */

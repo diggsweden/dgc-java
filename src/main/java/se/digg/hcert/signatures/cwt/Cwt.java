@@ -28,9 +28,11 @@ import se.digg.hcert.signatures.cwt.support.CBORInstantConverter;
  */
 public class Cwt {
 
-  /** HCERT message tag. */
-  //public static final int HCERT_CLAIM_KEY = -65537;
+  /** HCERT message tag. */  
   public static final int HCERT_CLAIM_KEY = -260;
+  
+  // TODO: remove after interop-tests ...
+  public static final int OLD_HCERT_CLAIM_KEY = -65537;
 
   /** The message tag for eu_hcert_v1 that is added under the HCERT claim. */
   public static final int EU_HCERT_V1_MESSAGE_TAG = 1;
@@ -261,25 +263,25 @@ public class Cwt {
    * Adds the binary representation of a EU HCERT v1 structure.
    * 
    * @param hcert
-   *          the binary representation of a EU HCERT
+   *          the CBOR encoding of a EU HCERT
    */
   public void setHcertV1(final byte[] hcert) {
     final CBORObject m = CBORObject.NewMap();
-    m.set(EU_HCERT_V1_MESSAGE_TAG, CBORObject.FromObject(hcert));
+    m.set(EU_HCERT_V1_MESSAGE_TAG, CBORObject.DecodeFromBytes(hcert));
     this.cwtObject.set(HCERT_CLAIM_KEY, m);
   }
 
   /**
    * Gets the binary representation of a EU HCERT v1 structure.
    * 
-   * @return the binary representation of a EU HCERT or null
+   * @return the CBOR encoding of a EU HCERT or null
    */
   public byte[] getHcertv1() {
-    final CBORObject hcert = this.cwtObject.get(HCERT_CLAIM_KEY);
+    CBORObject hcert = this.cwtObject.get(HCERT_CLAIM_KEY);
     if (hcert == null) {
-      return null;
+      hcert = this.cwtObject.get(OLD_HCERT_CLAIM_KEY);
     }
-    return Optional.ofNullable(hcert.get(EU_HCERT_V1_MESSAGE_TAG)).map(CBORObject::GetByteString).orElse(null);
+    return Optional.ofNullable(hcert.get(EU_HCERT_V1_MESSAGE_TAG)).map(CBORObject::EncodeToBytes).orElse(null);
   }
 
   /**
@@ -288,11 +290,35 @@ public class Cwt {
    * @param claimKey
    *          the claim key
    * @param value
-   *          the claim value (in its CBOR binary encoding)
+   *          the claim value (in its CBOR encoding)
    */
   public void setClaim(final int claimKey, final byte[] value) {
-    this.cwtObject.set(claimKey, CBORObject.FromObject(value));
+    this.cwtObject.set(claimKey, CBORObject.DecodeFromBytes(value));
   }
+  
+  /**
+   * Sets a claim identified by {@code claimKey}.
+   * 
+   * @param claimKey
+   *          the claim key
+   * @param value
+   *          the claim value
+   */
+  public void setClaim(final int claimKey, final CBORObject value) {
+    this.cwtObject.set(claimKey, value);
+  }
+  
+  /**
+   * Sets a claim identified by {@code claimKey}.
+   * 
+   * @param claimKey
+   *          the claim key
+   * @param value
+   *          the claim value (in its CBOR encoding)
+   */
+  public void setClaim(final String claimKey, final byte[] value) {
+    this.cwtObject.set(claimKey, CBORObject.DecodeFromBytes(value));
+  }  
 
   /**
    * Sets a claim identified by {@code claimKey}.
@@ -300,10 +326,21 @@ public class Cwt {
    * @param claimKey
    *          the claim key
    * @param value
-   *          the claim value (in its CBOR binary encoding)
+   *          the claim value
    */
-  public void setClaim(final String claimKey, final byte[] value) {
-    this.cwtObject.set(claimKey, CBORObject.FromObject(value));
+  public void setClaim(final String claimKey, final CBORObject value) {
+    this.cwtObject.set(claimKey, value);
+  }  
+
+  /**
+   * Gets the claim identified by {@code claimKey}.
+   * 
+   * @param claimKey
+   *          the claim key
+   * @return the claim value as a CBORObject, or null
+   */
+  public CBORObject getClaim(final int claimKey) {
+    return this.cwtObject.get(claimKey);
   }
 
   /**
@@ -311,21 +348,10 @@ public class Cwt {
    * 
    * @param claimKey
    *          the claim key
-   * @return the claim value (in its CBOR binary encoding), or null
+   * @return the claim value as a CBORObject, or null
    */
-  public byte[] getClaim(final int claimKey) {
-    return Optional.ofNullable(this.cwtObject.get(claimKey)).map(CBORObject::GetByteString).orElse(null);
-  }
-
-  /**
-   * Gets the claim identified by {@code claimKey}.
-   * 
-   * @param claimKey
-   *          the claim key
-   * @return the claim value (in its CBOR binary encoding), or null
-   */
-  public byte[] getClaim(final String claimKey) {
-    return Optional.ofNullable(this.cwtObject.get(claimKey)).map(CBORObject::GetByteString).orElse(null);
+  public CBORObject getClaim(final String claimKey) {    
+    return this.cwtObject.get(claimKey);
   }
 
   /** {@inheritDoc} */
@@ -454,7 +480,7 @@ public class Cwt {
      * Sets the binary representation of a EU HCERT v1 structure.
      * 
      * @param hcert
-     *          the binary representation of a EU HCERT
+     *          the CBOR encoded HCERT
      * @return the builder
      */
     public CwtBuilder hcertV1(final byte[] hcert) {
@@ -468,13 +494,27 @@ public class Cwt {
      * @param claimKey
      *          the claim key
      * @param value
-     *          the claim value (in its CBOR binary encoding)
+     *          the claim value (in its CBOR encoding)
      * @return the builder
      */
     public CwtBuilder claim(final int claimKey, final byte[] value) {
       this.cwt.setClaim(claimKey, value);
       return this;
     }
+    
+    /**
+     * Sets a claim identified by {@code claimKey}.
+     * 
+     * @param claimKey
+     *          the claim key
+     * @param value
+     *          the claim value
+     * @return the builder
+     */
+    public CwtBuilder claim(final int claimKey, final CBORObject value) {
+      this.cwt.setClaim(claimKey, value);
+      return this;
+    }    
 
     /**
      * Sets a claim identified by {@code claimKey}.
@@ -482,13 +522,27 @@ public class Cwt {
      * @param claimKey
      *          the claim key
      * @param value
-     *          the claim value (in its CBOR binary encoding)
+     *          the claim value (in its CBOR encoding)
      * @return the builder
      */
     public CwtBuilder claim(final String claimKey, final byte[] value) {
       this.cwt.setClaim(claimKey, value);
       return this;
     }
+    
+    /**
+     * Sets a claim identified by {@code claimKey}.
+     * 
+     * @param claimKey
+     *          the claim key
+     * @param value
+     *          the claim value
+     * @return the builder
+     */
+    public CwtBuilder claim(final String claimKey, final CBORObject value) {
+      this.cwt.setClaim(claimKey, value);
+      return this;
+    }    
 
   }
 

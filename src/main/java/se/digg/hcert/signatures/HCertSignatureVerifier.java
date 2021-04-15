@@ -125,7 +125,8 @@ public interface HCertSignatureVerifier {
      */
     public Instant getExpires() {
       return this.expires;
-    }
+    }    
+    
   }
 
 }

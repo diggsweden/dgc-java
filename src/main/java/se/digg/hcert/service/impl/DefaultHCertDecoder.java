@@ -11,8 +11,6 @@ import java.security.cert.CertificateExpiredException;
 import java.util.Arrays;
 import java.util.Optional;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.cbor.databind.CBORMapper;
 import com.upokecenter.cbor.CBORException;
 
 import lombok.extern.slf4j.Slf4j;
@@ -20,9 +18,10 @@ import se.digg.hcert.encoding.BarcodeDecoder;
 import se.digg.hcert.encoding.BarcodeException;
 import se.digg.hcert.encoding.Zlib;
 import se.digg.hcert.encoding.impl.DefaultBarcodeDecoder;
-import se.digg.hcert.eu_hcert.v1.VaccinationProof;
+import se.digg.hcert.eu_hcert.v1.DigitalGreenCertificate;
+import se.digg.hcert.eu_hcert.v1.HCertSchemaException;
+import se.digg.hcert.eu_hcert.v1.MapperUtils;
 import se.digg.hcert.service.HCertDecoder;
-import se.digg.hcert.service.HCertSchemaException;
 import se.digg.hcert.signatures.CertificateProvider;
 import se.digg.hcert.signatures.HCertSignatureVerifier;
 import se.digg.hcert.signatures.impl.DefaultHCertSignatureVerifier;
@@ -57,10 +56,10 @@ public class DefaultHCertDecoder implements HCertDecoder {
 
   /** {@inheritDoc} */
   @Override
-  public VaccinationProof decode(final byte[] image)
+  public DigitalGreenCertificate decode(final byte[] image)
       throws HCertSchemaException, SignatureException, CertificateExpiredException, BarcodeException, IOException {
 
-    return this.toVaccinationProof(this.decodeToEncodedHcert(image));
+    return MapperUtils.toDigitalGreenCertificate(this.decodeToEncodedHcert(image));
   }
 
   /** {@inheritDoc} */
@@ -92,10 +91,10 @@ public class DefaultHCertDecoder implements HCertDecoder {
 
   /** {@inheritDoc} */
   @Override
-  public VaccinationProof decodeRaw(final byte[] cwt)
+  public DigitalGreenCertificate decodeRaw(final byte[] cwt)
       throws HCertSchemaException, SignatureException, CertificateExpiredException, IOException {
 
-    return this.toVaccinationProof(this.decodeRawToEncodedHcert(cwt));
+    return MapperUtils.toDigitalGreenCertificate(this.decodeRawToEncodedHcert(cwt));
   }
 
   /** {@inheritDoc} */
@@ -104,30 +103,13 @@ public class DefaultHCertDecoder implements HCertDecoder {
 
     try {
       final HCertSignatureVerifier.Result result = this.hcertSignatureVerifier.verify(cwt, this.certificateProvider);
+      
+      // TODO: Log
+      
       return result.getHcert();
     }
     catch (final CBORException e) {
       throw new IOException("CBOR error - " + e.getMessage(), e);
-    }
-  }
-
-  /**
-   * Reads the CBOR encoding into a {@code VaccinationProof} object.
-   * 
-   * @param cbor
-   *          the CBOR encoding
-   * @return the vaccination proof
-   * @throws HCertSchemaException
-   *           for schema errors
-   */
-  private VaccinationProof toVaccinationProof(final byte[] cbor) throws HCertSchemaException {
-    final ObjectMapper cborMapper = new CBORMapper();
-    try {
-      return cborMapper.readValue(cbor, VaccinationProof.class);
-    }
-    catch (final IOException e) {
-      throw new HCertSchemaException("Failed to read binary HCERT into schema generated class: "
-          + VaccinationProof.class.getSimpleName(), e);
     }
   }
 

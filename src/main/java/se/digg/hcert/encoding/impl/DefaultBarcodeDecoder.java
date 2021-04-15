@@ -72,8 +72,8 @@ public class DefaultBarcodeDecoder implements BarcodeDecoder {
 
   /** {@inheritDoc} */
   @Override
-  public String decodeToString(final byte[] barcode, final Charset characterSet) throws BarcodeException {
-    final byte[] bytes = this.decode(barcode);
+  public String decodeToString(final byte[] image, final Charset characterSet) throws BarcodeException {
+    final byte[] bytes = this.decode(image);
     return new String(bytes, characterSet != null ? characterSet : Charset.defaultCharset());
   }
 

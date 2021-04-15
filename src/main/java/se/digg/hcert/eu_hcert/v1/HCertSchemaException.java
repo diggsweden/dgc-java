@@ -3,7 +3,7 @@
  *
  * Copyright 2021 Myndigheten för digital förvaltning (DIGG)
  */
-package se.digg.hcert.service;
+package se.digg.hcert.eu_hcert.v1;
 
 /**
  * Exception for HCERT schema errors, i.e., if a HCERT encoding cannot be mapped into the Java classes for the HCERT schema.

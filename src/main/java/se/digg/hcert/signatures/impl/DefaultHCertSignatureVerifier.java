@@ -70,7 +70,12 @@ public class DefaultHCertSignatureVerifier implements HCertSignatureVerifier {
             log.warn("Signed HCERT did not contain an expiration time - assuming it is valid");
           }
           
-          return new HCertSignatureVerifier.Result(cwt.getHcertv1(), cert, country, cwt.getIssuedAt(), cwt.getExpiration());
+          final byte[] hcert = cwt.getHcertv1();
+          if (hcert == null) {
+            throw new SignatureException("No HCERT available in CWT");
+          }
+          
+          return new HCertSignatureVerifier.Result(hcert, cert, country, cwt.getIssuedAt(), cwt.getExpiration());
         }
         catch (CBORException | SignatureException e) {
           log.info("HCERT signature verification failed using certificate '{}' - {}",
