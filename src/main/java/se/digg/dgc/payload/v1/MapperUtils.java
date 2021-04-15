@@ -89,7 +89,7 @@ public class MapperUtils {
       return cborMapper.readValue(cbor, DigitalGreenCertificate.class);
     }
     catch (final IOException e) {
-      throw new DGCSchemaException("Failed to decode HCERT from CBOR encoding", e);
+      throw new DGCSchemaException("Failed to decode DGC from CBOR encoding", e);
     }
   }
 
@@ -107,7 +107,7 @@ public class MapperUtils {
       return jsonMapper.readValue(json, DigitalGreenCertificate.class);
     }
     catch (final IOException e) {
-      throw new DGCSchemaException("Failed to decode HCERT from JSON", e);
+      throw new DGCSchemaException("Failed to decode DGC from JSON", e);
     }
   }
 
