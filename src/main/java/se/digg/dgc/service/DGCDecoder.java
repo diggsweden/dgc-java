@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.security.SignatureException;
 import java.security.cert.CertificateExpiredException;
 
-import se.digg.dgc.encoding.BarcodeException;
 import se.digg.dgc.payload.v1.DGCSchemaException;
 import se.digg.dgc.payload.v1.DigitalGreenCertificate;
 
@@ -21,12 +20,12 @@ import se.digg.dgc.payload.v1.DigitalGreenCertificate;
  * @author Henric Norlander (extern.henric.norlander@digg.se)
  */
 public interface DGCDecoder {
-
+  
   /**
-   * Given a barcode image the method decodes, and verifies, the contents into its DGC payload.
+   * Given the base45-encoding of a signed DGC the method verifies and decodes it into the DGC payload representation. 
    * 
-   * @param image
-   *          the barcode image holding the signed DGC
+   * @param base45
+   *          the base45-encoding of the signed DGC (including the HCERT header)
    * @return the DGC payload
    * @throws DGCSchemaException
    *           for DGC schema errors
@@ -34,34 +33,28 @@ public interface DGCDecoder {
    *           for signature verification errors
    * @throws CertificateExpiredException
    *           if the DGC has expired
-   * @throws BarcodeException
-   *           for errors reading the barcode
    * @throws IOException
    *           for errors decoding data, for example CBOR related errors
    * @see #decodeBarcodeToBytes(byte[])
    */
-  DigitalGreenCertificate decodeBarcode(final byte[] image)
-      throws DGCSchemaException, SignatureException, CertificateExpiredException, BarcodeException, IOException;
+  DigitalGreenCertificate decode(final String base45)
+      throws DGCSchemaException, SignatureException, CertificateExpiredException, IOException;
 
   /**
-   * Given a barcode image the method decodes, and verifies, the contents into the binary CBOR representation of the
-   * DGC.
+   * Given the base45-encoding of a signed DGC the method verifies and decodes it into the CBOR encoding of the DGC payload.
    * 
-   * @param image
-   *          the barcode image holding the signed DGC
-   * @return the DGC payload in its CBOR representation
+   * @param base45
+   *          the base45-encoding of the signed DGC (including the HCERT header)
+   * @return the CBOR encoding of the DGC payload
    * @throws SignatureException
    *           for signature verification errors
    * @throws CertificateExpiredException
    *           if the DGC has expired
-   * @throws BarcodeException
-   *           for errors reading the barcode
    * @throws IOException
    *           for errors decoding data, for example CBOR related errors
    * @see #decodeBarcode(byte[])
    */
-  byte[] decodeBarcodeToBytes(final byte[] image)
-      throws SignatureException, CertificateExpiredException, BarcodeException, IOException;
+  byte[] decodeToBytes(final String base45) throws SignatureException, CertificateExpiredException, IOException;
 
   /**
    * Verifies a "raw" DGC (i.e., a signed CWT holding the DGC payload) and decodes it to the actual DGC payload.
