@@ -92,16 +92,16 @@
     <dependency>
       <groupId>com.google.zxing</groupId>
       <artifactId>core</artifactId>
-      <version>${zxing.version}</version>
+      <version>[${zxing.version},)</version>
       <optional>true</optional>
     </dependency>
     
     <dependency>
       <groupId>com.google.zxing</groupId>
       <artifactId>javase</artifactId>
-      <version>${zxing.version}</version>
+      <version>[${zxing.version},)</version>
       <optional>true</optional>
-    </dependency>    
+    </dependency>
 
     <!-- Security -->
     <dependency>
