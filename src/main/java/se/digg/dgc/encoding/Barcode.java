@@ -24,7 +24,7 @@ public class Barcode {
   private final ImageFormat imageFormat;
 
   /** The byte array representing the barcode image according to the selected image format. */
-  private final byte[] code;
+  private final byte[] image;
 
   /** The width of the barcode in pixels. */
   private final int width;
@@ -37,7 +37,7 @@ public class Barcode {
    * 
    * @param type
    *          the type of barcode
-   * @param code
+   * @param image
    *          byte array representing the barcode image according to the selected image format
    * @param imageFormat
    *          the image format of the code
@@ -46,9 +46,9 @@ public class Barcode {
    * @param height
    *          the height in pixels
    */
-  public Barcode(final BarcodeType type, final byte[] code, final ImageFormat imageFormat, final int width, final int height) {
+  public Barcode(final BarcodeType type, final byte[] image, final ImageFormat imageFormat, final int width, final int height) {
     this.type = Optional.ofNullable(type).orElseThrow(() -> new IllegalArgumentException("type must not be null"));
-    this.code = Optional.ofNullable(code)
+    this.image = Optional.ofNullable(image)
       .filter(c -> c.length > 0)
       .orElseThrow(() -> new IllegalArgumentException("code must not be null or empty"));
     this.imageFormat = Optional.ofNullable(imageFormat).orElseThrow(() -> new IllegalArgumentException("imageFormat must not be null"));
@@ -86,8 +86,8 @@ public class Barcode {
    * 
    * @return the image contents representing the barcode
    */
-  public byte[] getCode() {
-    return this.code;
+  public byte[] getImage() {
+    return this.image;
   }
 
   /**
@@ -137,7 +137,7 @@ public class Barcode {
    */
   public String toBase64Image() {
     return String.format("data:image/%s;base64, %s",
-      this.imageFormat.getName().toLowerCase(), Base64.getEncoder().encodeToString(this.code));
+      this.imageFormat.getName().toLowerCase(), Base64.getEncoder().encodeToString(this.image));
   }
 
   /** {@inheritDoc} */
@@ -145,7 +145,7 @@ public class Barcode {
   public String toString() {
     return String.format("%s barcode in %s format (%d x %d) - %s",
       this.type, this.imageFormat.getName(), this.width, this.height,
-      Base64.getEncoder().encodeToString(this.code));
+      Base64.getEncoder().encodeToString(this.image));
   }
 
   /**

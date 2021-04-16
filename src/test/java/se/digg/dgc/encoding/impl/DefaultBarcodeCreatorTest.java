@@ -36,7 +36,7 @@ public class DefaultBarcodeCreatorTest {
     final DefaultBarcodeDecoder decoder = new DefaultBarcodeDecoder();
     
     //final String value = decoder.decodeToString(barcode.getCode(), StandardCharsets.US_ASCII.name());
-    final String value = decoder.decodeToString(barcode.getCode(), StandardCharsets.UTF_8);
+    final String value = decoder.decodeToString(barcode.getImage(), StandardCharsets.UTF_8);
     
     Assert.assertEquals("LINDSTRÖM", value);
   }
