@@ -2,6 +2,8 @@
 
 # dgc-java
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 An implementation in Java for creating and validating a Digital Green Certificate.
 
 ---
@@ -67,6 +69,10 @@ The **dgc-create-validate** library offers a barcode (QR) implementation using t
 ```
 
 > At least version 3.4.1 of the ZXing libraries are required.
+
+## Acknowledgements
+
+* A special thank you to [Peter Occil](https://github.com/peteroupc) for his excellent work on the CBOR library for Java - https://github.com/peteroupc/CBOR-Java.
 
 -----
 
