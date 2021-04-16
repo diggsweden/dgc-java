@@ -31,6 +31,17 @@
       <email>extern.henric.norlander@digg.se</email>
     </developer>
   </developers>
+  
+  <distributionManagement>
+    <snapshotRepository>
+      <id>ossrh</id>
+      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+    </snapshotRepository>
+    <repository>
+      <id>ossrh</id>
+      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+    </repository>
+  </distributionManagement>  
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -225,5 +236,104 @@
     </plugins>
 
   </build>
+  
+  <profiles>
+
+    <profile>
+      <id>release</id>
+
+      <!-- See http://central.sonatype.org/pages/apache-maven.html for setup -->
+
+      <build>
+        <plugins>
+
+          <plugin>
+            <groupId>org.sonatype.plugins</groupId>
+            <artifactId>nexus-staging-maven-plugin</artifactId>
+            <version>1.6.7</version>
+            <extensions>true</extensions>
+            <configuration>
+              <serverId>ossrh</serverId>
+              <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+              <autoReleaseAfterClose>false</autoReleaseAfterClose>
+              <!-- 
+                Allows manual inspection of the staging repo before deploying it to the central repo. 
+                Use 'mvn nexus-staging:release -Prelease' to release and 
+                'mvn nexus-staging:drop' to abort. 
+              -->
+            </configuration>
+          </plugin>
+
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-gpg-plugin</artifactId>
+            <version>1.6</version>
+            <executions>
+              <execution>
+                <id>sign-artifacts</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>sign</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-source-plugin</artifactId>
+            <version>3.2.0</version>
+            <executions>
+              <execution>
+                <id>attach-sources</id>
+                <goals>
+                  <goal>jar-no-fork</goal>
+                </goals>
+              </execution>
+              <execution>
+                <id>attach-test-sources</id>
+                <goals>
+                  <goal>test-jar-no-fork</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-javadoc-plugin</artifactId>
+            <version>3.2.0</version>
+            <executions>
+              <execution>
+                <id>attach-javadoc</id>
+                <goals>
+                  <goal>jar</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <doctitle>Digital Green Certificate - Issuance and Validation - ${project.version}</doctitle>
+              <windowtitle>Digital Green Certificate - Issuance and Validation - ${project.version}</windowtitle>
+              <detectJavaApiLink>true</detectJavaApiLink>
+              <additionalparam>-Xdoclint:all -Xdoclint:-missing</additionalparam>
+              <additionalOptions>-Xdoclint:all -Xdoclint:-missing</additionalOptions>
+              <additionalJOptions>
+                <additionalJOption>-Xdoclint:all</additionalJOption>
+                <additionalJOption>-Xdoclint:-missing</additionalJOption>
+              </additionalJOptions>
+              <links>
+                <link>https://docs.spring.io/spring-framework/docs/current/javadoc-api/</link>
+                <link>https://docs.swedenconnect.se/credentials-support/apidoc/</link>
+                <link>https://zxing.github.io/zxing/apidocs/</link>
+              </links>
+            </configuration>
+          </plugin>
+
+        </plugins>
+      </build>
+
+    </profile>
+
+  </profiles>  
 
 </project>
