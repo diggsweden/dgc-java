@@ -72,7 +72,7 @@ The **dgc-create-validate** library offers a barcode (QR) implementation using t
 
 ## Documentation
 
-- Java API documentation of the library: <https://diggsweden.github.io/dgc-java/javadoc/>
+- Java API documentation of the library: https://diggsweden.github.io/dgc-java/javadoc/
 
 ## Acknowledgements
 
