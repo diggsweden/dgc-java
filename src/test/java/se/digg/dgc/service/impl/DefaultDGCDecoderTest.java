@@ -6,7 +6,7 @@
 package se.digg.dgc.service.impl;
 
 /**
- * Test cases for the DefaultHCertDecoder class.
+ * Test cases for the {@link DefaultDGCBarcodeEncoder} and {@link DefaultDGCBarcodeDecoder} classes.
  * 
  * @author Martin Lindström (martin@idsec.se)
  * @author Henrik Bengtsson (extern.henrik.bengtsson@digg.se)

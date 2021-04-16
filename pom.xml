@@ -206,7 +206,8 @@
           <includeAdditionalProperties>false</includeAdditionalProperties>
           <includeJsr303Annotations>true</includeJsr303Annotations>
           <includeConstructors>true</includeConstructors>
-          <useTitleAsClassname>true</useTitleAsClassname>          
+          <useTitleAsClassname>true</useTitleAsClassname>    
+          <generateBuilders>true</generateBuilders>      
           <!-- We need to register the JavaTimeModule for these. -->
           <dateType>java.time.LocalDate</dateType>
           <dateTimeType>java.time.Instant</dateTimeType>

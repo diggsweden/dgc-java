@@ -15,8 +15,6 @@ import java.util.zip.ZipException;
 import org.junit.Assert;
 import org.junit.Test;
 
-import se.digg.dgc.encoding.Zlib;
-
 /**
  * Test cases for Zlib.
  * 
