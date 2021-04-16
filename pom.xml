@@ -5,7 +5,7 @@
 
   <groupId>se.digg.dgc</groupId>
   <artifactId>dgc-create-validate</artifactId>
-  <version>0.9.0-SNAPSHOT</version>
+  <version>0.9.0</version>
 
   <name>DIGG :: Digital Green Certificate :: Issuance and Validation</name>
   <description>Issuance and validation of Digital Green Certificate</description>
@@ -250,7 +250,7 @@
           <plugin>
             <groupId>org.sonatype.plugins</groupId>
             <artifactId>nexus-staging-maven-plugin</artifactId>
-            <version>1.6.7</version>
+            <version>1.6.8</version>
             <extensions>true</extensions>
             <configuration>
               <serverId>ossrh</serverId>
