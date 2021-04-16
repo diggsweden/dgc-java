@@ -9,12 +9,12 @@
 
   <name>DIGG :: Digital Green Certificate :: Issuance and Validation</name>
   <description>Issuance and validation of Digital Green Certificate</description>
-  <url>https://github.com/diggsweden/hcert-impl</url>
+  <url>https://github.com/diggsweden/dgc-java</url>
 
   <scm>
-    <connection>scm:https://github.com/diggsweden/hcert-impl.git</connection>
-    <developerConnection>scm:https://github.com/diggsweden/hcert-impl.git</developerConnection>
-    <url>https://github.com/diggsweden/hcert-impl/tree/master</url>
+    <connection>scm:https://github.com/diggsweden/dgc-java.git</connection>
+    <developerConnection>scm:https://github.com/diggsweden/dgc-java.git</developerConnection>
+    <url>https://github.com/diggsweden/dgc-java/tree/master</url>
   </scm>
 
   <developers>
