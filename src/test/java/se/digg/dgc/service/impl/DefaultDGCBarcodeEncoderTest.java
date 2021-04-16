@@ -12,22 +12,22 @@ import org.junit.Test;
 import org.springframework.core.io.ClassPathResource;
 
 import se.digg.dgc.encoding.Barcode;
+import se.digg.dgc.encoding.impl.DefaultBarcodeCreator;
 import se.digg.dgc.payload.v1.DigitalGreenCertificate;
 import se.digg.dgc.payload.v1.Sub;
-import se.digg.dgc.service.impl.DefaultDGCEncoder;
 import se.digg.dgc.signatures.DGCSigner;
 import se.digg.dgc.signatures.impl.DefaultDGCSigner;
 import se.swedenconnect.security.credential.KeyStoreCredential;
 import se.swedenconnect.security.credential.PkiCredential;
 
 /**
- * Test cases for DefaultHCertEncoder.
+ * Test cases for {@link DefaultDGCBarcodeEncoder}.
  * 
  * @author Martin Lindström (martin@idsec.se)
  * @author Henrik Bengtsson (extern.henrik.bengtsson@digg.se)
  * @author Henric Norlander (extern.henric.norlander@digg.se)
  */
-public class DefaultDGCEncoderTest {
+public class DefaultDGCBarcodeEncoderTest {
   
   private PkiCredential rsa;
   private PkiCredential ecdsa;
@@ -36,7 +36,7 @@ public class DefaultDGCEncoderTest {
   
 //  private static final byte[] HCERT = "dummy-hcert".getBytes(StandardCharset.UTF_8);
 
-  public DefaultDGCEncoderTest() throws Exception {
+  public DefaultDGCBarcodeEncoderTest() throws Exception {
     this.rsa = new KeyStoreCredential(new ClassPathResource("rsa.jks"), password, "signer", password);
     this.rsa.init();
     this.ecdsa = new KeyStoreCredential(new ClassPathResource("ecdsa.jks"), password, "signer", password);
@@ -49,14 +49,14 @@ public class DefaultDGCEncoderTest {
     final Instant now = Instant.now();
     
     final DGCSigner signer = new DefaultDGCSigner(this.ecdsa);    
-    DefaultDGCEncoder encoder = new DefaultDGCEncoder(signer);
+    DefaultDGCBarcodeEncoder encoder = new DefaultDGCBarcodeEncoder(signer, new DefaultBarcodeCreator());
     
     final DigitalGreenCertificate dgc = new DigitalGreenCertificate();
     final Sub sub = new Sub();
 //    sub.setDob("19691129");
     dgc.setSub(sub);
     
-    Barcode barcode = encoder.encode(dgc, now.plus(Duration.ofDays(30)));
+    Barcode barcode = encoder.encodeToBarcode(dgc, now.plus(Duration.ofDays(30)));
     
   }
 

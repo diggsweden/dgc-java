@@ -6,7 +6,6 @@
 package se.digg.dgc.service.impl;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.security.SignatureException;
 import java.time.Instant;
 import java.util.Optional;
@@ -16,13 +15,9 @@ import org.slf4j.LoggerFactory;
 
 import com.upokecenter.cbor.CBORException;
 
-import se.digg.dgc.encoding.Barcode;
-import se.digg.dgc.encoding.BarcodeCreator;
-import se.digg.dgc.encoding.BarcodeException;
 import se.digg.dgc.encoding.Base45;
 import se.digg.dgc.encoding.DGCConstants;
 import se.digg.dgc.encoding.Zlib;
-import se.digg.dgc.encoding.impl.DefaultBarcodeCreator;
 import se.digg.dgc.payload.v1.DGCSchemaException;
 import se.digg.dgc.payload.v1.DigitalGreenCertificate;
 import se.digg.dgc.payload.v1.MapperUtils;
@@ -44,76 +39,48 @@ public class DefaultDGCEncoder implements DGCEncoder {
   /** The DGC signer instance. */
   private final DGCSigner dgcSigner;
 
-  /** For creating barcodes. */
-  private final BarcodeCreator barcodeCreator;
-
-  /**
-   * Constructor.
-   * <p>
-   * See {@link #DefaultDGCEncoder(DGCSigner, BarcodeCreator)}.
-   * </p>
-   * 
-   * @param dgcSigner
-   *          for signing the DGC:s
-   */
-  public DefaultDGCEncoder(final DGCSigner dgcSigner) {
-    this(dgcSigner, null);
-  }
-
   /**
    * Constructor.
    * 
    * @param dgcSigner
    *          a signer for signing the DGC:s
-   * @param barcodeCreator
-   *          a barcode creator, if null, a {@link DefaultBarcodeCreator} with default settings is used
    */
-  public DefaultDGCEncoder(final DGCSigner dgcSigner, final BarcodeCreator barcodeCreator) {
+  public DefaultDGCEncoder(final DGCSigner dgcSigner) {
     this.dgcSigner = Optional.ofNullable(dgcSigner).orElseThrow(() -> new IllegalArgumentException("dgcSigner must not be null"));
-    this.barcodeCreator = Optional.ofNullable(barcodeCreator).orElse(new DefaultBarcodeCreator());
   }
 
   /** {@inheritDoc} */
   @Override
-  public Barcode encode(final DigitalGreenCertificate dgc, final Instant expiration)
-      throws DGCSchemaException, IOException, SignatureException, BarcodeException {
-    
-    log.trace("Creating a barcode from DGC payload: {}");
-        
-    log.trace("Encoding to CBOR ...");
+  public String encode(final DigitalGreenCertificate dgc, final Instant expiration) throws DGCSchemaException, IOException, SignatureException {
+
+    log.trace("Encoding DGC payload to CBOR ...");
     final byte[] cborDgc = MapperUtils.toCBOREncoding(dgc);
     log.trace("Encoded DGC into {} bytes", cborDgc.length);
-    
+
     return this.encode(cborDgc, expiration);
   }
 
   /** {@inheritDoc} */
   @Override
-  public Barcode encode(final byte[] dgc, final Instant expiration) throws IOException, SignatureException, BarcodeException {
-
-    log.trace("Creating a barcode from CBOR-encoded DGC-payload (length: {}) ...", dgc.length);
+  public String encode(final byte[] dgc, final Instant expiration) throws IOException, SignatureException {
     
+    log.trace("Encoding to Base45 from CBOR-encoded DGC-payload (length: {}) ...", dgc.length);
+
     // Create a signed CWT ...
     //
     byte[] cwt = this.sign(dgc, expiration);
-    
+
     // Compression and Base45 encoding ...
     //
     log.trace("Compressing the signed CWT of length {} ...", cwt.length);
     cwt = Zlib.compress(cwt);
     log.trace("Signed CWT was compressed into {} bytes", cwt.length);
-    
+
     log.trace("Base45 encoding compressed CWT ...");
     final String base45 = Base45.getEncoder().encodeToString(cwt);
     log.trace("Base45 encoding: {}", base45);
     
-    // Create the Barcode ...
-    //
-    log.trace("Creating barcode ...");
-    final Barcode barcode = this.barcodeCreator.create(DGCConstants.DGC_V1_HEADER + base45, StandardCharsets.US_ASCII);
-    log.trace("Successfully created: {}", barcode);
-    
-    return barcode;
+    return DGCConstants.DGC_V1_HEADER + base45;
   }
 
   /** {@inheritDoc} */
@@ -122,7 +89,7 @@ public class DefaultDGCEncoder implements DGCEncoder {
       throws DGCSchemaException, IOException, SignatureException {
 
     log.trace("Signing DGC: {}", dgc);
-    
+
     // Transform the DGC payload into its CBOR encoding ...
     log.trace("CBOR encoding DGC ...");
     final byte[] cborDgc = MapperUtils.toCBOREncoding(dgc);

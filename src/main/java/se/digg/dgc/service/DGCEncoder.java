@@ -9,8 +9,6 @@ import java.io.IOException;
 import java.security.SignatureException;
 import java.time.Instant;
 
-import se.digg.dgc.encoding.Barcode;
-import se.digg.dgc.encoding.BarcodeException;
 import se.digg.dgc.payload.v1.DGCSchemaException;
 import se.digg.dgc.payload.v1.DigitalGreenCertificate;
 
@@ -24,42 +22,39 @@ import se.digg.dgc.payload.v1.DigitalGreenCertificate;
 public interface DGCEncoder {
 
   /**
-   * Based on the DGC payload and a expiration time, the method creates a signed DGC and delivers it in a barcode.
+   * Based on the DGC payload and a expiration time, the method encodes the payload to CBOR, signs it, deflates it, and
+   * delivers it in Base45 encoding (with a HCERT header).
    * 
    * @param dgc
    *          the contents of the DGC
    * @param expiration
    *          the expiration of the DGC
-   * @return a barcode containing the signed DGC
+   * @return the Base45 encoding of the signed DGC
    * @throws DGCSchemaException
    *           for DGC schema errors
    * @throws IOException
    *           for errors encoding data, for example CBOR related errors
    * @throws SignatureException
    *           errors concerning signing the DGC
-   * @throws BarcodeException
-   *           errors creating the barcode
    */
-  Barcode encode(final DigitalGreenCertificate dgc, final Instant expiration)
-      throws DGCSchemaException, IOException, SignatureException, BarcodeException;
+  String encode(final DigitalGreenCertificate dgc, final Instant expiration)
+      throws DGCSchemaException, IOException, SignatureException;
 
   /**
-   * Based on the DGC payload (in its CBOR encoding) and a expiration time, the method creates a DGC and delivers it as
-   * a barcode.
+   * Based on the CBOR encoded DGC payload and a expiration time, the method signs it, deflates it, and delivers it in
+   * Base45 encoding (with a HCERT header).
    * 
    * @param dgc
    *          the contents of the DGC in its CBOR encoding
    * @param expiration
    *          the expiration of the DGC
-   * @return a barcode containing the signed DGC
+   * @return the Base45 encoding of the signed DGC
    * @throws IOException
    *           for errors encoding data, for example CBOR related errors
    * @throws SignatureException
    *           errors concerning signing the DGC
-   * @throws BarcodeException
-   *           errors creating the barcode
    */
-  Barcode encode(final byte[] dgc, final Instant expiration) throws IOException, SignatureException, BarcodeException;
+  String encode(final byte[] dgc, final Instant expiration) throws IOException, SignatureException;
 
   /**
    * Given the DGC payload the method creates a CWT and signs it.

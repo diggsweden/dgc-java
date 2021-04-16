@@ -28,7 +28,9 @@ import se.digg.dgc.signatures.cwt.support.CBORInstantConverter;
  */
 public class Cwt {
 
-  /** HCERT message tag. */  
+  /** 
+   * HCERT message tag. See <a href="https://www.iana.org/assignments/cwt/cwt.xhtml">https://www.iana.org/assignments/cwt/cwt.xhtml</a>. 
+   */  
   public static final int HCERT_CLAIM_KEY = -260;
   
   // TODO: remove after interop-tests ...
