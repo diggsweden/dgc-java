@@ -201,7 +201,7 @@ public class Barcode {
    * Enum representing an image format.
    */
   public static enum ImageFormat {
-    JPG("jpg"), PNG("png");
+    JPG("jpg", "image/jpg"), PNG("png", "image/png");
 
     /**
      * Returns the image format in text format.
@@ -210,6 +210,15 @@ public class Barcode {
      */
     public String getName() {
       return this.name;
+    }
+
+    /**
+     * Gets the image MIME type.
+     * 
+     * @return the MIME type
+     */
+    public String getMimeType() {
+      return this.mimeType;
     }
 
     /**
@@ -229,16 +238,39 @@ public class Barcode {
     }
 
     /**
+     * Parses an image MIME type into an {@code ImageFormat} instance.
+     * 
+     * @param mimeType
+     *          the MIME type
+     * @return an ImageFormat
+     */
+    public static ImageFormat parseFromMimeType(final String mimeType) {
+      for (ImageFormat i : ImageFormat.values()) {
+        if (i.getMimeType().equalsIgnoreCase(mimeType)) {
+          return i;
+        }
+      }
+      throw new IllegalArgumentException("Unsupported image MIME type - " + mimeType);
+    }
+
+    /**
      * Constructor.
      * 
      * @param name
      *          the image format name
+     * @param mimeType
+     *          the image mime type
      */
-    private ImageFormat(final String name) {
+    private ImageFormat(final String name, final String mimeType) {
       this.name = name;
+      this.mimeType = mimeType;
     }
 
     /** The image format name. */
-    private String name;
+    private final String name;
+
+    /** The image MIME type. */
+    private final String mimeType;
   }
+
 }
