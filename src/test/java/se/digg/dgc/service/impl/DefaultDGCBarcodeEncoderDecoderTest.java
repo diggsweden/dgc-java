@@ -21,6 +21,7 @@ import se.digg.dgc.payload.v1.DigitalGreenCertificate;
 import se.digg.dgc.payload.v1.Id;
 import se.digg.dgc.payload.v1.Sub;
 import se.digg.dgc.payload.v1.Vac;
+import se.digg.dgc.payload.v1.Id.IdentifierType;
 import se.digg.dgc.signatures.impl.DefaultDGCSignatureVerifier;
 import se.digg.dgc.signatures.impl.DefaultDGCSigner;
 import se.swedenconnect.security.credential.KeyStoreCredential;
@@ -71,10 +72,8 @@ public class DefaultDGCBarcodeEncoderDecoderTest {
       .withDob(LocalDate.parse("1969-11-29"))
       .withGen("male");
     
-    Id pnr = new Id();
-    pnr.withI("NN").withT("196911292932");
-    Id passport = new Id();
-    passport.withI("PPN").withT("56987413");    
+    final Id pnr = new Id().withT(IdentifierType.NN).withI("196911292932");
+    final Id passport = new Id().withT(IdentifierType.PPN).withI("56987413").withC("SE");    
     sub.withId(Arrays.asList(pnr, passport));
     
     dgc.setSub(sub);
