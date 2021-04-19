@@ -18,7 +18,7 @@ public class DGCConstants {
    * Header string that is prefixed to Base45 encoded health care certificates containing version 1 of the Digital Green
    * Certificate payloads.
    */
-  public static final String DGC_V1_HEADER = "HC1";
+  public static final String DGC_V1_HEADER = "HC1:";
   
   // Hidden constructor
   private DGCConstants() {
