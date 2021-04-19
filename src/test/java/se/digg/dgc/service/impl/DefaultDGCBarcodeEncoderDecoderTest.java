@@ -70,10 +70,10 @@ public class DefaultDGCBarcodeEncoderDecoderTest {
       .withGn("Martin")
       .withFn("Lindström")
       .withDob(LocalDate.parse("1969-11-29"))
-      .withGen("male");
+      .withGen(Sub.AdministrativeGender.MALE);
     
     final Id pnr = new Id().withT(IdentifierType.NN).withI("196911292932");
-    final Id passport = new Id().withT(IdentifierType.PPN).withI("56987413").withC("SE");    
+    final Id passport = new Id().withT(IdentifierType.PP).withI("56987413").withC("SE");    
     sub.withId(Arrays.asList(pnr, passport));
     
     dgc.setSub(sub);

@@ -27,7 +27,8 @@
             "type": "object",
             "required": [
                 "gn",
-                "gna"
+                "dob",
+                "gen"
             ],
             "properties": {
                 "gn": {
@@ -70,7 +71,7 @@
                                 "description": "The type of identifier (viz. VS-2021-04-08) PP = Passport Number NN = National Person Identifier CZ = Citizenship Card Number HC = Health Card number NI = National Unique Individual Identifier MB = Member Number NH = National Helth Plan Identifier",
                                 "type": "string",
                                 "enum": [
-                                    "PPN",
+                                    "PP",
                                     "NN",
                                     "CZ",
                                     "HC",
@@ -105,6 +106,12 @@
                     "title": "Administrative gender",
                     "description": "Administrative gender (optional, viz. VS-2021-04-14)",
                     "type": "string",
+                    "enum": [
+                        "male",
+                        "female",
+                        "other",
+                        "unknown"
+                    ],
                     "example": "male"
                 }
             }
