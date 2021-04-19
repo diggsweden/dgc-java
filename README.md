@@ -2,7 +2,7 @@
 
 # dgc-java
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![Maven Central](https://maven-badges.herokuapp.com/maven-central/se.digg.dgc/dgc-create-validate/badge.svg)](https://maven-badges.herokuapp.com/maven-central/se.digg.dgc/dgc-create-validate) 
 
 An implementation in Java for creating and validating a Digital Green Certificate.
 
