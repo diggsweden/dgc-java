@@ -56,6 +56,11 @@ public class DefaultDGCEncoder implements DGCEncoder {
     
     dgc.setV(DGCSchemaVersion.DGC_SCHEMA_VERSION);
     
+    if(dgc.getSub().getFnt() == null && dgc.getSub().getFn() != null)
+      dgc.getSub().setFnt(MrzParser.toMrz(dgc.getSub().getFn(), -1));
+    if(dgc.getSub().getGnt() == null && dgc.getSub().getGn() != null)
+      dgc.getSub().setGnt(MrzParser.toMrz(dgc.getSub().getGn(), -1));
+
     // TODO: Check if there is a DGCID in the payload, and if not available, set one ...
 
     log.trace("Encoding DGC payload to CBOR ...");
