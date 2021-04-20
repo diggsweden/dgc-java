@@ -62,7 +62,10 @@ public class DefaultDGCBarcodeDecoder extends DefaultDGCDecoder implements DGCBa
     final byte[] encodedDgc = this.decodeBarcodeToBytes(image);
 
     log.trace("CBOR decoding DGC ...");
+    
+    // TODO: In the future, we'll have to handle different versions...
     final DigitalGreenCertificate dgc = MapperUtils.toDigitalGreenCertificate(encodedDgc);
+    
     log.trace("Decoded into: {}", dgc);
 
     return dgc;

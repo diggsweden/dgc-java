@@ -9,6 +9,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.UUID;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -64,13 +65,14 @@ public class DefaultDGCBarcodeEncoderDecoderTest {
   
   private DigitalGreenCertificate getTestDGC() {
     DigitalGreenCertificate dgc = new DigitalGreenCertificate();
+    dgc.setV("1.0.0");
+    dgc.setDgcid(UUID.randomUUID().toString());
     
     Sub sub = new Sub();
     sub
       .withGn("Martin")
       .withFn("Lindström")
-      .withDob(LocalDate.parse("1969-11-29"))
-      .withGen(Sub.AdministrativeGender.MALE);
+      .withDob(LocalDate.parse("1969-11-29"));
     
     final Id pnr = new Id().withT(IdentifierType.NN).withI("196911292932");
     final Id passport = new Id().withT(IdentifierType.PP).withI("56987413").withC("SE");    

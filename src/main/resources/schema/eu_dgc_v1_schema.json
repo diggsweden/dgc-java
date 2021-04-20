@@ -27,8 +27,7 @@
             "type": "object",
             "required": [
                 "gn",
-                "dob",
-                "gen"
+                "dob"
             ],
             "properties": {
                 "gn": {
@@ -63,21 +62,19 @@
                         "type": "object",
                         "required": [
                             "t",
+                            "c",
                             "i"
                         ],
                         "properties": {
                             "t": {
                                 "title": "Identifier type",
-                                "description": "The type of identifier (viz. VS-2021-04-08) PP = Passport Number NN = National Person Identifier CZ = Citizenship Card Number HC = Health Card number NI = National Unique Individual Identifier MB = Member Number NH = National Helth Plan Identifier",
+                                "description": "The type of identifier (viz. VS-2021-04-08) PP = Passport Number NN = National Person Identifier (country specified in the 'c' parameter) CZ = Citizenship Card Number HC = Health Card Number",
                                 "type": "string",
                                 "enum": [
                                     "PP",
                                     "NN",
                                     "CZ",
-                                    "HC",
-                                    "NI",
-                                    "MB",
-                                    "NH"
+                                    "HC"
                                 ],
                                 "example": "NN"
                             },
@@ -88,7 +85,7 @@
                                 "example": "SE"
                             },
                             "i": {
-                                "title": "Identfier number or string",
+                                "title": "Identifier number or string",
                                 "type": "string",
                                 "example": "121212-1212"
                             }
@@ -97,22 +94,10 @@
                 },
                 "dob": {
                     "title": "Date of birth",
-                    "description": "Mandatory if no Person identifier is provided",
+                    "description": "The date of birth of the person addressed in the certificate",
                     "type": "string",
                     "format": "date",
                     "example": "2012-12-12"
-                },
-                "gen": {
-                    "title": "Administrative gender",
-                    "description": "Administrative gender (optional, viz. VS-2021-04-14)",
-                    "type": "string",
-                    "enum": [
-                        "male",
-                        "female",
-                        "other",
-                        "unknown"
-                    ],
-                    "example": "male"
                 }
             }
         },

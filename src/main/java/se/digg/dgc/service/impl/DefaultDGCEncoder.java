@@ -19,6 +19,7 @@ import se.digg.dgc.encoding.Base45;
 import se.digg.dgc.encoding.DGCConstants;
 import se.digg.dgc.encoding.Zlib;
 import se.digg.dgc.payload.v1.DGCSchemaException;
+import se.digg.dgc.payload.v1.DGCSchemaVersion;
 import se.digg.dgc.payload.v1.DigitalGreenCertificate;
 import se.digg.dgc.payload.v1.MapperUtils;
 import se.digg.dgc.service.DGCEncoder;
@@ -52,6 +53,10 @@ public class DefaultDGCEncoder implements DGCEncoder {
   /** {@inheritDoc} */
   @Override
   public String encode(final DigitalGreenCertificate dgc, final Instant expiration) throws DGCSchemaException, IOException, SignatureException {
+    
+    dgc.setV(DGCSchemaVersion.DGC_SCHEMA_VERSION);
+    
+    // TODO: Check if there is a DGCID in the payload, and if not available, set one ...
 
     log.trace("Encoding DGC payload to CBOR ...");
     final byte[] cborDgc = MapperUtils.toCBOREncoding(dgc);
