@@ -61,6 +61,8 @@ public class DefaultDGCBarcodeEncoderDecoderTest {
     
     final DigitalGreenCertificate dgc2 = decoder.decodeBarcode(barcode.getImage());
     Assert.assertEquals(dgc, dgc2);
+    Assert.assertEquals("MAERTIN", dgc2.getSub().getGnt());
+    Assert.assertEquals("LINDSTROEM", dgc2.getSub().getFnt());
   }
   
   private DigitalGreenCertificate getTestDGC() {
@@ -70,7 +72,7 @@ public class DefaultDGCBarcodeEncoderDecoderTest {
     
     Sub sub = new Sub();
     sub
-      .withGn("Martin")
+      .withGn("Märtin")
       .withFn("Lindström")
       .withDob(LocalDate.parse("1969-11-29"));
     
