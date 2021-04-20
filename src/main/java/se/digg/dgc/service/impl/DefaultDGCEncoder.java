@@ -22,6 +22,7 @@ import se.digg.dgc.payload.v1.DGCSchemaException;
 import se.digg.dgc.payload.v1.DGCSchemaVersion;
 import se.digg.dgc.payload.v1.DigitalGreenCertificate;
 import se.digg.dgc.payload.v1.MapperUtils;
+import se.digg.dgc.payload.v1.Sub;
 import se.digg.dgc.service.DGCEncoder;
 import se.digg.dgc.signatures.DGCSigner;
 
@@ -40,6 +41,9 @@ public class DefaultDGCEncoder implements DGCEncoder {
   /** The DGC signer instance. */
   private final DGCSigner dgcSigner;
 
+  /** Setting that tells whether names in the subject should be transliterated or not. */
+  private boolean transliterateNames = false;
+
   /**
    * Constructor.
    * 
@@ -52,14 +56,14 @@ public class DefaultDGCEncoder implements DGCEncoder {
 
   /** {@inheritDoc} */
   @Override
-  public String encode(final DigitalGreenCertificate dgc, final Instant expiration) throws DGCSchemaException, IOException, SignatureException {
-    
+  public String encode(final DigitalGreenCertificate dgc, final Instant expiration) throws DGCSchemaException, IOException,
+      SignatureException {
+
     dgc.setV(DGCSchemaVersion.DGC_SCHEMA_VERSION);
-    
-    if(dgc.getSub().getFnt() == null && dgc.getSub().getFn() != null)
-      dgc.getSub().setFnt(MrzParser.toMrz(dgc.getSub().getFn(), -1));
-    if(dgc.getSub().getGnt() == null && dgc.getSub().getGn() != null)
-      dgc.getSub().setGnt(MrzParser.toMrz(dgc.getSub().getGn(), -1));
+
+    if (this.transliterateNames) {
+      this.transliterateNames(dgc.getSub());
+    }
 
     // TODO: Check if there is a DGCID in the payload, and if not available, set one ...
 
@@ -70,10 +74,30 @@ public class DefaultDGCEncoder implements DGCEncoder {
     return this.encode(cborDgc, expiration);
   }
 
+  /**
+   * Transliterates subject names.
+   * 
+   * @param subject
+   *          the subject containing the names to transliterate
+   */
+  protected void transliterateNames(final Sub subject) {
+    if (subject == null) {
+      return;
+    }
+    if (subject.getFnt() == null && subject.getFn() != null && subject.getFn().trim().length() > 0) {
+      subject.setFnt(MrzParser.toMrz(subject.getFn(), -1));
+      log.trace("Transliterated subject/family-name '{}' to '{}'", subject.getFn(), subject.getFnt());
+    }
+    if (subject.getGnt() == null && subject.getGn() != null && subject.getGn().trim().length() > 0) {
+      subject.setGnt(MrzParser.toMrz(subject.getGn(), -1));
+      log.trace("Transliterated subject/given-name '{}' to '{}'", subject.getGn(), subject.getGnt());
+    }
+  }
+
   /** {@inheritDoc} */
   @Override
   public String encode(final byte[] dgc, final Instant expiration) throws IOException, SignatureException {
-    
+
     log.trace("Encoding to Base45 from CBOR-encoded DGC-payload (length: {}) ...", dgc.length);
 
     // Create a signed CWT ...
@@ -89,7 +113,7 @@ public class DefaultDGCEncoder implements DGCEncoder {
     log.trace("Base45 encoding compressed CWT ...");
     final String base45 = Base45.getEncoder().encodeToString(cwt);
     log.trace("Base45 encoding: {}", base45);
-    
+
     return DGCConstants.DGC_V1_HEADER + base45;
   }
 
@@ -122,6 +146,21 @@ public class DefaultDGCEncoder implements DGCEncoder {
       log.info("Internal CBOR error - {}", e.getMessage(), e);
       throw new IOException("Internal CBOR error - " + e.getMessage(), e);
     }
+  }
+
+  /**
+   * Setting that tells whether subject names supplied in the {@code dgc} parameter of the
+   * {@link #encode(DigitalGreenCertificate, Instant)} method should be transliterated (if they are not transliterated
+   * when supplied).
+   * <p>
+   * The default is not to perform any additional processing.
+   * </p>
+   * 
+   * @param transliterateNames
+   *          flag that tells whether transliteration of subject names should be performed
+   */
+  public void setTransliterateNames(final boolean transliterateNames) {
+    this.transliterateNames = transliterateNames;
   }
 
 }
