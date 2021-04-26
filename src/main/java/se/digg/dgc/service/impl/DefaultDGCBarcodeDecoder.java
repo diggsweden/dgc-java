@@ -16,7 +16,6 @@ import se.digg.dgc.encoding.BarcodeDecoder;
 import se.digg.dgc.encoding.BarcodeException;
 import se.digg.dgc.payload.v1.DGCSchemaException;
 import se.digg.dgc.payload.v1.DigitalGreenCertificate;
-import se.digg.dgc.payload.v1.MapperUtils;
 import se.digg.dgc.service.DGCBarcodeDecoder;
 import se.digg.dgc.signatures.CertificateProvider;
 import se.digg.dgc.signatures.DGCSignatureVerifier;
@@ -64,7 +63,7 @@ public class DefaultDGCBarcodeDecoder extends DefaultDGCDecoder implements DGCBa
     log.trace("CBOR decoding DGC ...");
     
     // TODO: In the future, we'll have to handle different versions...
-    final DigitalGreenCertificate dgc = MapperUtils.toDigitalGreenCertificate(encodedDgc);
+    final DigitalGreenCertificate dgc = DigitalGreenCertificate.decode(encodedDgc); 
     
     log.trace("Decoded into: {}", dgc);
 
