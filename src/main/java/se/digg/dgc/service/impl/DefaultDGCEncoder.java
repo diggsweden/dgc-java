@@ -41,7 +41,7 @@ public class DefaultDGCEncoder implements DGCEncoder {
   private final DGCSigner dgcSigner;
 
   /** Setting that tells whether names in the subject should be transliterated or not. */
-  private boolean transliterateNames = false;
+  private boolean transliterateNames = true;
 
   /**
    * Constructor.
@@ -154,7 +154,7 @@ public class DefaultDGCEncoder implements DGCEncoder {
    * {@link #encode(DigitalGreenCertificate, Instant)} method should be transliterated (if they are not transliterated
    * when supplied).
    * <p>
-   * The default is not to perform any additional processing.
+   * The default is to transliterate names.
    * </p>
    * 
    * @param transliterateNames

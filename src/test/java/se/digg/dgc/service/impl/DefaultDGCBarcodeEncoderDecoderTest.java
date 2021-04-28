@@ -9,6 +9,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.UUID;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -66,22 +67,23 @@ public class DefaultDGCBarcodeEncoderDecoderTest {
   private DigitalGreenCertificate getTestDGC() {
     DigitalGreenCertificate dgc = new DigitalGreenCertificate();
     dgc.setVer("1.0.0");
-    //dgc.setDgcid(UUID.randomUUID().toString());
     
     dgc.setNam(new PersonName().withGn("Karl Mårten").withFn("Lindström"));
     dgc.setDob(LocalDate.parse("1969-11-29"));
     
     
     VaccinationEntry vac = new VaccinationEntry();    
-    vac.withTg(VaccinationEntry.DiseaseAgentTargeted._840539006)
+    vac
+      .withCi(UUID.randomUUID().toString())
+      .withTg("840539006")
       .withDt(LocalDate.parse("2021-04-02"))
       .withCo("SE")
       .withDn(Integer.valueOf(1))
       .withSd(Integer.valueOf(2))
       .withIs("eHälsomyndigheten")
-      .withMa(VaccinationEntry.VaccineMahManf.ORG_100010771)
-      .withMp(VaccinationEntry.VaccineMedicinalProduct.COVAXIN)
-      .withVp(VaccinationEntry.VaccineProphylaxis.J_07_BX_03);
+      .withMa("ORG-100001699")
+      .withMp("CVnCoV")
+      .withVp("1119349007");
       
     dgc.setV(Arrays.asList(vac));
     
