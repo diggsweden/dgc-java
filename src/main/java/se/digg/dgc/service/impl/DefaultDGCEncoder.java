@@ -21,8 +21,7 @@ import se.digg.dgc.encoding.Zlib;
 import se.digg.dgc.payload.v1.DGCSchemaException;
 import se.digg.dgc.payload.v1.DGCSchemaVersion;
 import se.digg.dgc.payload.v1.DigitalGreenCertificate;
-import se.digg.dgc.payload.v1.MapperUtils;
-import se.digg.dgc.payload.v1.Sub;
+import se.digg.dgc.payload.v1.PersonName;
 import se.digg.dgc.service.DGCEncoder;
 import se.digg.dgc.signatures.DGCSigner;
 
@@ -42,7 +41,7 @@ public class DefaultDGCEncoder implements DGCEncoder {
   private final DGCSigner dgcSigner;
 
   /** Setting that tells whether names in the subject should be transliterated or not. */
-  private boolean transliterateNames = false;
+  private boolean transliterateNames = true;
 
   /**
    * Constructor.
@@ -59,16 +58,18 @@ public class DefaultDGCEncoder implements DGCEncoder {
   public String encode(final DigitalGreenCertificate dgc, final Instant expiration) throws DGCSchemaException, IOException,
       SignatureException {
 
-    dgc.setV(DGCSchemaVersion.DGC_SCHEMA_VERSION);
+    if (dgc.getVer() == null) {
+      dgc.setVer(DGCSchemaVersion.DGC_SCHEMA_VERSION);
+    }
 
     if (this.transliterateNames) {
-      this.transliterateNames(dgc.getSub());
+      this.transliterateNames(dgc.getNam());
     }
 
     // TODO: Check if there is a DGCID in the payload, and if not available, set one ...
 
     log.trace("Encoding DGC payload to CBOR ...");
-    final byte[] cborDgc = MapperUtils.toCBOREncoding(dgc);
+    final byte[] cborDgc = dgc.encode(); 
     log.trace("Encoded DGC into {} bytes", cborDgc.length);
 
     return this.encode(cborDgc, expiration);
@@ -80,7 +81,7 @@ public class DefaultDGCEncoder implements DGCEncoder {
    * @param subject
    *          the subject containing the names to transliterate
    */
-  protected void transliterateNames(final Sub subject) {
+  protected void transliterateNames(final PersonName subject) {
     if (subject == null) {
       return;
     }
@@ -126,7 +127,7 @@ public class DefaultDGCEncoder implements DGCEncoder {
 
     // Transform the DGC payload into its CBOR encoding ...
     log.trace("CBOR encoding DGC ...");
-    final byte[] cborDgc = MapperUtils.toCBOREncoding(dgc);
+    final byte[] cborDgc = dgc.encode(); 
     log.trace("Encoded DGC into {} bytes", cborDgc.length);
 
     return this.sign(cborDgc, expiration);
@@ -153,7 +154,7 @@ public class DefaultDGCEncoder implements DGCEncoder {
    * {@link #encode(DigitalGreenCertificate, Instant)} method should be transliterated (if they are not transliterated
    * when supplied).
    * <p>
-   * The default is not to perform any additional processing.
+   * The default is to transliterate names.
    * </p>
    * 
    * @param transliterateNames

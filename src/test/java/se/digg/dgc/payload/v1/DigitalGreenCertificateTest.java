@@ -15,13 +15,13 @@ import org.junit.Test;
 import com.upokecenter.cbor.CBORObject;
 
 /**
- * Test cases for MapperUtils.
+ * Test cases for encoding/decoding of DigitalGreenCertificate.
  * 
  * @author Martin Lindström (martin@idsec.se)
  * @author Henrik Bengtsson (extern.henrik.bengtsson@digg.se)
  * @author Henric Norlander (extern.henric.norlander@digg.se)
  */
-public class MapperUtilsTest {
+public class DigitalGreenCertificateTest {
 
   /**
    * Support for serializing/deserializing of {@link LocalData} doesn't come for free in FasterXML so we'll test this a
@@ -36,19 +36,20 @@ public class MapperUtilsTest {
     final String date = "1969-11-29";
 
     // Encode
-    final Rec rec = new Rec("Covid-19", LocalDate.parse(date), "SE");
-    final byte[] cbor = MapperUtils.getCBORMapper().writeValueAsBytes(rec);
+    final DigitalGreenCertificate dgc = new DigitalGreenCertificate();
+    dgc.setDob(LocalDate.parse(date));
+    final byte[] cbor = DigitalGreenCertificate.getCBORMapper().writeValueAsBytes(dgc);
 
     // Assert using the detailed com.upokecenter.cbor library.
     //
     final CBORObject object = CBORObject.DecodeFromBytes(cbor);
-    final CBORObject dateObject = object.get("dat");
+    final CBORObject dateObject = object.get("dob");
     Assert.assertNotNull(dateObject);
     Assert.assertEquals(date, dateObject.AsString());
 
     // Decode
-    final Rec rec2 = MapperUtils.getCBORMapper().readValue(cbor, Rec.class);
-    Assert.assertEquals(date, rec2.getDat().toString());
+    final DigitalGreenCertificate dgc2 = DigitalGreenCertificate.getCBORMapper().readValue(cbor, DigitalGreenCertificate.class);
+    Assert.assertEquals(date, dgc2.getDob().toString());
   }
   
   /**
@@ -67,7 +68,7 @@ public class MapperUtilsTest {
     final Tst2 tst = new Tst2();
     tst.setTna("Acme");
     tst.setDtr(Instant.parse(dateTime));
-    final byte[] cbor = MapperUtils.getCBORMapper().writeValueAsBytes(tst);
+    final byte[] cbor = DigitalGreenCertificate.getCBORMapper().writeValueAsBytes(tst);
     
     // Assert using the detailed com.upokecenter.cbor library.
     //
@@ -86,7 +87,7 @@ public class MapperUtilsTest {
     Assert.assertEquals(dateTime, dateObject.AsString());
     
     // Decode
-    final Tst2 tst2 = MapperUtils.getCBORMapper().readValue(cbor, Tst2.class);
+    final Tst2 tst2 = DigitalGreenCertificate.getCBORMapper().readValue(cbor, Tst2.class);
     Assert.assertEquals(dateTime, tst2.getDtr().toString());
   }
   
@@ -107,7 +108,7 @@ public class MapperUtilsTest {
     Assert.assertEquals(dateTime, dtrObject.AsString());
     
     // Decode using FasterXML
-    final Tst2 tst = MapperUtils.getCBORMapper().readValue(object.EncodeToBytes(), Tst2.class);
+    final Tst2 tst = DigitalGreenCertificate.getCBORMapper().readValue(object.EncodeToBytes(), Tst2.class);
     Assert.assertEquals(dateTime, tst.getDtr().toString());
   }
   
@@ -129,7 +130,7 @@ public class MapperUtilsTest {
     Assert.assertEquals(seconds, dtrObject2.AsInt32Value());
     
     // Decode using FasterXML
-    final Tst2 tst = MapperUtils.getCBORMapper().readValue(object.EncodeToBytes(), Tst2.class);
+    final Tst2 tst = DigitalGreenCertificate.getCBORMapper().readValue(object.EncodeToBytes(), Tst2.class);
     Assert.assertEquals((long) seconds, tst.getDtr().getEpochSecond());
   }
   

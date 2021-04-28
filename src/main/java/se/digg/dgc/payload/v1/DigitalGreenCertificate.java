@@ -6,6 +6,7 @@
 package se.digg.dgc.payload.v1;
 
 import java.io.IOException;
+import java.time.LocalDate;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -14,13 +15,14 @@ import com.fasterxml.jackson.dataformat.cbor.databind.CBORMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 /**
- * Utility methods for serializing and deserializing a {@link DigitalGreenCertificate}.
+ * A wrapper for the root element generated from the Schema. This class offers methods for encoding and decoding to/from
+ * CBOR and JSON.
  * 
  * @author Martin Lindström (martin@idsec.se)
  * @author Henrik Bengtsson (extern.henrik.bengtsson@digg.se)
  * @author Henric Norlander (extern.henric.norlander@digg.se)
  */
-public class MapperUtils {
+public class DigitalGreenCertificate extends Eudgc {
 
   /** The CBOR mapper. */
   private static CBORMapper cborMapper = new CBORMapper();
@@ -37,41 +39,40 @@ public class MapperUtils {
   }
 
   /**
-   * Given a HCERT payload its CBOR encoding is returned.
+   * Default constructor.
+   */
+  public DigitalGreenCertificate() {
+    super();
+  }
+
+  /**
+   * Constructor assigning the subject name and date of birth of the subject.
    * 
-   * @param dgc
-   *          the HCERT/DGC payload to encode
+   * @param name
+   *          the subject name
+   * @param dateOfBirth
+   *          the date of birth of the subject
+   */
+  public DigitalGreenCertificate(final PersonName name, final LocalDate dateOfBirth) {
+    this();
+    this.setVer(DGCSchemaVersion.DGC_SCHEMA_VERSION);
+    this.setNam(name);
+    this.setDob(dateOfBirth);
+  }
+
+  /**
+   * Encodes this object to its CBOR byte representation.
+   * 
    * @return the CBOR encoding
    * @throws DGCSchemaException
    *           for encoding errors
    */
-  public static byte[] toCBOREncoding(final DigitalGreenCertificate dgc) throws DGCSchemaException {
+  public byte[] encode() throws DGCSchemaException {
     try {
-      return cborMapper.writeValueAsBytes(dgc);
+      return cborMapper.writeValueAsBytes(this);
     }
     catch (final JsonProcessingException e) {
       throw new DGCSchemaException("Failed to serialize to CBOR", e);
-    }
-  }
-
-  /**
-   * Given a HCERT payload its string JSON representation is returned.
-   * <p>
-   * Mainly for debugging.
-   * </p>
-   * 
-   * @param dgc
-   *          the HCERT/DGC payload to encode
-   * @return JSON string
-   * @throws DGCSchemaException
-   *           fort encoding errors
-   */
-  public static String toJSONString(final DigitalGreenCertificate dgc) throws DGCSchemaException {
-    try {
-      return jsonMapper.writeValueAsString(dgc);
-    }
-    catch (final JsonProcessingException e) {
-      throw new DGCSchemaException("Failed to serialize to JSON", e);
     }
   }
 
@@ -84,12 +85,31 @@ public class MapperUtils {
    * @throws DGCSchemaException
    *           for decoding errors
    */
-  public static DigitalGreenCertificate toDigitalGreenCertificate(final byte[] cbor) throws DGCSchemaException {
+  public static DigitalGreenCertificate decode(final byte[] cbor) throws DGCSchemaException {
     try {
       return cborMapper.readValue(cbor, DigitalGreenCertificate.class);
     }
     catch (final IOException e) {
       throw new DGCSchemaException("Failed to decode DGC from CBOR encoding", e);
+    }
+  }
+
+  /**
+   * Gets this object as a JSON string.
+   * <p>
+   * Mainly for debugging.
+   * </p>
+   * 
+   * @return JSON string
+   * @throws DGCSchemaException
+   *           fort encoding errors
+   */
+  public String toJSONString() throws DGCSchemaException {
+    try {
+      return jsonMapper.writeValueAsString(this);
+    }
+    catch (final JsonProcessingException e) {
+      throw new DGCSchemaException("Failed to serialize to JSON", e);
     }
   }
 
@@ -102,7 +122,7 @@ public class MapperUtils {
    * @throws DGCSchemaException
    *           for decoding errors
    */
-  public static DigitalGreenCertificate toDigitalGreenCertificate(final String json) throws DGCSchemaException {
+  public static DigitalGreenCertificate fromJsonString(final String json) throws DGCSchemaException {
     try {
       return jsonMapper.readValue(json, DigitalGreenCertificate.class);
     }
@@ -120,8 +140,10 @@ public class MapperUtils {
     return cborMapper;
   }
 
-  // Hidden constructor
-  private MapperUtils() {
+  /** {@inheritDoc} */
+  @Override
+  public String toString() {
+    return super.toString();
   }
 
 }

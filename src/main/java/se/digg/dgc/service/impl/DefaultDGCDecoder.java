@@ -20,7 +20,6 @@ import se.digg.dgc.encoding.DGCConstants;
 import se.digg.dgc.encoding.Zlib;
 import se.digg.dgc.payload.v1.DGCSchemaException;
 import se.digg.dgc.payload.v1.DigitalGreenCertificate;
-import se.digg.dgc.payload.v1.MapperUtils;
 import se.digg.dgc.service.DGCDecoder;
 import se.digg.dgc.signatures.CertificateProvider;
 import se.digg.dgc.signatures.DGCSignatureVerifier;
@@ -69,7 +68,7 @@ public class DefaultDGCDecoder implements DGCDecoder {
     final byte[] dgcEncoding = this.decodeToBytes(base45);
     
     log.trace("CBOR decoding DGC ...");
-    final DigitalGreenCertificate dgc = MapperUtils.toDigitalGreenCertificate(dgcEncoding);
+    final DigitalGreenCertificate dgc = DigitalGreenCertificate.decode(dgcEncoding); 
     log.trace("Decoded into: {}", dgc);
     
     return dgc;
@@ -117,7 +116,7 @@ public class DefaultDGCDecoder implements DGCDecoder {
     final byte[] encodedDgc = this.decodeRawToBytes(cwt);
 
     log.trace("CBOR decoding DGC ...");
-    final DigitalGreenCertificate dgc = MapperUtils.toDigitalGreenCertificate(encodedDgc);
+    final DigitalGreenCertificate dgc = DigitalGreenCertificate.decode(encodedDgc);
     log.trace("Decoded into: {}", dgc);
 
     return dgc;
