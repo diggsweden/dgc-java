@@ -131,12 +131,6 @@
       <version>${bouncy-castle.version}</version>
     </dependency>
 
-    <dependency>
-      <groupId>se.swedenconnect.security</groupId>
-      <artifactId>credentials-support</artifactId>
-      <version>${credentials-support.version}</version>
-    </dependency>
-    
     <!-- For testing -->
     <dependency>
       <groupId>junit</groupId>
