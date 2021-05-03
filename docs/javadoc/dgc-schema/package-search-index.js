@@ -1,0 +1,1 @@
+packageSearchIndex = [{"l":"All Packages","url":"allpackages-index.html"},{"l":"se.digg.dgc.payload.v1"},{"l":"se.digg.dgc.transliteration"},{"l":"se.digg.dgc.valueset.v1"},{"l":"se.digg.dgc.valueset.v1.validation"}]

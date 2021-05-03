@@ -5,7 +5,7 @@
 
   <groupId>se.digg.dgc</groupId>
   <artifactId>dgc-parent</artifactId>
-  <version>0.9.3-SNAPSHOT</version>
+  <version>0.9.3</version>
   <packaging>pom</packaging>
 
   <name>DIGG :: Digital Green Certificate :: DGC Java</name>
@@ -276,13 +276,6 @@
                 <additionalJOption>-Xdoclint:all</additionalJOption>
                 <additionalJOption>-Xdoclint:-missing</additionalJOption>
               </additionalJOptions>
-              <!-- 
-              <links>
-                <link>https://docs.spring.io/spring-framework/docs/current/javadoc-api/</link>
-                <link>https://diggsweden.github.io/dgc-java/javadoc/dgc-schema/</link>
-                <link>https://diggsweden.github.io/dgc-java/javadoc/dgc-create-validate/</link>
-              </links>
-              -->
             </configuration>
           </plugin>
 
