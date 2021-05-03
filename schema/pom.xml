@@ -1,0 +1,175 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+  
+  <parent>
+    <groupId>se.digg.dgc</groupId>
+    <artifactId>dgc-parent</artifactId>
+    <version>0.9.3-SNAPSHOT</version>
+  </parent>  
+
+  <artifactId>dgc-schema</artifactId>
+
+  <name>DIGG :: Digital Green Certificate :: DGC Schema</name>
+  <description>Java representation of Schema for Digital Green Certificate</description>
+  <url>https://github.com/diggsweden/dgc-java</url>
+  
+  <licenses>
+    <license>
+      <name>MIT License</name>
+      <url>http://www.opensource.org/licenses/mit-license.php</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>  
+
+  <scm>
+    <connection>scm:https://github.com/diggsweden/dgc-java.git</connection>
+    <developerConnection>scm:https://github.com/diggsweden/dgc-java.git</developerConnection>
+    <url>https://github.com/diggsweden/dgc-java/tree/master</url>
+  </scm>
+
+  <developers>
+    <developer>
+      <name>Martin Lindström</name>
+      <email>martin.lindstrom@idsec.se</email>
+    </developer>
+    <developer>
+      <name>Henrik Bengtsson</name>
+      <email>extern.henrik.bengtsson@digg.se</email>
+    </developer>
+    <developer>
+      <name>Henric Norlander</name>
+      <email>extern.henric.norlander@digg.se</email>
+    </developer>
+  </developers>
+  
+  <distributionManagement>
+    <repository>
+      <id>ossrh</id>
+      <url>https://s01.oss.sonatype.org/content/groups/staging/</url>
+    </repository>
+  </distributionManagement>  
+
+  <properties>
+  </properties>
+
+  <dependencies>
+  
+    <dependency>
+      <groupId>javax.validation</groupId>
+      <artifactId>validation-api</artifactId>
+    </dependency>
+    
+    <!-- Jackson -->
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>com.fasterxml.jackson.dataformat</groupId>
+      <artifactId>jackson-dataformat-cbor</artifactId>
+    </dependency>
+    
+    <dependency>
+      <groupId>com.fasterxml.jackson.datatype</groupId>
+      <artifactId>jackson-datatype-jsr310</artifactId>
+    </dependency>    
+
+    <!-- CBOR and COSE -->
+    <dependency>
+      <groupId>com.upokecenter</groupId>
+      <artifactId>cbor</artifactId>
+    </dependency>
+        
+    <!-- For testing -->    
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+      <version>2.8.0</version>
+      <scope>test</scope>
+    </dependency>
+
+  </dependencies>
+
+  <build>
+
+    <plugins>
+      
+      <plugin>
+        <groupId>org.jsonschema2pojo</groupId>
+        <artifactId>jsonschema2pojo-maven-plugin</artifactId>
+        <version>1.1.1</version>
+        <configuration>          
+          <sourceDirectory>${basedir}/src/main/resources/schema</sourceDirectory>
+          <targetPackage>se.digg.dgc.payload.v1</targetPackage>
+          <includeAdditionalProperties>false</includeAdditionalProperties>
+          <includeJsr303Annotations>true</includeJsr303Annotations>
+          <includeConstructors>true</includeConstructors>
+          <useTitleAsClassname>true</useTitleAsClassname>    
+          <generateBuilders>true</generateBuilders>          
+          <initializeCollections>false</initializeCollections>
+          <!-- We need to register the JavaTimeModule for these. -->
+          <dateType>java.time.LocalDate</dateType>
+          <dateTimeType>java.time.Instant</dateTimeType>
+          <outputDirectory>${project.build.directory}/generated-sources/schema</outputDirectory>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>generate</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>      
+
+    </plugins>
+
+  </build>
+  
+  <profiles>
+
+    <profile>
+      <id>release</id>
+
+      <!-- See http://central.sonatype.org/pages/apache-maven.html for setup -->
+
+      <build>
+        <plugins>
+
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-javadoc-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>attach-javadoc</id>
+                <goals>
+                  <goal>jar</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <doctitle>Digital Green Certificate - DGC Schema - ${project.version}</doctitle>
+              <windowtitle>Digital Green Certificate - DGC Schema - ${project.version}</windowtitle>
+              <detectJavaApiLink>true</detectJavaApiLink>
+              <additionalparam>-Xdoclint:all -Xdoclint:-missing</additionalparam>
+              <additionalOptions>-Xdoclint:all -Xdoclint:-missing</additionalOptions>
+              <additionalJOptions>
+                <additionalJOption>-Xdoclint:all</additionalJOption>
+                <additionalJOption>-Xdoclint:-missing</additionalJOption>
+              </additionalJOptions>
+              <links>
+                <link>https://docs.spring.io/spring-framework/docs/current/javadoc-api/</link>
+              </links>
+            </configuration>
+          </plugin>
+
+        </plugins>
+      </build>
+
+    </profile>
+
+  </profiles>  
+
+</project>
