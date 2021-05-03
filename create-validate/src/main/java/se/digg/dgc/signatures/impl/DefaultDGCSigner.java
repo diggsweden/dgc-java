@@ -11,6 +11,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.Provider;
+import java.security.PublicKey;
 import java.security.SignatureException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
@@ -18,6 +19,7 @@ import java.security.cert.X509Certificate;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
 import java.time.Instant;
+import java.util.Optional;
 
 import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
@@ -37,7 +39,6 @@ import se.digg.dgc.signatures.cose.CoseSign1_Object;
 import se.digg.dgc.signatures.cose.HeaderParameterKey;
 import se.digg.dgc.signatures.cose.SignatureAlgorithm;
 import se.digg.dgc.signatures.cwt.Cwt;
-import se.swedenconnect.security.credential.BasicCredential;
 import se.swedenconnect.security.credential.PkiCredential;
 
 /**
@@ -53,7 +54,7 @@ public class DefaultDGCSigner implements DGCSigner {
   private static final Logger log = LoggerFactory.getLogger(DefaultDGCSigner.class);
 
   /** The credential that we are using for signing. */
-  private final PkiCredential signerCredential;
+  private final CredentialWrapper signerCredential;
 
   /** The Java Security Provider to use when signing. */
   private Provider securityProvider;
@@ -81,7 +82,7 @@ public class DefaultDGCSigner implements DGCSigner {
    *           for certificate decoding errors
    */
   public DefaultDGCSigner(final PrivateKey signerKey, final X509Certificate signerCertificate) throws CertificateException {
-    this(new BasicCredential(signerCertificate, signerKey));
+    this(new CredentialWrapper(signerKey, signerCertificate));
   }
 
   /**
@@ -93,7 +94,20 @@ public class DefaultDGCSigner implements DGCSigner {
    *           for certificate decoding errors
    */
   public DefaultDGCSigner(final PkiCredential signerCredential) throws CertificateException {
+    this(new CredentialWrapper(signerCredential));
+  }
+  
+  /**
+   * Constructor.
+   * 
+   * @param signerCredential
+   *          the signer credential
+   * @throws CertificateException
+   *           for certificate decoding errors
+   */
+  private DefaultDGCSigner(final CredentialWrapper signerCredential) throws CertificateException {
     this.signerCredential = signerCredential;
+    
     this.country = getCountry(signerCredential.getCertificate());
     this.keyIdentifier = calculateKid(signerCredential.getCertificate());
     this.signerExpiration = Instant.ofEpochMilli(signerCredential.getCertificate().getNotAfter().getTime());
@@ -232,6 +246,40 @@ public class DefaultDGCSigner implements DGCSigner {
    */
   public void setSecurityProvider(final Provider securityProvider) {
     this.securityProvider = securityProvider;
+  }
+
+  /**
+   * A credential wrapper so that we don't have to require the use of the {@link PkiCredential} class.
+   */
+  private static class CredentialWrapper {
+
+    private PrivateKey signerKey;
+    private X509Certificate signerCertificate;
+    private PkiCredential signerCredential;
+
+    public CredentialWrapper(final PrivateKey signerKey, final X509Certificate signerCertificate) {
+      this.signerKey = Optional.ofNullable(signerKey)
+        .orElseThrow(() -> new IllegalArgumentException("signerKey must not be null"));
+      this.signerCertificate = Optional.ofNullable(signerCertificate)
+        .orElseThrow(() -> new IllegalArgumentException("signerCertificate must not be null"));
+    }
+
+    public CredentialWrapper(final PkiCredential signerCredential) {
+      this.signerCredential = Optional.ofNullable(signerCredential)
+        .orElseThrow(() -> new IllegalArgumentException("signerCredential must not be null"));
+    }
+
+    public PublicKey getPublicKey() {
+      return this.getCertificate().getPublicKey();
+    }
+
+    public X509Certificate getCertificate() {
+      return this.signerCredential != null ? this.signerCredential.getCertificate() : this.signerCertificate;
+    }
+
+    public PrivateKey getPrivateKey() {
+      return this.signerCredential != null ? this.signerCredential.getPrivateKey() : this.signerKey;
+    }
   }
 
 }

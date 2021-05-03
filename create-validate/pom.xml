@@ -138,8 +138,44 @@
       <groupId>se.swedenconnect.security</groupId>
       <artifactId>credentials-support</artifactId>
       <version>${credentials-support.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.springframework</groupId>
+          <artifactId>spring-core</artifactId>
+        </exclusion>        
+        <exclusion>
+          <groupId>org.springframework</groupId>
+          <artifactId>spring-beans</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.springframework</groupId>
+          <artifactId>spring-context</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     
+    <!-- Include those to make full use of PkiCredentials support -->
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-core</artifactId>
+      <version>[5.0.0.RELEASE,)</version>
+      <optional>true</optional>  
+    </dependency>
+    
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-beans</artifactId>
+      <version>[5.0.0.RELEASE,)</version>
+      <optional>true</optional>
+    </dependency>
+            
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-context</artifactId>
+      <version>[5.0.0.RELEASE,)</version>
+      <optional>true</optional>
+    </dependency>
+
     <!-- For testing -->    
     <dependency>
       <groupId>commons-io</groupId>
