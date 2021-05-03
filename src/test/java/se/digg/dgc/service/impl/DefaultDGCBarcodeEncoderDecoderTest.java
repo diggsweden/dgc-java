@@ -33,58 +33,58 @@ import java.util.UUID;
  */
 public class DefaultDGCBarcodeEncoderDecoderTest {
 
-    private PkiCredential ecdsa;
+  private PkiCredential ecdsa;
 
-    private static String password = "secret";
+  private static String password = "secret";
 
-    public DefaultDGCBarcodeEncoderDecoderTest() throws Exception {
-        this.ecdsa = PkiCredentialHelper.getFromJKS("ecdsa.jks", password, "se");
-    }
+  public DefaultDGCBarcodeEncoderDecoderTest() throws Exception {
+    this.ecdsa = PkiCredentialHelper.getFromJKS("ecdsa.jks", password, "se");
+  }
 
-    @Test
-    public void testEncodeDecodeBarcode() throws Exception {
+  @Test
+  public void testEncodeDecodeBarcode() throws Exception {
 
-        final Instant expire = Instant.now().plus(Duration.ofDays(30));
-        final DigitalGreenCertificate dgc = getTestDGC();
+    final Instant expire = Instant.now().plus(Duration.ofDays(30));
+    final DigitalGreenCertificate dgc = getTestDGC();
 
-        final DefaultDGCBarcodeEncoder encoder = new DefaultDGCBarcodeEncoder(new DefaultDGCSigner(this.ecdsa), new DefaultBarcodeCreator());
-        encoder.setTransliterateNames(true);
+    final DefaultDGCBarcodeEncoder encoder = new DefaultDGCBarcodeEncoder(new DefaultDGCSigner(this.ecdsa), new DefaultBarcodeCreator());
+    encoder.setTransliterateNames(true);
 
-        final Barcode barcode = encoder.encodeToBarcode(dgc, expire);
+    final Barcode barcode = encoder.encodeToBarcode(dgc, expire);
 
-        final DefaultDGCBarcodeDecoder decoder = new DefaultDGCBarcodeDecoder(
-                new DefaultDGCSignatureVerifier(), (x, y) -> Arrays.asList(this.ecdsa.getCertificate()), new DefaultBarcodeDecoder());
+    final DefaultDGCBarcodeDecoder decoder = new DefaultDGCBarcodeDecoder(
+      new DefaultDGCSignatureVerifier(), (x, y) -> Arrays.asList(this.ecdsa.getCertificate()), new DefaultBarcodeDecoder());
 
-        final DigitalGreenCertificate dgc2 = decoder.decodeBarcode(barcode.getImage());
-        Assert.assertEquals(dgc, dgc2);
-        Assert.assertEquals("KARL<MAARTEN", dgc2.getNam().getGnt());
-        Assert.assertEquals("LINDSTROEM", dgc2.getNam().getFnt());
-    }
+    final DigitalGreenCertificate dgc2 = decoder.decodeBarcode(barcode.getImage());
+    Assert.assertEquals(dgc, dgc2);
+    Assert.assertEquals("KARL<MAARTEN", dgc2.getNam().getGnt());
+    Assert.assertEquals("LINDSTROEM", dgc2.getNam().getFnt());
+  }
 
-    private DigitalGreenCertificate getTestDGC() {
-        DigitalGreenCertificate dgc = new DigitalGreenCertificate();
-        dgc.setVer("1.0.0");
+  private DigitalGreenCertificate getTestDGC() {
+    DigitalGreenCertificate dgc = new DigitalGreenCertificate();
+    dgc.setVer("1.0.0");
 
-        dgc.setNam(new PersonName().withGn("Karl Mårten").withFn("Lindström"));
-        dgc.setDob(LocalDate.parse("1969-11-29"));
+    dgc.setNam(new PersonName().withGn("Karl Mårten").withFn("Lindström"));
+    dgc.setDob(LocalDate.parse("1969-11-29"));
 
 
-        VaccinationEntry vac = new VaccinationEntry();
-        vac
-                .withCi(UUID.randomUUID().toString())
-                .withTg("840539006")
-                .withDt(LocalDate.parse("2021-04-02"))
-                .withCo("SE")
-                .withDn(Integer.valueOf(1))
-                .withSd(Integer.valueOf(2))
-                .withIs("eHälsomyndigheten")
-                .withMa("ORG-100001699")
-                .withMp("CVnCoV")
-                .withVp("1119349007");
+    VaccinationEntry vac = new VaccinationEntry();
+    vac
+      .withCi(UUID.randomUUID().toString())
+      .withTg("840539006")
+      .withDt(LocalDate.parse("2021-04-02"))
+      .withCo("SE")
+      .withDn(Integer.valueOf(1))
+      .withSd(Integer.valueOf(2))
+      .withIs("eHälsomyndigheten")
+      .withMa("ORG-100001699")
+      .withMp("CVnCoV")
+      .withVp("1119349007");
 
-        dgc.setV(Arrays.asList(vac));
+    dgc.setV(Arrays.asList(vac));
 
-        return dgc;
-    }
+    return dgc;
+  }
 
 }

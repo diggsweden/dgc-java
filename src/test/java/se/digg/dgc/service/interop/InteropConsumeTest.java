@@ -30,39 +30,39 @@ import static se.digg.dgc.helper.PkiCredentialHelper.getResourceInputStream;
  */
 public class InteropConsumeTest {
 
-    @Test
-    public void testDecodeFromBarcode() throws Exception {
-        final byte[] image = getResourceInputStream("interop/hcert-testdata/test1.png").readAllBytes();
-        final X509Certificate cert = getFromPEM("interop/hcert-testdata/issuer1.crt");
+  @Test
+  public void testDecodeFromBarcode() throws Exception {
+    final byte[] image = getResourceInputStream("interop/hcert-testdata/test1.png").readAllBytes();
+    final X509Certificate cert = getFromPEM("interop/hcert-testdata/issuer1.crt");
 
-        // Decode barcode into the Base45 string ...
-        final DefaultBarcodeDecoder decoder = new DefaultBarcodeDecoder();
-        final String base45 = decoder.decodeToString(image, StandardCharsets.US_ASCII);
+    // Decode barcode into the Base45 string ...
+    final DefaultBarcodeDecoder decoder = new DefaultBarcodeDecoder();
+    final String base45 = decoder.decodeToString(image, StandardCharsets.US_ASCII);
 
-        // Assert the the prefix is there.
-        Assert.assertTrue(base45.startsWith("HC1"));
+    // Assert the the prefix is there.
+    Assert.assertTrue(base45.startsWith("HC1"));
 
-        // Base45 decode
-        final byte[] compressedCwt = Base45.getDecoder().decode(base45.substring(3));
+    // Base45 decode
+    final byte[] compressedCwt = Base45.getDecoder().decode(base45.substring(3));
 
-        // Decompress
-        final byte[] cwt = Zlib.decompress(compressedCwt, true);
+    // Decompress
+    final byte[] cwt = Zlib.decompress(compressedCwt, true);
 
-        // Verify signature
-        final DefaultDGCSignatureVerifier verifier = new DefaultDGCSignatureVerifier();
-        DGCSignatureVerifier.Result result = verifier.verify(cwt, (c, k) -> Arrays.asList(cert));
+    // Verify signature
+    final DefaultDGCSignatureVerifier verifier = new DefaultDGCSignatureVerifier();
+    DGCSignatureVerifier.Result result = verifier.verify(cwt, (c, k) -> Arrays.asList(cert));
 
-        System.out.println(String.format("CWT: issuing-country='%s', issued-at='%s', expires='%s',signer-cert='%s'",
-                result.getCountry(), result.getIssuedAt(), result.getExpires(), result.getSignerCertificate().getSubjectX500Principal()));
+    System.out.println(String.format("CWT: issuing-country='%s', issued-at='%s', expires='%s',signer-cert='%s'",
+      result.getCountry(), result.getIssuedAt(), result.getExpires(), result.getSignerCertificate().getSubjectX500Principal()));
 
-        // Dump HCERT contents in JSON
-        final CBORObject dgcObject = CBORObject.DecodeFromBytes(result.getDgcPayload());
-        System.out.println(dgcObject.ToJSONString());
+    // Dump HCERT contents in JSON
+    final CBORObject dgcObject = CBORObject.DecodeFromBytes(result.getDgcPayload());
+    System.out.println(dgcObject.ToJSONString());
 
-        // Deserialize into our Java representation ...
+    // Deserialize into our Java representation ...
 //    final ObjectMapper cborMapper = new CBORMapper();
 //    final DigitalGreenCertificate dgc = cborMapper.readValue(result.getHcert(), DigitalGreenCertificate.class);
-    }
+  }
 
 
 }
