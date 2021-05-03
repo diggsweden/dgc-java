@@ -61,10 +61,16 @@
 
   <dependencies>
   
+    <!-- 
+      Note that the dgc-schema dependency has provided-scope.
+      The reason for this is that the schema may change more frequently and we don't want
+      to hardwire a version dependency to it.
+     -->
     <dependency>
       <groupId>se.digg.dgc</groupId>
       <artifactId>dgc-schema</artifactId>
       <version>${project.version}</version>
+      <scope>provided</scope>
     </dependency>
   
     <dependency>

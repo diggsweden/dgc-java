@@ -10,7 +10,7 @@ An implementation in Java for creating and validating a Digital Green Certificat
 
 ## About
 
-This repository contains the Java library **dgc-create-validate** for creating and validating Digital Green Certificates. It is maintained by the [Swedish Agency for Digital Government](https://www.digg.se/en).
+This repository contains the Java libraries **dgc-schema** and **dgc-create-validate** for creating and validating Digital Green Certificates. It is maintained by the [Swedish Agency for Digital Government](https://www.digg.se/en).
 
 ## Resources
 
@@ -26,17 +26,17 @@ This repository contains the Java library **dgc-create-validate** for creating a
 
 The code is structured into the following parts:
 
-- API - Java POJO:s generated from the [schema](https://github.com/ehn-digital-green-development/hcert-schema).
+- API - Java POJO:s generated from the [schema](https://github.com/ehn-digital-green-development/hcert-schema). **dgc-schema**
 
-- CBOR, CWT/COSE - Support for representing the DGC in CBOR and to sign/validate it.
+- CBOR, CWT/COSE - Support for representing the DGC in CBOR and to sign/validate it. **dgc-create-validate**
 
-- Compresssion/decompression
+- Compresssion/decompression. **dgc-create-validate**
 
-- Base45 implementation
+- Base45 implementation. **dgc-create-validate**
 
-- QR code generation - Support for creating/reading QR-codes.
+- QR code generation - Support for creating/reading QR-codes. **dgc-create-validate**
 
-- Service layer - A service that ties all the above components together and presents high-level methods for creating and validating Digital Green Certificates.
+- Service layer - A service that ties all the above components together and presents high-level methods for creating and validating Digital Green Certificates. **dgc-create-validate**
 
 ## Maven
 
@@ -45,12 +45,16 @@ Include the following in your POM:
 ```
 <dependency>
   <groupId>se.digg.dgc</groupId>
+  <artifactId>dgc-schema</artifactId>
+  <version>${dgc-java.version}</version>
+</dependency>
+
+<dependency>
+  <groupId>se.digg.dgc</groupId>
   <artifactId>dgc-create-validate</artifactId>
   <version>${dgc-java.version}</version>
 </dependency>
 ```
-
-> Note: The artifact will be published to Maven central once the DGC schema is stable.
 
 The **dgc-create-validate** library offers a barcode (QR) implementation using the [ZXing](https://github.com/zxing/zxing) library, but the [BarcodeCreator](https://github.com/DIGGSweden/dgc-java/blob/main/src/main/java/se/digg/dgc/encoding/BarcodeCreator.java) and [BarcodeDecoder](https://github.com/DIGGSweden/dgc-java/blob/main/src/main/java/se/digg/dgc/encoding/BarcodeDecoder.java) interfaces make it possible to implement your own barcode support using the library of your own choice. Therefore the dependencies to the ZXing jars are marked as optional in the **dgc-create-validate** POM. If you want to use the default implementation you need to include the following in your POM:
 
