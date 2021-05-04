@@ -86,7 +86,7 @@ public class DefaultBarcodeCreator implements BarcodeCreator {
       try (final ByteArrayOutputStream stream = new ByteArrayOutputStream()) {
         MatrixToImageWriter.writeToStream(bitMatrix, imageFormat.getName(), stream);
         byte[] bytes = stream.toByteArray();
-        return new Barcode(this.type, bytes, this.imageFormat, this.widthAndHeight, this.widthAndHeight);
+        return new Barcode(this.type, bytes, this.imageFormat, this.widthAndHeight, this.widthAndHeight, contents);
       }
       catch (final IOException e) {
         throw new BarcodeException("Failed to create barcode - " + e.getMessage(), e);
