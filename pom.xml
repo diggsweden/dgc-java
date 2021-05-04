@@ -98,7 +98,7 @@
       <dependency>
         <groupId>com.upokecenter</groupId>
         <artifactId>cbor</artifactId>
-        <version>4.3.0</version>
+        <version>4.4.1</version>
       </dependency>
       
       <!-- Test -->

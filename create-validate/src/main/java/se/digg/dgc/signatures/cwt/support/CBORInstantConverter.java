@@ -6,13 +6,11 @@
 package se.digg.dgc.signatures.cwt.support;
 
 import java.time.Instant;
+import java.util.Date;
 
-import com.upokecenter.cbor.CBORException;
-import com.upokecenter.cbor.CBORNumber;
+import com.upokecenter.cbor.CBORDateConverter;
 import com.upokecenter.cbor.CBORObject;
 import com.upokecenter.cbor.ICBORToFromConverter;
-import com.upokecenter.numbers.EDecimal;
-import com.upokecenter.numbers.EInteger;
 
 /**
  * Converter for representation of NumericDate using Instant according to RFC8392.
@@ -22,6 +20,12 @@ import com.upokecenter.numbers.EInteger;
  * @author Henric Norlander (extern.henric.norlander@digg.se)
  */
 public class CBORInstantConverter implements ICBORToFromConverter<Instant> {
+  
+  /** Converter used to take an Instant to/from a CBORObject (untagged). */
+  private static final CBORDateConverter untaggedDateConverter = CBORDateConverter.UntaggedNumber;
+  
+  /** Converter which we fall back on if the object is tagged. */
+  private static final CBORDateConverter taggedDateConverter = CBORDateConverter.TaggedNumber;
 
   /** {@inheritDoc} */
   @Override
@@ -29,7 +33,7 @@ public class CBORInstantConverter implements ICBORToFromConverter<Instant> {
     if (obj == null) {
       return null;
     }
-    return CBORObject.FromObject(obj.getEpochSecond());
+    return untaggedDateConverter.ToCBORObject(new Date(obj.toEpochMilli()));
   }
 
   /** {@inheritDoc} */
@@ -38,45 +42,16 @@ public class CBORInstantConverter implements ICBORToFromConverter<Instant> {
     if (obj == null) {
       return null;
     }
-
-    CBORObject untaggedObject = obj;
-
-    if (obj.HasMostOuterTag(0)) {
-      // We are liberal. Really it should be a numeric date.
-      try {
-        return stringToInstant(obj.AsString());
-      }
-      catch (ArithmeticException | IllegalStateException | IllegalArgumentException e) {
-        throw new CBORException(e.getMessage(), e);
-      }
-    }
-    else if (obj.HasMostOuterTag(1)) {
-      // Section 2 of RFC8392 states that the leading 1 tag MUST be omitted, but it is present here
-      untaggedObject = obj.UntagOne();
-    }
-
-    if (!untaggedObject.isNumber()) {
-      throw new CBORException("Expected number for representation of date");
-    }
-    final CBORNumber num = untaggedObject.AsNumber();
-    if (!num.IsFinite()) {
-      throw new CBORException("Not a finite number");
-    }
-    if (num.compareTo(Long.MIN_VALUE) < 0 || num.compareTo(Long.MAX_VALUE) > 0) {
-      throw new CBORException("Date can not be represented as Instant (too small or large)");
-    }
     
-    final EDecimal dec = (EDecimal)untaggedObject.ToObject(EDecimal.class);
-    final int[] lesserFields = new int[7];
-    final EInteger[] year = new EInteger[1];
-    CBORUtils.breakDownSecondsSinceEpoch(dec, year, lesserFields);
-    return CBORUtils.buildUpInstant(year[0], lesserFields);
+    final Date date;
+    if (obj.HasMostOuterTag(0) || obj.HasMostOuterTag(1)) {
+      // We are liberal. Really it should be a numeric untagged date.
+      date = taggedDateConverter.FromCBORObject(obj);
+    }
+    else {
+      date = untaggedDateConverter.FromCBORObject(obj);
+    }
+    return Instant.ofEpochMilli(date.getTime());
   }
-
-  private static Instant stringToInstant(final String str) {
-    int[] lesserFields = new int[7];
-    EInteger[] year = new EInteger[1];
-    CBORUtils.parseAtomDateTimeString(str, year, lesserFields);
-    return CBORUtils.buildUpInstant(year[0], lesserFields);
-  }
+  
 }
