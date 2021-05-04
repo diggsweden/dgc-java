@@ -446,7 +446,7 @@ public class CoseSign1_Object {
   }
 
   /**
-   * Tells whether to include the COSE_Sign1 message tag in encodings. The default is {@code true}
+   * Tells whether to include the COSE_Sign1 message tag in encodings. The default is {@code true}.
    * 
    * @param includeMessageTag
    *          whether to include the message tag

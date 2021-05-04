@@ -38,6 +38,9 @@ public class Cwt {
 
   /** The message tag for eu_dgc_v1 that is added under the HCERT claim. */
   public static final int EU_DGC_V1_MESSAGE_TAG = 1;
+  
+  /** The CBOR CWT message tag. */
+  public static final int MESSAGE_TAG = 61;
 
   /** For handling of instants. */
   private static final CBORInstantConverter instantConverter = new CBORInstantConverter();

@@ -8,6 +8,7 @@ package se.digg.dgc.cwt;
 import java.time.Duration;
 import java.time.Instant;
 
+import org.apache.commons.codec.binary.Hex;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -39,6 +40,8 @@ public class CwtTest {
       .claim("98", object.EncodeToBytes())
       .claim(99, object)
       .build();
+    
+    System.out.println(Hex.encodeHexString(cwt.encode()));
     
     Cwt cwt2 = Cwt.decode(cwt.encode());
     

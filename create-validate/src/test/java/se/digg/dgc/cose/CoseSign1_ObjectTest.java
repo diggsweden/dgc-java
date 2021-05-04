@@ -53,9 +53,11 @@ public class CoseSign1_ObjectTest {
       .content(cwt.encode())
       .build();
 
+    sign.setIncludeMessageTag(true);
+    
     sign.sign(this.ecdsa.getPrivateKey(), null);
 
-    final byte[] encoding = sign.encode();
+    final byte[] encoding = sign.encode();    
 
     CoseSign1_Object object2 = CoseSign1_Object.decode(encoding);
 

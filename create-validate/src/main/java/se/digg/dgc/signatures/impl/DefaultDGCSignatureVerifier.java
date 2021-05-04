@@ -29,9 +29,12 @@ import se.digg.dgc.signatures.cwt.Cwt;
  * @author Henric Norlander (extern.henric.norlander@digg.se)
  */
 public class DefaultDGCSignatureVerifier implements DGCSignatureVerifier {
-  
+
   /** Logger */
   private static final Logger log = LoggerFactory.getLogger(DefaultDGCSignatureVerifier.class);
+
+  /** For test only: Simulates the current validation time. */
+  private Instant testValidationTime;
 
   /** {@inheritDoc} */
   @Override
@@ -44,16 +47,16 @@ public class DefaultDGCSignatureVerifier implements DGCSignatureVerifier {
 
     try {
       final CoseSign1_Object coseObject = CoseSign1_Object.decode(signedCwt);
-      
+
       final byte[] kid = coseObject.getKeyIdentifier();
       final String country = coseObject.getCwt().getIssuer();
 
       if (kid == null && country == null) {
         throw new SignatureException("Signed object does not contain key identifier or country - cannot find certificate");
       }
-      
+
       final List<X509Certificate> certs = certificateProvider.getCertificates(country, kid);
-      
+
       for (final X509Certificate cert : certs) {
         log.trace("Attempting DGC signature verification using certificate '{}'", cert.getSubjectX500Principal().getName());
 
@@ -66,19 +69,19 @@ public class DefaultDGCSignatureVerifier implements DGCSignatureVerifier {
 
           final Instant expiration = cwt.getExpiration();
           if (expiration != null) {
-            if (Instant.now().isAfter(expiration)) {
+            if (this.getNow().isAfter(expiration)) {
               throw new CertificateExpiredException("Signed DGC has expired");
             }
           }
           else {
             log.warn("Signed HCERT did not contain an expiration time - assuming it is valid");
           }
-          
+
           final byte[] dgcPayload = cwt.getDgcV1();
           if (dgcPayload == null) {
             throw new SignatureException("No DGC payload available in CWT");
           }
-          
+
           return new DGCSignatureVerifier.Result(dgcPayload, cert, country, cwt.getIssuedAt(), cwt.getExpiration());
         }
         catch (CBORException | SignatureException e) {
@@ -97,6 +100,29 @@ public class DefaultDGCSignatureVerifier implements DGCSignatureVerifier {
     catch (final CBORException e) {
       throw new SignatureException("Invalid signature - " + e.getMessage(), e);
     }
+  }
+
+  /**
+   * Gets the current time.
+   * 
+   * @return the current time
+   */
+  private Instant getNow() {
+    if (this.testValidationTime != null) {
+      log.warn("{} is in test mode - using simulated time for now: {}", this.getClass().getSimpleName(), testValidationTime);
+      return this.testValidationTime;
+    }
+    return Instant.now();
+  }
+
+  /**
+   * For test only: Simulates the current validation time.
+   * 
+   * @param testValidationTime
+   *          simulated "now"
+   */
+  public void setTestValidationTime(final Instant testValidationTime) {
+    this.testValidationTime = testValidationTime;
   }
 
 }
