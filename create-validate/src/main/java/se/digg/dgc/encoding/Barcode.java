@@ -32,6 +32,9 @@ public class Barcode {
   /** The height of the barcode in pixels. */
   private final int height;
 
+  /** The content of the barcode, i.e., the data "in" the barcode. */
+  private final String payload;
+
   /**
    * Constructor.
    * 
@@ -45,8 +48,11 @@ public class Barcode {
    *          the width in pixels
    * @param height
    *          the height in pixels
+   * @param payload
+   *          the barcode payload (content)
    */
-  public Barcode(final BarcodeType type, final byte[] image, final ImageFormat imageFormat, final int width, final int height) {
+  public Barcode(final BarcodeType type, final byte[] image, final ImageFormat imageFormat, 
+      final int width, final int height, final String payload) {
     this.type = Optional.ofNullable(type).orElseThrow(() -> new IllegalArgumentException("type must not be null"));
     this.image = Optional.ofNullable(image)
       .filter(c -> c.length > 0)
@@ -54,6 +60,7 @@ public class Barcode {
     this.imageFormat = Optional.ofNullable(imageFormat).orElseThrow(() -> new IllegalArgumentException("imageFormat must not be null"));
     this.width = width;
     this.height = height;
+    this.payload = Optional.ofNullable(payload).orElseThrow(() -> new IllegalArgumentException("payload must not be null"));
 
     if (this.width <= 0) {
       throw new IllegalArgumentException("width must be a positive integer");
@@ -106,6 +113,15 @@ public class Barcode {
    */
   public int getHeight() {
     return this.height;
+  }
+
+  /**
+   * Gets the payload/contents of the barcode.
+   * 
+   * @return the payload
+   */
+  public String getPayload() {
+    return this.payload;
   }
 
   /**

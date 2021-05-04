@@ -221,7 +221,7 @@
                 <link>https://docs.spring.io/spring-framework/docs/current/javadoc-api/</link>
                 <link>https://docs.swedenconnect.se/credentials-support/apidoc/</link>
                 <link>https://zxing.github.io/zxing/apidocs/</link>
-                <!-- <link>https://diggsweden.github.io/dgc-java/javadoc/dgc-schema/</link> -->
+                <link>https://diggsweden.github.io/dgc-java/javadoc/dgc-schema/</link>
               </links>
             </configuration>
           </plugin>

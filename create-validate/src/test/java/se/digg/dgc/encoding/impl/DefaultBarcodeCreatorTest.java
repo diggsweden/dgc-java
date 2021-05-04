@@ -11,8 +11,6 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import se.digg.dgc.encoding.Barcode;
-import se.digg.dgc.encoding.impl.DefaultBarcodeCreator;
-import se.digg.dgc.encoding.impl.DefaultBarcodeDecoder;
 
 /**
  * Test cases for DefaultBarcodeCreator.
