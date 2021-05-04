@@ -37,8 +37,8 @@ public class CoseSign1_Object {
   /** The COSE_Sign1 message tag. */
   public static final int MESSAGE_TAG = 18;
 
-  /** Should the message tag be included? The default is {@code false}. */
-  private boolean includeMessageTag = false;
+  /** Should the message tag be included? The default is {@code true}. */
+  private boolean includeMessageTag = true;
 
   /** The protected attributes. */
   private CBORObject protectedAttributes;
@@ -446,7 +446,7 @@ public class CoseSign1_Object {
   }
 
   /**
-   * Tells whether to include the COSE_Sign1 message tag in encodings. The default is {@code false}
+   * Tells whether to include the COSE_Sign1 message tag in encodings. The default is {@code true}
    * 
    * @param includeMessageTag
    *          whether to include the message tag
