@@ -158,7 +158,7 @@ public class ValueSetValidationResult {
   /** {@inheritDoc} */
   @Override
   public String toString() {
-    return String.format("ValueSetValidationResult [result=%s, propertyName='%s', message='%s', children=%s]",
+    return String.format("ValueSetValidationResult [result=%s, propertyName='%s', message='%s', children=%d]",
       this.result, this.propertyName, this.message, this.children.size());
   }
 
