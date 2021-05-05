@@ -114,7 +114,9 @@ public class ValueSetValidationResult {
     else {
       this.message = msg;
     }
-    this.children.add(new ValueSetValidationResult(childProperty, childResult.getResult(), childResult.getMessage()));
+    ValueSetValidationResult vr = new ValueSetValidationResult(childProperty, childResult.getResult(), childResult.getMessage());
+    childResult.getChildren().forEach(vr::addChildResult);
+    this.children.add(vr);
   }
 
   /**
@@ -156,8 +158,8 @@ public class ValueSetValidationResult {
   /** {@inheritDoc} */
   @Override
   public String toString() {
-    return String.format("ValueSetValidationResult [result=%s, propertyName='%s', message='%s', children=%s]",
-      this.result, this.propertyName, this.message, this.children);
+    return String.format("ValueSetValidationResult [result=%s, propertyName='%s', message='%s', children=%d]",
+      this.result, this.propertyName, this.message, this.children.size());
   }
 
 }

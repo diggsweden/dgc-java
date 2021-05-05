@@ -6,6 +6,9 @@
 package se.digg.dgc.valueset.v1.validation;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -99,6 +102,44 @@ public class DefaultValueSetValidatorTest {
     
     ValueSetValidationResult res = v.validate(e);
     Assert.assertEquals(ValueSetValidationResult.Status.ERROR, res.getResult());
+  }
+
+  @Test
+  public void testEuDGCVaccinationError() throws Exception {
+    final DefaultValueSetValidator v = new DefaultValueSetValidator(Arrays.asList(
+        ValueSetConstants.diseaseAgentTargeted(),
+        ValueSetConstants.vaccineProphylaxis(),
+        ValueSetConstants.medicalProduct(),
+        ValueSetConstants.marketingAuthorizationHolder()));
+
+    final VaccinationEntry e1 = new VaccinationEntry()
+        .withTg("840539006")
+        .withVp("1119349007")
+        .withMp("EU/1/20/1507")
+        .withMa("ORG-100030215");
+
+    final String erroneousManufacturer = "ORG-FOOBAR";
+    final VaccinationEntry e2 = new VaccinationEntry()
+        .withTg("840539006")
+        .withVp("1119349007")
+        .withMp("EU/1/20/1507")
+        .withMa(erroneousManufacturer);
+
+    final Eudgc eudgc = new Eudgc();
+    eudgc.setV(List.of(e1, e2));
+
+    ValueSetValidationResult res = v.validate(eudgc);
+    Assert.assertEquals(ValueSetValidationResult.Status.ERROR, res.getResult());
+
+    List<ValueSetValidationResult> childResultErrors = res.getChildren().stream()
+        .flatMap(vr -> vr.getChildren().stream())
+        .filter(vr -> !vr.isSuccess())
+        .collect(Collectors.toList());
+
+    Assert.assertEquals(childResultErrors.size(), 1);
+    Assert.assertEquals(ValueSetValidationResult.Status.ERROR, childResultErrors.get(0).getResult());
+    Assert.assertEquals(childResultErrors.get(0).getMessage(),
+        String.format("Value for 'ma' (%s) is not valid according to value-set 'vaccines-covid-19-auth-holders'", erroneousManufacturer));
   }
   
   @Test
