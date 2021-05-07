@@ -12,6 +12,9 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeParseException;
 import java.util.Base64;
 
 import org.apache.commons.codec.DecoderException;
@@ -353,7 +356,7 @@ public class TestStatement {
 
     /** The time to simulate when validating this entry. */
     @JsonProperty("VALIDATIONCLOCK")
-    private Instant validationClock;
+    private String validationClock;
 
     /** The description of the test. */
     @JsonProperty("DESCRIPTION")
@@ -404,12 +407,35 @@ public class TestStatement {
       this.certificate = Base64.getEncoder().encodeToString(certificate.getEncoded());
     }
 
-    public Instant getValidationClock() {
+    public String getValidationClock() {
       return this.validationClock;
     }
+    
+    public Instant getValidationClockInstant() {
+      if (this.validationClock == null) {
+        return null;
+      }
+      // We are expected an Instant, but can accept a day also.
+      try {
+        return Instant.parse(this.validationClock);
+      }
+      catch (DateTimeParseException e) {
+        try {
+          LocalDate date = LocalDate.parse(this.validationClock);
+          return date.atStartOfDay().toInstant(ZoneOffset.UTC);
+        }
+        catch (Exception e2) {
+          throw e;
+        }
+      }
+    }
 
-    public void setValidationClock(final Instant validationClock) {
+    public void setValidationClock(final String validationClock) {
       this.validationClock = validationClock;
+    }
+    
+    public void setValidationClock(final Instant validationClock) {
+      this.validationClock = validationClock.toString();
     }
 
     public String getDescription() {
