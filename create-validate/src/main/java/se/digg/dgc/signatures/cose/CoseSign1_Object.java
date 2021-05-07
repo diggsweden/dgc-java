@@ -89,11 +89,19 @@ public class CoseSign1_Object {
     }
 
     // If the message is tagged, it must have the message tag for a COSE_Sign1 message.
+    // We also handle the case where there is an outer CWT tag.
     //
-    if (message.isTagged()) {
-      if (message.GetAllTags().length != 1) {
+    if (message.isTagged()) {      
+      if (message.GetAllTags().length > 2) {
         throw new CBORException("Invalid object - too many tags");
       }
+      if (message.GetAllTags().length == 2) {
+        if (Cwt.MESSAGE_TAG != message.getMostOuterTag().ToInt32Unchecked()) {
+          throw new CBORException(String.format(
+            "Invalid COSE_Sign1 structure - Expected CWT %d tag - but was %d",
+            Cwt.MESSAGE_TAG, message.getMostInnerTag().ToInt32Unchecked()));
+        }
+      }      
       if (MESSAGE_TAG != message.getMostInnerTag().ToInt32Unchecked()) {
         throw new CBORException(String.format(
           "Invalid COSE_Sign1 structure - Expected %d tag - but was %d",

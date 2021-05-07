@@ -33,9 +33,6 @@ public class Cwt {
    */  
   public static final int HCERT_CLAIM_KEY = -260;
   
-  // TODO: remove after interop-tests ...
-  public static final int OLD_HCERT_CLAIM_KEY = -65537;
-
   /** The message tag for eu_dgc_v1 that is added under the HCERT claim. */
   public static final int EU_DGC_V1_MESSAGE_TAG = 1;
   
@@ -282,10 +279,7 @@ public class Cwt {
    * @return the CBOR encoding of a DGC v1 payload or null if no payload is stored
    */
   public byte[] getDgcV1() {
-    CBORObject hcert = this.cwtObject.get(HCERT_CLAIM_KEY);
-    if (hcert == null) {
-      hcert = this.cwtObject.get(OLD_HCERT_CLAIM_KEY);
-    }
+    final CBORObject hcert = this.cwtObject.get(HCERT_CLAIM_KEY);
     return Optional.ofNullable(hcert.get(EU_DGC_V1_MESSAGE_TAG)).map(CBORObject::EncodeToBytes).orElse(null);
   }
 

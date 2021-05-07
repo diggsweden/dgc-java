@@ -1,0 +1,24 @@
+{
+  "ver": "1.0.0",
+  "nam": {
+    "fn": "Lövström",
+    "fnt": "LOEVSTROEM",
+    "gn": "Oscar",
+    "gnt": "OSCAR"
+  },
+  "dob": "1958-11-11",
+  "v": [
+    {
+      "tg": "840539006",
+      "vp": "J07BX03",
+      "mp": "EU/1/21/1529",
+      "ma": "ORG-100030215",
+      "dn": 2,
+      "sd": 2,
+      "dt": "2021-03-18",
+      "co": "SE",
+      "is": "Swedish eHealth Agency",
+      "ci": "urn:uvci:01:SE:EHM/100000024GI5HMGZKSMS"
+    }
+  ]
+}

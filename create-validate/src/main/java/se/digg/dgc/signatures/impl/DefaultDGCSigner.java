@@ -71,6 +71,12 @@ public class DefaultDGCSigner implements DGCSigner {
   /** The algorithm to use when signing. */
   private SignatureAlgorithm algorithmIdentifier;
 
+  /** Whether to include the Cose_Sign1 message tag. */
+  private boolean includeCoseTag = true;
+
+  /** Whether to include the CWT message tag. */
+  private boolean includeCwtTag = false;
+
   /**
    * Constructor.
    * 
@@ -96,7 +102,7 @@ public class DefaultDGCSigner implements DGCSigner {
   public DefaultDGCSigner(final PkiCredential signerCredential) throws CertificateException {
     this(new CredentialWrapper(signerCredential));
   }
-  
+
   /**
    * Constructor.
    * 
@@ -107,7 +113,7 @@ public class DefaultDGCSigner implements DGCSigner {
    */
   private DefaultDGCSigner(final CredentialWrapper signerCredential) throws CertificateException {
     this.signerCredential = signerCredential;
-    
+
     this.country = getCountry(signerCredential.getCertificate());
     this.keyIdentifier = calculateKid(signerCredential.getCertificate());
     this.signerExpiration = Instant.ofEpochMilli(signerCredential.getCertificate().getNotAfter().getTime());
@@ -140,6 +146,7 @@ public class DefaultDGCSigner implements DGCSigner {
         .build();
 
       final CoseSign1_Object coseObject = CoseSign1_Object.builder()
+        .includeMessageTag(this.includeCoseTag)
         .protectedAttribute(HeaderParameterKey.ALG.getCborObject(), this.algorithmIdentifier.getCborObject())
         .protectedAttribute(HeaderParameterKey.KID.getCborObject(), CBORObject.FromObject(this.keyIdentifier))
         .content(cwt.encode())
@@ -147,7 +154,15 @@ public class DefaultDGCSigner implements DGCSigner {
 
       coseObject.sign(this.signerCredential.getPrivateKey(), this.securityProvider);
 
-      return coseObject.encode();
+      final byte[] coseEncoding = coseObject.encode();
+
+      if (this.includeCwtTag) {
+        final CBORObject obj = CBORObject.DecodeFromBytes(coseEncoding);
+        return CBORObject.FromObjectAndTag(obj, Cwt.MESSAGE_TAG).EncodeToBytes();
+      }
+      else {
+        return coseEncoding;
+      }
     }
     catch (CBORException e) {
       throw new SignatureException("CBOR error - " + e.getMessage(), e);
@@ -246,6 +261,32 @@ public class DefaultDGCSigner implements DGCSigner {
    */
   public void setSecurityProvider(final Provider securityProvider) {
     this.securityProvider = securityProvider;
+  }
+
+  /**
+   * Whether to include the Cose_Sign1 message tag in the resulting encoding. The default is {@code true}.
+   * <p>
+   * See <a href="https://tools.ietf.org/html/rfc8152">RFC8152</a>.
+   * </p>
+   * 
+   * @param includeCoseTag
+   *          whether to include the Cose_Sign1 message tag
+   */
+  public void setIncludeCoseTag(boolean includeCoseTag) {
+    this.includeCoseTag = includeCoseTag;
+  }
+
+  /**
+   * Sets whether to include the CWT message tag. The default is {@code false}.
+   * <p>
+   * See section 6, or <a href="https://tools.ietf.org/html/rfc8392">RFC8392</a>.
+   * </p>
+   * 
+   * @param includeCwtTag
+   *          whether to include the CWT message tag
+   */
+  public void setIncludeCwtTag(final boolean includeCwtTag) {
+    this.includeCwtTag = includeCwtTag;
   }
 
   /**
