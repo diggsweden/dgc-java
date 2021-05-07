@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.security.cert.X509Certificate;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Base64;
 
 import org.junit.Test;
 import org.springframework.core.io.ClassPathResource;
@@ -59,6 +60,7 @@ public class CreateTestDataTest {
 
   private PkiCredential rsa;
   private PkiCredential ecdsa;
+  private PkiCredential ecdsa2;
 
   private static final char[] password = "secret".toCharArray();
 
@@ -72,13 +74,16 @@ public class CreateTestDataTest {
   public CreateTestDataTest() throws Exception {
     this.rsa = new KeyStoreCredential(new ClassPathResource("rsa.jks"), password, "signer", password);
     this.rsa.init();
-    this.ecdsa = new KeyStoreCredential(new ClassPathResource("ecdsa.jks"), password, "signer", password);
+    this.ecdsa = new KeyStoreCredential(new ClassPathResource("dgc-signer.jks"), password, "signer", password);
     this.ecdsa.init();
+    this.ecdsa2 = new KeyStoreCredential(new ClassPathResource("ecdsa.jks"), password, "signer", password);
+    this.ecdsa2.init();
   }
   
+  // One vac-entry
   @Test
   public void test1() throws Exception {
-    final DigitalGreenCertificate dgc = readDgcFile("dgc1.json", DigitalGreenCertificate.class); 
+    final DigitalGreenCertificate dgc = readDgcFile("dgc-simple-one-entry.json", DigitalGreenCertificate.class); 
     final Instant issueTime = Instant.now();
     final Instant expiration = issueTime.plus(Duration.ofDays(90));    
     final DGCSigner signer = new DefaultDGCSigner(this.ecdsa);
@@ -89,7 +94,97 @@ public class CreateTestDataTest {
     // Before we write the test we want to make sure that we can handle it ...
     DGCTestDataVerifier.validate("Test #1", test);
 
-    writeTestFile("1.json", test);
+    writeTestFile("1", test);    
+  }
+  
+  // Two vac-entries
+  @Test
+  public void test2() throws Exception {
+    final DigitalGreenCertificate dgc = readDgcFile("dgc-simple-two-entries.json", DigitalGreenCertificate.class); 
+    final Instant issueTime = Instant.now();
+    final Instant expiration = issueTime.plus(Duration.ofDays(90));    
+    final DGCSigner signer = new DefaultDGCSigner(this.ecdsa);
+
+    final TestStatement test = createTestStatement(dgc, dgc.encode(), issueTime, expiration, signer, null, null, this.ecdsa.getCertificate());
+    test.getTestCtx().setDescription("2: Two vaccination entries - Everything should verify fine");
+
+    // Before we write the test we want to make sure that we can handle it ...
+    DGCTestDataVerifier.validate("Test #2", test);
+
+    writeTestFile("2", test);
+  }
+  
+  // One vac-entry, signed using an RSA key
+  @Test
+  public void test3() throws Exception {
+    final DigitalGreenCertificate dgc = readDgcFile("dgc-simple-one-entry.json", DigitalGreenCertificate.class); 
+    final Instant issueTime = Instant.now();
+    final Instant expiration = issueTime.plus(Duration.ofDays(90));
+    final DGCSigner signer = new DefaultDGCSigner(this.rsa);
+
+    final TestStatement test = createTestStatement(dgc, dgc.encode(), issueTime, expiration, signer, null, null, this.rsa.getCertificate());
+    test.getTestCtx().setDescription("3: One vaccination entry - RSA signature. Everything should verify fine");
+
+    // Before we write the test we want to make sure that we can handle it ...
+    DGCTestDataVerifier.validate("Test #3", test);
+
+    writeTestFile("3", test);
+  }
+  
+  // One vac-entry, no COSE message tag included
+  @Test
+  public void test4() throws Exception {
+    final DigitalGreenCertificate dgc = readDgcFile("dgc-simple-one-entry.json", DigitalGreenCertificate.class); 
+    final Instant issueTime = Instant.now();
+    final Instant expiration = issueTime.plus(Duration.ofDays(90));
+    final DefaultDGCSigner signer = new DefaultDGCSigner(this.ecdsa);
+    signer.setIncludeCoseTag(false);
+
+    final TestStatement test = createTestStatement(dgc, dgc.encode(), issueTime, expiration, signer, null, null, this.ecdsa.getCertificate());
+    test.getTestCtx().setDescription("4: One vaccination entry - No tag for COSE object. Everything should verify fine.");
+
+    // Before we write the test we want to make sure that we can handle it ...
+    DGCTestDataVerifier.validate("Test #4", test);
+
+    writeTestFile("4", test);
+  }
+  
+  // One vac-entry, Both CWT and COSE message tags included
+  @Test
+  public void test5() throws Exception {
+    final DigitalGreenCertificate dgc = readDgcFile("dgc-simple-one-entry.json", DigitalGreenCertificate.class); 
+    final Instant issueTime = Instant.now();
+    final Instant expiration = issueTime.plus(Duration.ofDays(90));
+    final DefaultDGCSigner signer = new DefaultDGCSigner(this.ecdsa);
+    signer.setIncludeCoseTag(true);
+    signer.setIncludeCwtTag(true);
+
+    final TestStatement test = createTestStatement(dgc, dgc.encode(), issueTime, expiration, signer, null, null, this.ecdsa.getCertificate());
+    test.getTestCtx().setDescription("5: One vaccination entry - Both CWT and Cose_Sign1 tags present. Everything should verify fine.");
+
+    // Before we write the test we want to make sure that we can handle it ...
+    DGCTestDataVerifier.validate("Test #5", test);
+
+    writeTestFile("5", test);
+  }
+  
+  // One vac-entry, Signature validation will fail
+  @Test
+  public void test6() throws Exception {
+    final DigitalGreenCertificate dgc = readDgcFile("dgc-simple-one-entry.json", DigitalGreenCertificate.class); 
+    final Instant issueTime = Instant.now();
+    final Instant expiration = issueTime.plus(Duration.ofDays(90));
+    final DefaultDGCSigner signer = new DefaultDGCSigner(this.ecdsa2);
+
+    final TestStatement test = createTestStatement(dgc, dgc.encode(), issueTime, expiration, signer, null, null, this.ecdsa.getCertificate());
+    test.getTestCtx().setDescription("6: One vaccination entry - Signature validation should fail.");
+    
+    test.getExpectedResults().expectedVerify = false;
+
+    // Before we write the test we want to make sure that we can handle it ...
+    DGCTestDataVerifier.validate("Test #6", test);
+
+    writeTestFile("6", test);
   }
 
   /**
@@ -177,12 +272,17 @@ public class CreateTestDataTest {
     if (!directory.exists()) {
       directory.mkdir();
     }
-    final File file = new File(TARGET_DIR + "/" + testFile);
+    final File file = new File(TARGET_DIR + "/" + testFile + ".json");
     System.out.println("Writing testfile " + file.getAbsolutePath());
     try (FileOutputStream fos = new FileOutputStream(file, false)) {
       fos.write(testStatement.toJson().getBytes(StandardCharset.UTF_8));
       fos.flush();
     }
+    try (FileOutputStream fos = new FileOutputStream(new File(TARGET_DIR + "/" + testFile + ".png"), false)) {      
+      fos.write(Base64.getDecoder().decode(testStatement.getBarCode()));
+      fos.flush();
+    }
+    
   }
 
   private static <T> T readDgcFile(final String file, final Class<T> clazz) throws IOException {

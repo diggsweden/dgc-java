@@ -17,7 +17,6 @@ import java.util.Base64;
 import java.util.Collections;
 import java.util.zip.ZipException;
 
-import org.apache.commons.codec.binary.Hex;
 import org.junit.Assert;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -326,9 +325,6 @@ public class DGCTestDataVerifier {
 
     final byte[] payload = CoseSign1_Object.decode(cose).getCwt().getDgcV1();
     
-    System.out.println("Payload: " + Hex.encodeHexString(payload));
-    System.out.println("CBOR: " + Hex.encodeHexString(cbor));
-
     // First compare arrays directly ...
     if (expected) {
       if (Arrays.equals(cbor, payload)) {
