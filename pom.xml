@@ -5,7 +5,7 @@
 
   <groupId>se.digg.dgc</groupId>
   <artifactId>dgc-parent</artifactId>
-  <version>0.9.5</version>
+  <version>0.9.6-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>DIGG :: Digital Green Certificate :: DGC Java</name>
