@@ -78,8 +78,6 @@ public class DigitalGreenCertificateTest {
         .withCi("01:SE:JKJKHJGHG6768686HGJGH#M")));
 
     String json = dgc.toJSONString();
-    
-    System.out.println(json);
 
     DigitalGreenCertificate dgc2 = DigitalGreenCertificate.fromJsonString(json);
     
@@ -131,10 +129,12 @@ public class DigitalGreenCertificateTest {
     final String dateTime = "2021-04-14T14:17:50.525450Z";
 
     // Encode
-    final Tst2 tst = new Tst2();
-    tst.setTna("Acme");
-    tst.setDtr(Instant.parse(dateTime));
-    final byte[] cbor = DigitalGreenCertificate.getCBORMapper().writeValueAsBytes(tst);
+    final DigitalGreenCertificate dgc = new DigitalGreenCertificate(); 
+    final TestEntry tst = new TestEntry();
+    tst.setCo("SE");
+    tst.setDr(Instant.parse(dateTime));
+    dgc.setT(Arrays.asList(tst));
+    final byte[] cbor = dgc.encode();
 
     // Assert using the detailed com.upokecenter.cbor library.
     //
@@ -142,19 +142,40 @@ public class DigitalGreenCertificateTest {
 
     System.out.println(object.ToJSONString());
 
-    final CBORObject dateObject = object.get("dtr");
+    final CBORObject dateObject = object.get("t").get(0).get("dr");
     Assert.assertNotNull(dateObject);
 
     //
-    // Bug in FasterXML: Missing tag 0 or 1
+    // Assert that the tag is there ...
     //
-    // Assert.assertTrue(dateObject.isTagged());
+    Assert.assertTrue(dateObject.isTagged());
+    Assert.assertTrue(dateObject.HasMostOuterTag(0));
 
     Assert.assertEquals(dateTime, dateObject.AsString());
 
     // Decode
-    final Tst2 tst2 = DigitalGreenCertificate.getCBORMapper().readValue(cbor, Tst2.class);
-    Assert.assertEquals(dateTime, tst2.getDtr().toString());
+    final DigitalGreenCertificate dgc2 = DigitalGreenCertificate.decode(cbor);  
+    Assert.assertEquals(dateTime, dgc2.getT().get(0).getDr().toString());
+  }
+  
+  @Test
+  public void testDateTimeIsoOffset() throws Exception {
+
+    final String dateTime = "2021-05-03T20:00:00+02:00";
+
+    // Encode
+    CBORObject tst = CBORObject.NewMap();
+    tst.set("co", CBORObject.FromObject("SE"));
+    CBORObject dateObject = CBORObject.FromObject(dateTime);
+    tst.set("dr", CBORObject.FromObjectAndTag(dateObject, 0));
+    
+    byte[] cbor = tst.EncodeToBytes();
+    
+    // Make sure that our CBOR mapper can handle the offset time
+    TestEntry tst2 = DigitalGreenCertificate.getCBORMapper().readValue(cbor, TestEntry.class);
+    
+    // Assert that that it is serialized with no offset
+    Assert.assertTrue(tst2.getDr().toString().endsWith("Z"));
   }
 
   @Test
@@ -164,18 +185,18 @@ public class DigitalGreenCertificateTest {
 
     CBORObject object = CBORObject.NewMap();
 
-    object.set("dtr", CBORObject.FromObject(date));
-    object.set("tna", CBORObject.FromObject("Acme"));
+    object.set("dr", CBORObject.FromObject(date));
+    object.set("co", CBORObject.FromObject("SE"));
 
     // Just assert that this is a CBOR date-time in string format
-    CBORObject dtrObject = object.get("dtr");
+    CBORObject dtrObject = object.get("dr");
     Assert.assertTrue(dtrObject.isTagged());
     Assert.assertTrue(dtrObject.HasMostOuterTag(0));
     Assert.assertEquals(dateTime, dtrObject.AsString());
 
     // Decode using FasterXML
-    final Tst2 tst = DigitalGreenCertificate.getCBORMapper().readValue(object.EncodeToBytes(), Tst2.class);
-    Assert.assertEquals(dateTime, tst.getDtr().toString());
+    final TestEntry tst = DigitalGreenCertificate.getCBORMapper().readValue(object.EncodeToBytes(), TestEntry.class);
+    Assert.assertEquals(dateTime, tst.getDr().toString());
   }
 
   @Test
@@ -186,39 +207,18 @@ public class DigitalGreenCertificateTest {
 
     CBORObject object = CBORObject.NewMap();
     CBORObject dtrObject = CBORObject.FromObject(seconds);
-    object.set("dtr", dtrObject.WithTag(1));
-    object.set("tna", CBORObject.FromObject("Acme"));
+    object.set("dr", dtrObject.WithTag(1));
+    object.set("co", CBORObject.FromObject("SE"));
 
-    // Just assert that this is a CBOR date-time in string format
-    CBORObject dtrObject2 = object.get("dtr");
+    // Just assert that this is a CBOR date-time in numeric format
+    CBORObject dtrObject2 = object.get("dr");
     Assert.assertTrue(dtrObject2.isTagged());
     Assert.assertTrue(dtrObject2.HasMostOuterTag(1));
     Assert.assertEquals(seconds, dtrObject2.AsInt32Value());
 
     // Decode using FasterXML
-    final Tst2 tst = DigitalGreenCertificate.getCBORMapper().readValue(object.EncodeToBytes(), Tst2.class);
-    Assert.assertEquals((long) seconds, tst.getDtr().getEpochSecond());
-  }
-
-  public static class Tst2 {
-    private Instant dtr;
-    private String tna;
-
-    public Instant getDtr() {
-      return this.dtr;
-    }
-
-    public void setDtr(final Instant dtr) {
-      this.dtr = dtr;
-    }
-
-    public String getTna() {
-      return this.tna;
-    }
-
-    public void setTna(final String tna) {
-      this.tna = tna;
-    }
+    final TestEntry tst = DigitalGreenCertificate.getCBORMapper().readValue(object.EncodeToBytes(), TestEntry.class);
+    Assert.assertEquals((long) seconds, tst.getDr().getEpochSecond());
   }
 
 }

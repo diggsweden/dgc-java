@@ -22,10 +22,6 @@ import org.junit.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.upokecenter.cbor.CBORDateConverter;
 import com.upokecenter.cbor.CBORObject;
 
@@ -35,6 +31,7 @@ import se.digg.dgc.encoding.Base45;
 import se.digg.dgc.encoding.DGCConstants;
 import se.digg.dgc.encoding.Zlib;
 import se.digg.dgc.encoding.impl.DefaultBarcodeDecoder;
+import se.digg.dgc.payload.v1.DigitalGreenCertificate;
 import se.digg.dgc.signatures.CertificateProvider;
 import se.digg.dgc.signatures.DGCSignatureVerifier;
 import se.digg.dgc.signatures.cose.CoseSign1_Object;
@@ -53,16 +50,6 @@ public class DGCTestDataVerifier {
 
   /** Logger */
   private static final Logger log = LoggerFactory.getLogger(DGCTestDataVerifier.class);
-
-  /** JSON Mapper. */
-  private static ObjectMapper jsonMapper = new ObjectMapper();
-
-  static {
-    jsonMapper.registerModule(new JavaTimeModule());
-    jsonMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-    jsonMapper.setSerializationInclusion(Include.NON_NULL);
-    jsonMapper.setSerializationInclusion(Include.NON_EMPTY);
-  }
 
   /**
    * Validates the data from the test statement.
@@ -449,7 +436,7 @@ public class DGCTestDataVerifier {
    *           for parsing errors
    */
   public static TestStatement getTestStatement(final String file) throws IOException {
-    return jsonMapper.readValue(new File(file), TestStatement.class);
+    return DigitalGreenCertificate.getJSONMapper().readValue(new File(file), TestStatement.class);
   }
 
   // Hidden

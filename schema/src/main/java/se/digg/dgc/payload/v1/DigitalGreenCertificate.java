@@ -6,14 +6,23 @@
 package se.digg.dgc.payload.v1;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAccessor;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.dataformat.cbor.databind.CBORMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.datatype.jsr310.deser.InstantDeserializer;
+import com.upokecenter.cbor.CBORObject;
 
 import se.digg.dgc.transliteration.MrzEncoder;
 
@@ -52,12 +61,15 @@ public class DigitalGreenCertificate extends Eudgc {
   private static ObjectMapper jsonMapper = new ObjectMapper();
 
   static {
-    cborMapper.registerModule(new JavaTimeModule());
+    SimpleModule timeModule = new JavaTimeModule();
+    timeModule.addDeserializer(Instant.class, CustomInstantDeserializer.INSTANT);
+
+    cborMapper.registerModule(timeModule);
     cborMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
     cborMapper.setSerializationInclusion(Include.NON_NULL);
-    cborMapper.setSerializationInclusion(Include.NON_EMPTY);    
+    cborMapper.setSerializationInclusion(Include.NON_EMPTY);
 
-    jsonMapper.registerModule(new JavaTimeModule());
+    jsonMapper.registerModule(timeModule);
     jsonMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
     jsonMapper.setSerializationInclusion(Include.NON_NULL);
     jsonMapper.setSerializationInclusion(Include.NON_EMPTY);
@@ -128,9 +140,31 @@ public class DigitalGreenCertificate extends Eudgc {
    * @throws DGCSchemaException
    *           for encoding errors
    */
-  public byte[] encode() throws DGCSchemaException {
+  public byte[] encode() throws DGCSchemaException {    
     try {
-      return cborMapper.writeValueAsBytes(this);
+      final boolean containsTestEntries = this.getT() != null && this.getT().size() > 0;
+      final byte[] encoding = cborMapper.writeValueAsBytes(this);
+      
+      // If this object contains test entries we use CBORObject to make sure that
+      // all Instant's are encoded as tagged strings. FasterXML won't include the tag.
+      //
+      if (!containsTestEntries) {
+        return encoding;
+      }
+      final CBORObject obj = CBORObject.DecodeFromBytes(encoding);
+      final CBORObject tArr = obj.get("t");
+      for (int i = 0; i < tArr.size(); i++) {
+        final CBORObject tObj = tArr.get(i);
+        final CBORObject sc = tObj.get("sc");
+        if (sc != null && !sc.HasMostOuterTag(0)) {
+          tObj.set("sc", CBORObject.FromObjectAndTag(sc, 0));
+        }
+        final CBORObject dr = tObj.get("dr");
+        if (dr != null && !dr.HasMostOuterTag(0)) {
+          tObj.set("dr", CBORObject.FromObjectAndTag(dr, 0));
+        }
+      }
+      return obj.EncodeToBytes();
     }
     catch (final JsonProcessingException e) {
       throw new DGCSchemaException("Failed to serialize to CBOR", e);
@@ -201,10 +235,46 @@ public class DigitalGreenCertificate extends Eudgc {
     return cborMapper;
   }
 
+  /**
+   * Gets a configured {@link ObjectMapper} to use for JSON serializing and deserializing.
+   * 
+   * @return an ObjectMapper
+   */
+  public static ObjectMapper getJSONMapper() {
+    return jsonMapper;
+  }
+
   /** {@inheritDoc} */
   @Override
   public String toString() {
     return super.toString();
+  }
+
+  /**
+   * Deserializer that can handle also ISO OFFSET.
+   */
+  private static class CustomInstantDeserializer extends InstantDeserializer<Instant> {
+
+    private static final long serialVersionUID = 3929100820024454525L;
+
+    public static final CustomInstantDeserializer INSTANT = new CustomInstantDeserializer(
+      Instant.class, DateTimeFormatter.ISO_OFFSET_DATE_TIME,
+      Instant::from,
+      a -> Instant.ofEpochMilli(a.value),
+      a -> Instant.ofEpochSecond(a.integer, a.fraction),
+      null,
+      true);
+
+    protected CustomInstantDeserializer(final Class<Instant> supportedType,
+        final DateTimeFormatter formatter,
+        final Function<TemporalAccessor, Instant> parsedToValue,
+        final Function<FromIntegerArguments, Instant> fromMilliseconds,
+        final Function<FromDecimalArguments, Instant> fromNanoseconds,
+        final BiFunction<Instant, ZoneId, Instant> adjust,
+        final boolean replaceZeroOffsetAsZ) {
+
+      super(supportedType, formatter, parsedToValue, fromMilliseconds, fromNanoseconds, adjust, replaceZeroOffsetAsZ);
+    }
   }
 
 }

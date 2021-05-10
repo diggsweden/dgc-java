@@ -26,9 +26,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+
+import se.digg.dgc.payload.v1.DigitalGreenCertificate;
 
 /**
  * A representation of a test statement, see
@@ -42,16 +41,6 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 @JsonInclude(Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class TestStatement {
-
-  /** The JSON mapper. */
-  private static ObjectMapper jsonMapper = new ObjectMapper();
-
-  static {
-    jsonMapper.registerModule(new JavaTimeModule());
-    jsonMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-    jsonMapper.setSerializationInclusion(Include.NON_NULL);
-    jsonMapper.setSerializationInclusion(Include.NON_EMPTY);
-  }
 
   /** The JSON holding the DGC payload. */
   @JsonProperty("JSON")
@@ -99,7 +88,7 @@ public class TestStatement {
    *           for JSON processing errors
    */
   public String toJson() throws JsonProcessingException {
-    return jsonMapper.writeValueAsString(this);
+    return DigitalGreenCertificate.getJSONMapper().writeValueAsString(this);
   }
 
   /**
@@ -121,7 +110,7 @@ public class TestStatement {
   @JsonIgnore
   public String getJsonString() throws JsonProcessingException {
     return this.json != null
-        ? jsonMapper.writeValueAsString(this.json)
+        ? DigitalGreenCertificate.getJSONMapper().writeValueAsString(this.json)
         : null;
   }
 
