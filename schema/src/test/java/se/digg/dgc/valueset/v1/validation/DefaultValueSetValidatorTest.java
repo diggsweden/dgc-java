@@ -7,7 +7,6 @@ package se.digg.dgc.valueset.v1.validation;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.junit.Assert;

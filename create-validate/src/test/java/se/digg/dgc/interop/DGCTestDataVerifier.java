@@ -15,6 +15,7 @@ import java.time.Instant;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.Collections;
+import java.util.Date;
 import java.util.zip.ZipException;
 
 import org.junit.Assert;
@@ -25,6 +26,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.upokecenter.cbor.CBORDateConverter;
 import com.upokecenter.cbor.CBORObject;
 
 import se.digg.dgc.encoding.BarcodeDecoder;
@@ -48,7 +50,7 @@ import se.digg.dgc.signatures.impl.DefaultDGCSignatureVerifier;
  * @author Henric Norlander (extern.henric.norlander@digg.se)
  */
 public class DGCTestDataVerifier {
-  
+
   /** Logger */
   private static final Logger log = LoggerFactory.getLogger(DGCTestDataVerifier.class);
 
@@ -79,11 +81,15 @@ public class DGCTestDataVerifier {
     // Cover up for that ...
     //
     if (test.getCborBytes() != null) {
-      CBORObject _cbor = CBORObject.DecodeFromBytes(test.getCborBytes());
-      CBORObject hcert = _cbor.get(Cwt.HCERT_CLAIM_KEY);
-      if (hcert != null && hcert.get(Cwt.EU_DGC_V1_MESSAGE_TAG) != null) {
-        test.setCbor(hcert.get(Cwt.EU_DGC_V1_MESSAGE_TAG).EncodeToBytes());
-        log.warn("[{}]: Bad testdata CBOR field contains CBOR encoding of CWT - not just the payload", testName);
+      try {
+        CBORObject _cbor = CBORObject.DecodeFromBytes(test.getCborBytes());
+        CBORObject hcert = _cbor.get(Cwt.HCERT_CLAIM_KEY);
+        if (hcert != null && hcert.get(Cwt.EU_DGC_V1_MESSAGE_TAG) != null) {
+          test.setCbor(hcert.get(Cwt.EU_DGC_V1_MESSAGE_TAG).EncodeToBytes());
+          log.warn("[{}]: Bad testdata CBOR field contains CBOR encoding of CWT - not just the payload", testName);
+        }
+      }
+      catch (Exception e) {
       }
     }
 
@@ -381,8 +387,47 @@ public class DGCTestDataVerifier {
     Assert.assertNotNull(String.format("[%s]: Can not execute CBOR decode test - Missing JSON", testName), json);
 
     // Normalize
-    final String cborNormalizedJson = CBORObject.DecodeFromBytes(cbor).ToJSONString();
+    //
+
+    // Since the CBOR encoding may contain timestamps encoded as ints, we see if we to
+    // take care of that as part of the normalization process.
+    final String cborNormalizedJson;
+    {
+      final CBORObject cborObj = CBORObject.DecodeFromBytes(cbor);
+      if (cborObj.get("t") != null) {
+        final CBORObject tArr = cborObj.get("t");
+        for (int i = 0; i < tArr.size(); i++) {
+          final CBORObject tObj = tArr.get(i);
+          final CBORObject scObj = tObj.get("sc");
+          if (scObj != null) {
+            if (scObj.HasMostOuterTag(1)) {
+              final Date date = CBORDateConverter.TaggedString.FromCBORObject(scObj);
+              tObj.set("sc", CBORDateConverter.TaggedString.ToCBORObject(date));
+            }
+            else if (scObj.isNumber()) {
+              final Date date = CBORDateConverter.UntaggedNumber.FromCBORObject(scObj);
+              tObj.set("sc", CBORDateConverter.TaggedString.ToCBORObject(date));
+            }
+          }
+          final CBORObject drObj = tObj.get("dr");
+          if (drObj != null) {
+            if (drObj.HasMostOuterTag(1)) {
+              final Date date = CBORDateConverter.TaggedString.FromCBORObject(drObj);
+              tObj.set("dr", CBORDateConverter.TaggedString.ToCBORObject(date));
+            }
+            else if (drObj.isNumber()) {
+              final Date date = CBORDateConverter.UntaggedNumber.FromCBORObject(drObj);
+              tObj.set("dr", CBORDateConverter.TaggedString.ToCBORObject(date));
+            }
+          }
+        }
+      }
+      cborNormalizedJson = cborObj.ToJSONString();
+    }
+
     final String jsonNormalized = CBORObject.FromJSONString(json).ToJSONString();
+
+    // This may still fail, since the CBOR may use ints for timestamps ...
 
     if (expected) {
       Assert.assertEquals(String.format("[%s]: CBOR decode test failed", testName),
