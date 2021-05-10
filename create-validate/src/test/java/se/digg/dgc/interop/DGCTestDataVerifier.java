@@ -18,6 +18,8 @@ import java.util.Collections;
 import java.util.zip.ZipException;
 
 import org.junit.Assert;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -46,6 +48,9 @@ import se.digg.dgc.signatures.impl.DefaultDGCSignatureVerifier;
  * @author Henric Norlander (extern.henric.norlander@digg.se)
  */
 public class DGCTestDataVerifier {
+  
+  /** Logger */
+  private static final Logger log = LoggerFactory.getLogger(DGCTestDataVerifier.class);
 
   /** JSON Mapper. */
   private static ObjectMapper jsonMapper = new ObjectMapper();
@@ -68,6 +73,19 @@ public class DGCTestDataVerifier {
    *           for assertion errors
    */
   public static void validate(final String testName, final TestStatement test) throws Exception {
+
+    // Step 0: Some countries supply the CBOR encoding of the entire CWT instead of just the CBOR encoding of the
+    // payload.
+    // Cover up for that ...
+    //
+    if (test.getCborBytes() != null) {
+      CBORObject _cbor = CBORObject.DecodeFromBytes(test.getCborBytes());
+      CBORObject hcert = _cbor.get(Cwt.HCERT_CLAIM_KEY);
+      if (hcert != null && hcert.get(Cwt.EU_DGC_V1_MESSAGE_TAG) != null) {
+        test.setCbor(hcert.get(Cwt.EU_DGC_V1_MESSAGE_TAG).EncodeToBytes());
+        log.warn("[{}]: Bad testdata CBOR field contains CBOR encoding of CWT - not just the payload", testName);
+      }
+    }
 
     // 1. Load the picture and extract the prefixed BASE45content.
     //
@@ -109,10 +127,10 @@ public class DGCTestDataVerifier {
     if (test.getExpectedResults().expectedValidJson != null) {
       validateCborDecode(testName, test.getExpectedResults().expectedValidJson, test.getCborBytes(), test.getJsonString());
     }
-    
+
     // 8. Validate the extracted JSON against the schema defined in the test context.
     //
-    
+
     // TODO
 
   }
@@ -139,7 +157,7 @@ public class DGCTestDataVerifier {
     try {
       final BarcodeDecoder decoder = new DefaultBarcodeDecoder();
       final String payload = decoder.decodeToString(Base64.getDecoder().decode(qrCode), StandardCharsets.US_ASCII);
-      
+
       if (expectedResult) {
         Assert.assertEquals(String.format("[%s]: Barcode decode test failed - Decoded data does not match expected", testName),
           prefixedContents, payload);
@@ -256,8 +274,8 @@ public class DGCTestDataVerifier {
       final DefaultDGCSignatureVerifier verifier = new DefaultDGCSignatureVerifier();
       verifier.setTestValidationTime(validationClock);
 
-      final CertificateProvider certProvider =
-          (c, k) -> signerCertificate != null ? Arrays.asList(signerCertificate) : Collections.emptyList();
+      final CertificateProvider certProvider = (c, k) -> signerCertificate != null ? Arrays.asList(signerCertificate)
+          : Collections.emptyList();
 
       try {
         final DGCSignatureVerifier.Result vResult = verifier.verify(cose, certProvider);
@@ -324,14 +342,14 @@ public class DGCTestDataVerifier {
     Assert.assertNotNull(String.format("[%s]: Can not execute COSE decode test - Missing CBOR", testName), cbor);
 
     final byte[] payload = CoseSign1_Object.decode(cose).getCwt().getDgcV1();
-    
+
     // First compare arrays directly ...
     if (expected) {
       if (Arrays.equals(cbor, payload)) {
         // OK, exact encoding
         return;
       }
-        
+
       // Otherwise, use the same CBOR decoder/encoder to make sure the data is the same.
       final byte[] normalizedPayload = CBORObject.DecodeFromBytes(payload).EncodeToBytes();
       final byte[] normalizedCbor = CBORObject.DecodeFromBytes(cbor).EncodeToBytes();
@@ -361,7 +379,7 @@ public class DGCTestDataVerifier {
   public static void validateCborDecode(final String testName, final boolean expected, final byte[] cbor, final String json) {
     Assert.assertNotNull(String.format("[%s]: Can not execute CBOR decode test - Missing CBOR", testName), cbor);
     Assert.assertNotNull(String.format("[%s]: Can not execute CBOR decode test - Missing JSON", testName), json);
-    
+
     // Normalize
     final String cborNormalizedJson = CBORObject.DecodeFromBytes(cbor).ToJSONString();
     final String jsonNormalized = CBORObject.FromJSONString(json).ToJSONString();

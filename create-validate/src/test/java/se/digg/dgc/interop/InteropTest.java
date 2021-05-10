@@ -36,10 +36,14 @@ public class InteropTest {
   @Parameters
   public static Collection<Object[]> data() {
     return Arrays.asList(new Object[][] {
-        // Doesn't work. They pass in the entire CWT instead of just the DGC payload of the CWT
         { "BG-1", "BG/1.json" },
         { "RO-1", "RO/1.json" },
         { "RO-2", "RO/2.json" },
+        { "AT-1", "AT/1.json" },
+        { "AT-2", "AT/2.json" },
+// Uses ints for date-time.... Maybe the lib should be extended to handle this ...        
+//        { "AT-3", "AT/3.json" },
+//        { "AT-4", "AT/4.json" },
         { "SE-1", "SE/1.json" },
         { "SE-2", "SE/2.json" },
         { "SE-3", "SE/3.json" },
