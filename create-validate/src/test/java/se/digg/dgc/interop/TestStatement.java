@@ -14,6 +14,7 @@ import java.security.cert.X509Certificate;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Base64;
 
@@ -406,7 +407,7 @@ public class TestStatement {
       }
       // We are expected an Instant, but can accept a day also.
       try {
-        return Instant.parse(this.validationClock);
+        return Instant.from(DateTimeFormatter.ISO_OFFSET_DATE_TIME.parse(this.validationClock));
       }
       catch (DateTimeParseException e) {
         try {

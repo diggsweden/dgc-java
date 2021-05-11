@@ -17,13 +17,19 @@ import javax.imageio.ImageIO;
 
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.BinaryBitmap;
+import com.google.zxing.ChecksumException;
 import com.google.zxing.DecodeHintType;
+import com.google.zxing.FormatException;
 import com.google.zxing.MultiFormatReader;
 import com.google.zxing.NotFoundException;
+import com.google.zxing.Reader;
 import com.google.zxing.Result;
+import com.google.zxing.aztec.AztecReader;
 import com.google.zxing.client.j2se.BufferedImageLuminanceSource;
 import com.google.zxing.common.HybridBinarizer;
+import com.google.zxing.qrcode.QRCodeReader;
 
+import se.digg.dgc.encoding.Barcode;
 import se.digg.dgc.encoding.BarcodeDecoder;
 import se.digg.dgc.encoding.BarcodeException;
 
@@ -45,7 +51,7 @@ public class DefaultBarcodeDecoder implements BarcodeDecoder {
 
   /** {@inheritDoc} */
   @Override
-  public byte[] decode(final byte[] image) throws BarcodeException {
+  public byte[] decode(final byte[] image, final Barcode.BarcodeType type) throws BarcodeException {
 
     BufferedImage bufferedImage = null;
     try (final ByteArrayInputStream imageStream = new ByteArrayInputStream(image)) {
@@ -53,11 +59,33 @@ public class DefaultBarcodeDecoder implements BarcodeDecoder {
     }
     catch (IOException e) {
       throw new BarcodeException("Failed to read supplied image bytes into a valid image", e);
+    }    
+    final BinaryBitmap bitmap = new BinaryBitmap(new HybridBinarizer(new BufferedImageLuminanceSource(bufferedImage)));
+    
+    final Reader reader;    
+    final Map<DecodeHintType, Object> hints = new HashMap<>();
+    hints.put(DecodeHintType.TRY_HARDER, Boolean.TRUE);
+    if (type == null) {
+      reader = new MultiFormatReader();
+      hints.put(DecodeHintType.POSSIBLE_FORMATS, Arrays.asList(BarcodeFormat.QR_CODE, BarcodeFormat.AZTEC));
     }
-
+    else if (type == Barcode.BarcodeType.QR) {
+      reader = new QRCodeReader();      
+    }
+    else { // AZTEC
+      reader = new AztecReader();
+    }
+    
     try {
-      final MultiFormatReader reader = new MultiFormatReader();
-      final Result result = reader.decode(new BinaryBitmap(new HybridBinarizer(new BufferedImageLuminanceSource(bufferedImage))), HINTS);
+      // Sometimes we get a not found expception - in those cases we try with PURE_BARCODE
+      Result result = null;
+      try {
+        result = reader.decode(bitmap, hints); 
+      }
+      catch (final NotFoundException | FormatException e) {
+        hints.put(DecodeHintType.PURE_BARCODE, Boolean.TRUE);
+        result = reader.decode(bitmap, hints);
+      }      
       if (result.getText() != null) {
         return result.getText().getBytes();
       }
@@ -68,12 +96,18 @@ public class DefaultBarcodeDecoder implements BarcodeDecoder {
     catch (final NotFoundException e) {
       throw new BarcodeException("No barcode found inside supplied image", e);
     }
-  }
+    catch (final ChecksumException e) {
+      throw new BarcodeException("Barcode checksum error", e);
+    }
+    catch (final FormatException e) {
+      throw new BarcodeException("Barcode format error", e);
+    }
+  }  
 
   /** {@inheritDoc} */
   @Override
-  public String decodeToString(final byte[] image, final Charset characterSet) throws BarcodeException {
-    final byte[] bytes = this.decode(image);
+  public String decodeToString(final byte[] image, final Barcode.BarcodeType type, final Charset characterSet) throws BarcodeException {
+    final byte[] bytes = this.decode(image, type);
     return new String(bytes, characterSet != null ? characterSet : Charset.defaultCharset());
   }
 

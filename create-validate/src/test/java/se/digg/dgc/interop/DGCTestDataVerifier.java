@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 import com.upokecenter.cbor.CBORDateConverter;
 import com.upokecenter.cbor.CBORObject;
 
+import se.digg.dgc.encoding.Barcode;
 import se.digg.dgc.encoding.BarcodeDecoder;
 import se.digg.dgc.encoding.BarcodeException;
 import se.digg.dgc.encoding.Base45;
@@ -83,7 +84,7 @@ public class DGCTestDataVerifier {
     // 1. Load the picture and extract the prefixed BASE45content.
     //
     if (test.getExpectedResults().expectedPictureDecode != null) {
-      validateQrCodeCode(testName, test.getExpectedResults().expectedPictureDecode, test.getBarCode(), test.getPrefix());
+      validateQrCode(testName, test.getExpectedResults().expectedPictureDecode, test.getBarCode(), test.getPrefix());
     }
 
     // 2. Load Prefix Object from RAW Content and remove the prefix. Validate against the BASE45 raw content.
@@ -142,14 +143,15 @@ public class DGCTestDataVerifier {
    * @throws Exception
    *           for test errors
    */
-  public static void validateQrCodeCode(final String testName, final boolean expectedResult,
+  public static void validateQrCode(final String testName, final boolean expectedResult,
       final String qrCode, final String prefixedContents) {
     Assert.assertNotNull(String.format("[%s]: Can not execute Barcode decode test - Missing 2DCode", testName), qrCode);
     Assert.assertNotNull(String.format("[%s]: Can not execute Barcode decode test - Missing PREFIX", testName), prefixedContents);
 
     try {
       final BarcodeDecoder decoder = new DefaultBarcodeDecoder();
-      final String payload = decoder.decodeToString(Base64.getDecoder().decode(qrCode), StandardCharsets.US_ASCII);
+      final String payload = decoder.decodeToString(Base64.getDecoder().decode(qrCode), 
+        Barcode.BarcodeType.QR,StandardCharsets.US_ASCII);
 
       if (expectedResult) {
         Assert.assertEquals(String.format("[%s]: Barcode decode test failed - Decoded data does not match expected", testName),
@@ -383,6 +385,9 @@ public class DGCTestDataVerifier {
       final CBORObject cborObj = CBORObject.DecodeFromBytes(cbor);
       if (cborObj.get("t") != null) {
         final CBORObject tArr = cborObj.get("t");
+        if (tArr.size() == 0) {
+          cborObj.Remove("t");
+        }
         for (int i = 0; i < tArr.size(); i++) {
           final CBORObject tObj = tArr.get(i);
           final CBORObject scObj = tObj.get("sc");
@@ -409,11 +414,23 @@ public class DGCTestDataVerifier {
           }
         }
       }
+      if (cborObj.get("v") != null) {
+        final CBORObject vArr = cborObj.get("t");
+        if (vArr != null && vArr.size() == 0) {
+          cborObj.Remove("v");
+        }
+      }
+      if (cborObj.get("r") != null) {
+        final CBORObject rArr = cborObj.get("r");
+        if (rArr != null && rArr.size() == 0) {
+          cborObj.Remove("r");
+        }
+      }
       cborNormalizedJson = cborObj.ToJSONString();
     }
 
     final String jsonNormalized = CBORObject.FromJSONString(json).ToJSONString();
-
+    
     // This may still fail, since the CBOR may use ints for timestamps ...
 
     if (expected) {
