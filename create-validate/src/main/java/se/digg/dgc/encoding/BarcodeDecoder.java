@@ -21,23 +21,27 @@ public interface BarcodeDecoder {
    * 
    * @param image
    *          the bytes of the images holding the barcode
+   * @param type
+   *          the type of barcode (set to null if not known)
    * @return the contents of the barcode
    * @throws BarcodeException
    *           for decoding errors
    */
-  byte[] decode(final byte[] image) throws BarcodeException;
+  byte[] decode(final byte[] image, final Barcode.BarcodeType type) throws BarcodeException;
 
   /**
    * Locates the barcode in the supplied image and decodes it into a string of the given character set.
    * 
    * @param image
    *          the bytes of the images holding the barcode
+   * @param type
+   *          the type of barcode (set to null if not known)
    * @param characterSet
    *          the character set
    * @return the contents of the barcode
    * @throws BarcodeException
    *           for decoding errors
    */
-  String decodeToString(final byte[] image, final Charset characterSet) throws BarcodeException;
+  String decodeToString(final byte[] image, final Barcode.BarcodeType type, final Charset characterSet) throws BarcodeException;
 
 }

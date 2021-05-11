@@ -12,6 +12,7 @@ import java.security.cert.CertificateExpiredException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import se.digg.dgc.encoding.Barcode;
 import se.digg.dgc.encoding.BarcodeDecoder;
 import se.digg.dgc.encoding.BarcodeException;
 import se.digg.dgc.payload.v1.DGCSchemaException;
@@ -78,7 +79,7 @@ public class DefaultDGCBarcodeDecoder extends DefaultDGCDecoder implements DGCBa
     // Get the barcode from the image and decode it ...
     //
     log.trace("Decoding barcode image ...");
-    String base45 = this.barcodeDecoder.decodeToString(image, null);
+    String base45 = this.barcodeDecoder.decodeToString(image, Barcode.BarcodeType.QR, null);
     log.trace("Decoded barcode image into {}", base45);
     
     return this.decodeToBytes(base45);

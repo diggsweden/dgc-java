@@ -37,49 +37,56 @@ public class InteropTest {
   public static Collection<Object[]> data() {
     return Arrays.asList(new Object[][] {
 
-        // Bulgaria
-        { "BG-1", "BG/1.json" },
-
-        // Romania
-        { "RO-1", "RO/1.json" },
-        { "RO-2", "RO/2.json" },
-
-        // Austria
-        { "AT-1", "AT/1.json" },
-        { "AT-2", "AT/2.json" },
-        // AT has a bug where they use millis instead of seconds for timestamps ...
-        // { "AT-3", "AT/3.json" },
-        // { "AT-4", "AT/4.json" },
-
-        // Spain
-        { "ES-1101", "ES/1101.json" },
-
-        // Bad testdata - Base64 instead of Hex
-        // { "ES-1201", "ES/1201.json" },
-        // { "ES-1202", "ES/1202.json" },
-        // { "ES-1203", "ES/1203.json" },
-        { "ES-2001", "ES/2001.json" },
-        { "ES-2002", "ES/2002.json" },
-        { "ES-201", "ES/201.json" },
-        { "ES-202", "ES/202.json" },
-        { "ES-501", "ES/501.json" },
-        { "ES-502", "ES/502.json" },
-        { "ES-503", "ES/503.json" },
-
-        // Croatia
-        // Fails because the expiration time is missing from the CWT
-        // Also, the iss-field of the CWT is wrong.
-        // { "HR-1", "HR/1.json" },
+//        // Bulgaria
+//        { "BG-1", "BG/1.json" },
+//
+//        // Romania
+//        { "RO-1", "RO/1.json" },
+//        { "RO-2", "RO/2.json" },
+//
+//        // Austria
+//        { "AT-1", "AT/1.json" },
+//        { "AT-2", "AT/2.json" },
+//        { "AT-3", "AT/3.json" },
+//        { "AT-4", "AT/4.json" },
+//
+//        // Spain
+//        { "ES-1101", "ES/1101.json" },
+//
+//        // Bad testdata - Base64 instead of Hex
+//        // { "ES-1201", "ES/1201.json" },
+//        // { "ES-1202", "ES/1202.json" },
+//        // { "ES-1203", "ES/1203.json" },
+//        { "ES-2001", "ES/2001.json" },
+//        { "ES-2002", "ES/2002.json" },
+//        { "ES-201", "ES/201.json" },
+//        { "ES-202", "ES/202.json" },
+//        { "ES-501", "ES/501.json" },
+//        { "ES-502", "ES/502.json" },
+//        { "ES-503", "ES/503.json" },
+//
+//        // Croatia
+        { "HR-1", "HR/1.json" },
+        
+        // Empty strings in test entry
         // { "HR-2", "HR/2.json" },
-        // { "HR-3", "HR/3.json" },
+        { "HR-3", "HR/3.json" },
 
         // Iceland
         { "IS-1", "IS/1.json" },
 
         // Greece
-        // Fails because the expiration time is missing from the CWT
         { "GR-1", "GR/1.json" },
         { "GR-2", "GR/2.json" },
+        
+        // Denmark
+      
+        // ZXing fails to decode this ...
+        { "DK-5", "DK/5.json" },
+        { "DK-6", "DK/6.json" },
+        { "DK-7", "DK/7.json" },
+        { "DK-8", "DK/8.json" },
+        { "DK-9", "DK/9.json" },
 
         // Sweden (this library)
         { "SE-1", "SE/1.json" },
@@ -114,6 +121,7 @@ public class InteropTest {
   public void validate() throws Exception {
     final TestStatement testStatement = DGCTestDataVerifier.getTestStatement(this.testFile);
     DGCTestDataVerifier.validate(this.testName, testStatement);
+    
   }
 
 }
