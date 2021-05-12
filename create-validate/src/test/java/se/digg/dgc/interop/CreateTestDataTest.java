@@ -44,18 +44,21 @@ public class CreateTestDataTest {
   public static final String TARGET_DIR = "target/interop";
 
   private PkiCredential rsa;
-  private PkiCredential ecdsa;
-  private PkiCredential ecdsa2;
+  private PkiCredential ecdsaVacPurpose;
+  private PkiCredential ecdsaAllPurposes;
+  private PkiCredential ecdsaOther;
 
   private static final char[] password = "secret".toCharArray();
 
   public CreateTestDataTest() throws Exception {
     this.rsa = new KeyStoreCredential(new ClassPathResource("rsa.jks"), password, "signer", password);
     this.rsa.init();
-    this.ecdsa = new KeyStoreCredential(new ClassPathResource("dgc-signer.jks"), password, "signer", password);
-    this.ecdsa.init();
-    this.ecdsa2 = new KeyStoreCredential(new ClassPathResource("ecdsa.jks"), password, "signer", password);
-    this.ecdsa2.init();
+    this.ecdsaVacPurpose = new KeyStoreCredential(new ClassPathResource("dgc-signer.jks"), password, "dgc-signer-test-vac-only", password);
+    this.ecdsaVacPurpose.init();
+    this.ecdsaAllPurposes = new KeyStoreCredential(new ClassPathResource("dgc-signer.jks"), password, "dgc-signer-test", password);
+    this.ecdsaAllPurposes.init();
+    this.ecdsaOther = new KeyStoreCredential(new ClassPathResource("ecdsa.jks"), password, "signer", password);
+    this.ecdsaOther.init();
   }
 
   // One vac-entry
@@ -64,10 +67,10 @@ public class CreateTestDataTest {
     final DigitalGreenCertificate dgc = readDgcFile("dgc-simple-one-entry.json", DigitalGreenCertificate.class);
     final Instant issueTime = Instant.now();
     final Instant expiration = issueTime.plus(Duration.ofDays(90));
-    final DGCSigner signer = new DefaultDGCSigner(this.ecdsa);
+    final DGCSigner signer = new DefaultDGCSigner(this.ecdsaVacPurpose);
 
     final TestStatement test =
-        createTestStatement(dgc, dgc.encode(), issueTime, expiration, signer, null, null, this.ecdsa.getCertificate());
+        createTestStatement(dgc, dgc.encode(), issueTime, expiration, signer, null, null, this.ecdsaVacPurpose.getCertificate());
     test.getTestCtx().setDescription("1: One vaccination entry - Everything should verify fine");
 
     // Before we write the test we want to make sure that we can handle it ...
@@ -82,10 +85,10 @@ public class CreateTestDataTest {
     final DigitalGreenCertificate dgc = readDgcFile("dgc-simple-two-entries.json", DigitalGreenCertificate.class);
     final Instant issueTime = Instant.now();
     final Instant expiration = issueTime.plus(Duration.ofDays(90));
-    final DGCSigner signer = new DefaultDGCSigner(this.ecdsa);
+    final DGCSigner signer = new DefaultDGCSigner(this.ecdsaVacPurpose);
 
     final TestStatement test =
-        createTestStatement(dgc, dgc.encode(), issueTime, expiration, signer, null, null, this.ecdsa.getCertificate());
+        createTestStatement(dgc, dgc.encode(), issueTime, expiration, signer, null, null, this.ecdsaVacPurpose.getCertificate());
     test.getTestCtx().setDescription("2: Two vaccination entries - Everything should verify fine");
 
     // Before we write the test we want to make sure that we can handle it ...
@@ -117,11 +120,11 @@ public class CreateTestDataTest {
     final DigitalGreenCertificate dgc = readDgcFile("dgc-simple-one-entry.json", DigitalGreenCertificate.class);
     final Instant issueTime = Instant.now();
     final Instant expiration = issueTime.plus(Duration.ofDays(90));
-    final DefaultDGCSigner signer = new DefaultDGCSigner(this.ecdsa);
+    final DefaultDGCSigner signer = new DefaultDGCSigner(this.ecdsaVacPurpose);
     signer.setIncludeCoseTag(false);
 
     final TestStatement test =
-        createTestStatement(dgc, dgc.encode(), issueTime, expiration, signer, null, null, this.ecdsa.getCertificate());
+        createTestStatement(dgc, dgc.encode(), issueTime, expiration, signer, null, null, this.ecdsaVacPurpose.getCertificate());
     test.getTestCtx().setDescription("4: One vaccination entry - No tag for COSE object. Everything should verify fine.");
 
     // Before we write the test we want to make sure that we can handle it ...
@@ -136,12 +139,12 @@ public class CreateTestDataTest {
     final DigitalGreenCertificate dgc = readDgcFile("dgc-simple-one-entry.json", DigitalGreenCertificate.class);
     final Instant issueTime = Instant.now();
     final Instant expiration = issueTime.plus(Duration.ofDays(90));
-    final DefaultDGCSigner signer = new DefaultDGCSigner(this.ecdsa);
+    final DefaultDGCSigner signer = new DefaultDGCSigner(this.ecdsaVacPurpose);
     signer.setIncludeCoseTag(true);
     signer.setIncludeCwtTag(true);
 
     final TestStatement test =
-        createTestStatement(dgc, dgc.encode(), issueTime, expiration, signer, null, null, this.ecdsa.getCertificate());
+        createTestStatement(dgc, dgc.encode(), issueTime, expiration, signer, null, null, this.ecdsaVacPurpose.getCertificate());
     test.getTestCtx().setDescription("5: One vaccination entry - Both CWT and Cose_Sign1 tags present. Everything should verify fine.");
 
     // Before we write the test we want to make sure that we can handle it ...
@@ -156,10 +159,10 @@ public class CreateTestDataTest {
     final DigitalGreenCertificate dgc = readDgcFile("dgc-simple-one-entry.json", DigitalGreenCertificate.class);
     final Instant issueTime = Instant.now();
     final Instant expiration = issueTime.plus(Duration.ofDays(90));
-    final DefaultDGCSigner signer = new DefaultDGCSigner(this.ecdsa2);
+    final DefaultDGCSigner signer = new DefaultDGCSigner(this.ecdsaOther);
 
     final TestStatement test =
-        createTestStatement(dgc, dgc.encode(), issueTime, expiration, signer, null, null, this.ecdsa.getCertificate());
+        createTestStatement(dgc, dgc.encode(), issueTime, expiration, signer, null, null, this.ecdsaVacPurpose.getCertificate());
     test.getTestCtx().setDescription("6: One vaccination entry - Signature validation should fail.");
 
     test.getExpectedResults().expectedVerify = false;
