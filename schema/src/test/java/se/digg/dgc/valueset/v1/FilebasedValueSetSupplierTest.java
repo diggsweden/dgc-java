@@ -56,12 +56,11 @@ public class FilebasedValueSetSupplierTest {
       final LocalDate secondDate = LocalDate.parse("2021-02-02");
       final ValueSet valueSet = new ValueSet("value-set", firstDate, values);
       
-      final String filePath = path.toString();
       final File file = path.toFile();
       
       jsonMapper.writeValue(file, valueSet);
       
-      final FilebasedValueSetSupplier supplier = new FilebasedValueSetSupplier(filePath, Duration.ofMillis(500L));
+      final FilebasedValueSetSupplier supplier = new FilebasedValueSetSupplier(file, Duration.ofMillis(500L));
       
       // Should return initial value (no re-loading has been done).
       Assert.assertEquals(firstDate, supplier.get().getDate());
