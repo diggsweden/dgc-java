@@ -33,7 +33,7 @@ public class CBORInstantConverter implements ICBORToFromConverter<Instant> {
     if (obj == null) {
       return null;
     }
-    return untaggedDateConverter.ToCBORObject(new Date(obj.toEpochMilli()));
+    return untaggedDateConverter.ToCBORObject(new Date(obj.getEpochSecond() * 1000L));
   }
 
   /** {@inheritDoc} */

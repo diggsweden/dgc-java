@@ -8,11 +8,11 @@ package se.digg.dgc.cwt;
 import java.time.Duration;
 import java.time.Instant;
 
-import org.apache.commons.codec.binary.Hex;
 import org.junit.Assert;
 import org.junit.Test;
 
 import com.upokecenter.cbor.CBORObject;
+import com.upokecenter.cbor.CBORType;
 
 import se.digg.dgc.signatures.cwt.Cwt;
 
@@ -41,7 +41,14 @@ public class CwtTest {
       .claim(99, object)
       .build();
     
-    System.out.println(Hex.encodeHexString(cwt.encode()));
+    //System.out.println(Hex.encodeHexString(cwt.encode()));
+    
+    // Make sure that an int is used to represent the times...
+    CBORObject obj = CBORObject.DecodeFromBytes(cwt.encode());
+    CBORObject iat = obj.get(6);
+    Assert.assertFalse(iat.isTagged());
+    Assert.assertTrue(iat.getType() == CBORType.Integer);
+    Assert.assertEquals(seconds, iat.AsInt64Value());
     
     Cwt cwt2 = Cwt.decode(cwt.encode());
     
