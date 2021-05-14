@@ -16,12 +16,16 @@ import java.util.Arrays;
 import java.util.Base64;
 import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.zip.ZipException;
 
 import org.junit.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.databind.MapperFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.upokecenter.cbor.CBORDateConverter;
 import com.upokecenter.cbor.CBORObject;
 
@@ -32,6 +36,7 @@ import se.digg.dgc.encoding.Base45;
 import se.digg.dgc.encoding.DGCConstants;
 import se.digg.dgc.encoding.Zlib;
 import se.digg.dgc.encoding.impl.DefaultBarcodeDecoder;
+import se.digg.dgc.interop.DGCPayloadValidator.Report;
 import se.digg.dgc.payload.v1.DigitalGreenCertificate;
 import se.digg.dgc.signatures.CertificateProvider;
 import se.digg.dgc.signatures.DGCSignatureVerifier;
@@ -48,6 +53,14 @@ import se.digg.dgc.signatures.impl.DefaultDGCSignatureVerifier;
  * @author Henric Norlander (extern.henric.norlander@digg.se)
  */
 public class DGCTestDataVerifier {
+
+  private static ObjectMapper jsonMapper = DigitalGreenCertificate.getJSONMapper();
+
+  static {
+    jsonMapper.configure(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES, true);
+    jsonMapper.setSerializationInclusion(Include.USE_DEFAULTS);
+    jsonMapper.setSerializationInclusion(Include.NON_NULL);
+  }
 
   /** Logger */
   private static final Logger log = LoggerFactory.getLogger(DGCTestDataVerifier.class);
@@ -92,12 +105,16 @@ public class DGCTestDataVerifier {
     if (test.getExpectedResults().expectedUnprefix != null) {
       validatePrefix(testName, test.getExpectedResults().expectedUnprefix, test.getPrefix(), test.getBase45());
     }
+    
+    if (test.getExpectedResults().expectedCompression != null) {
+      validateDecompress(testName, test.getExpectedResults().expectedCompression, test.getCompressedBytes(), test.getCoseBytes());
+    }
 
     // 3. Decode the BASE45 RAW Content and validate the COSE content against the RAW content.
     //
     if (test.getExpectedResults().expectedBase45Decode != null) {
       validateBase45DecodeAndDecompress(testName, test.getExpectedResults().expectedBase45Decode,
-        test.getBase45(), test.getCoseBytes());
+        test.getBase45(), test.getCoseBytes(), test.getCompressedBytes());
     }
 
     // 4. Check the EXP Field for expiring against the VALIDATIONCLOCK time.
@@ -125,7 +142,19 @@ public class DGCTestDataVerifier {
     // 8. Validate the extracted JSON against the schema defined in the test context.
     //
 
-    // TODO
+    // Own test. Validate the CBOR data
+    if (test.getCborBytes() != null) {
+      List<DGCPayloadValidator.Report> report = DGCPayloadValidator.validateDgcPayload(test.getCborBytes());
+      if (!report.isEmpty()) {
+        final boolean errors = report.stream().filter(r -> r.getType() == Report.Type.ERROR).findAny().isPresent();
+        if (errors) {
+          Assert.fail(String.format("[%s]: %s", testName, report));
+        }
+        else {
+          System.out.println(testName + ": " + report);
+        }
+      }
+    }
 
   }
 
@@ -150,8 +179,8 @@ public class DGCTestDataVerifier {
 
     try {
       final BarcodeDecoder decoder = new DefaultBarcodeDecoder();
-      final String payload = decoder.decodeToString(Base64.getDecoder().decode(qrCode), 
-        Barcode.BarcodeType.QR,StandardCharsets.US_ASCII);
+      final String payload = decoder.decodeToString(Base64.getDecoder().decode(qrCode),
+        Barcode.BarcodeType.QR, StandardCharsets.US_ASCII);
 
       if (expectedResult) {
         Assert.assertEquals(String.format("[%s]: Barcode decode test failed - Decoded data does not match expected", testName),
@@ -206,7 +235,42 @@ public class DGCTestDataVerifier {
   }
 
   /**
+   * Validates that decompression works.
+   * 
+   * @param testName
+   *          name of test
+   * @param expectedResult
+   *          true/false
+   * @param compressed
+   *          compressed CWT
+   * @param cose
+   *          the signed CWT (COSE)
+   */
+  public static void validateDecompress(final String testName, final boolean expectedResult,
+      final byte[] compressed, final byte[] cose) {
+    Assert.assertNotNull(String.format("[%s]: Can not execute decompress test - Missing COMPRESSED", testName), compressed);
+    Assert.assertNotNull(String.format("[%s]: Can not execute decompress test - Missing COSE", testName), cose);
+
+    try {
+      final byte[] decompressed = Zlib.decompress(compressed, true);
+
+      Assert.assertArrayEquals(String.format("[%s]: Decompress test failed", testName),
+        cose, decompressed);
+
+      if (!expectedResult) {
+        Assert.fail(String.format("[%s]: Decompress test failed - match but expected failure", testName));
+      }
+    }
+    catch (IllegalArgumentException | ZipException e) {
+      if (expectedResult) {
+        Assert.fail(String.format("[%s]: Decompress test failed - %s", testName, e.getMessage()));
+      }
+    }
+  }
+
+  /**
    * Validates test number 3: Decode the BASE45 RAW Content and validate the COSE content against the RAW content.
+   * TODO: will change
    * 
    * @param testName
    *          name of test
@@ -218,16 +282,25 @@ public class DGCTestDataVerifier {
    *          the COSE bytes
    */
   public static void validateBase45DecodeAndDecompress(final String testName, final boolean expectedResult,
-      final String base45, final byte[] cose) {
+      final String base45, final byte[] cose, final byte[] compressed) {
     Assert.assertNotNull(String.format("[%s]: Can not execute Base45 decode test - Missing BASE45", testName), base45);
-    Assert.assertNotNull(String.format("[%s]: Can not execute Prefix test - Missing COSE", testName), cose);
+    if (cose == null && compressed == null) {
+      Assert.fail(String.format("[%s]: Can not execute Base45 decode test - Missing both COSE and COMPRESSED", testName));
+    }    
 
     try {
       final byte[] decoded = Base45.getDecoder().decode(base45);
-      final byte[] decompressed = Zlib.decompress(decoded, true);
+      
+      if (compressed != null) {
+        Assert.assertArrayEquals(String.format("[%s]: Base45 decode and test failed", testName),
+          compressed, decoded);
+      }
+      else if (cose != null) {      
+        final byte[] decompressed = Zlib.decompress(decoded, true);
 
-      Assert.assertArrayEquals(String.format("[%s]: Base45 decode and decompress test failed", testName),
-        cose, decompressed);
+        Assert.assertArrayEquals(String.format("[%s]: Base45 decode and decompress test failed", testName),
+          cose, decompressed);
+      }
 
       if (!expectedResult) {
         Assert.fail(String.format("[%s]: Base45 decode and decompress test failed - match but expected failure", testName));
@@ -378,16 +451,13 @@ public class DGCTestDataVerifier {
     // Normalize
     //
 
-    // Since the CBOR encoding may contain timestamps encoded as ints, we see if we to
+    // Since the CBOR encoding may contain timestamps encoded as ints, we see if need to
     // take care of that as part of the normalization process.
     final String cborNormalizedJson;
     {
       final CBORObject cborObj = CBORObject.DecodeFromBytes(cbor);
       if (cborObj.get("t") != null) {
         final CBORObject tArr = cborObj.get("t");
-        if (tArr.size() == 0) {
-          cborObj.Remove("t");
-        }
         for (int i = 0; i < tArr.size(); i++) {
           final CBORObject tObj = tArr.get(i);
           final CBORObject scObj = tObj.get("sc");
@@ -414,23 +484,11 @@ public class DGCTestDataVerifier {
           }
         }
       }
-      if (cborObj.get("v") != null) {
-        final CBORObject vArr = cborObj.get("t");
-        if (vArr != null && vArr.size() == 0) {
-          cborObj.Remove("v");
-        }
-      }
-      if (cborObj.get("r") != null) {
-        final CBORObject rArr = cborObj.get("r");
-        if (rArr != null && rArr.size() == 0) {
-          cborObj.Remove("r");
-        }
-      }
       cborNormalizedJson = cborObj.ToJSONString();
     }
 
     final String jsonNormalized = CBORObject.FromJSONString(json).ToJSONString();
-    
+
     // This may still fail, since the CBOR may use ints for timestamps ...
 
     if (expected) {
@@ -453,7 +511,7 @@ public class DGCTestDataVerifier {
    *           for parsing errors
    */
   public static TestStatement getTestStatement(final String file) throws IOException {
-    return DigitalGreenCertificate.getJSONMapper().readValue(new File(file), TestStatement.class);
+    return jsonMapper.readValue(new File(file), TestStatement.class);
   }
 
   // Hidden

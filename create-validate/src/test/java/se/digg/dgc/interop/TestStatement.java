@@ -55,6 +55,10 @@ public class TestStatement {
   @JsonProperty("COSE")
   private String cose;
 
+  /** Compressed CWT (as a hex-encoded string). */
+  @JsonProperty("COMPRESSED")
+  private String compressed;
+
   /** The compressed Cose_Sign1 object in its Base45-encoding. */
   @JsonProperty("BASE45")
   private String base45;
@@ -217,6 +221,53 @@ public class TestStatement {
   @JsonIgnore
   public void setCose(final byte[] cose) {
     this.cose = Hex.encodeHexString(cose);
+  }
+
+  /**
+   * Gets the compressed CWT.
+   * 
+   * @return the compressed CWT
+   */
+  public String getCompressed() {
+    return this.compressed;
+  }
+
+  /**
+   * Gets the compressed CWT in byte representation.
+   * 
+   * @return the compressed CWT
+   */
+  @JsonIgnore
+  public byte[] getCompressedBytes() {
+    try {
+      return this.compressed != null
+          ? Hex.decodeHex(this.compressed)
+          : null;
+    }
+    catch (DecoderException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  /**
+   * Sets the compressed CWT.
+   * 
+   * @param compressed
+   *          the compressed CWT
+   */
+  public void setCompressed(final String compressed) {
+    this.compressed = compressed;
+  }
+
+  /**
+   * Sets the compressed CWT.
+   * 
+   * @param compressed
+   *          the compressed CWT
+   */
+  @JsonIgnore
+  public void setCompressed(final byte[] compressed) {
+    this.compressed = Hex.encodeHexString(compressed);
   }
 
   /**
@@ -400,7 +451,7 @@ public class TestStatement {
     public String getValidationClock() {
       return this.validationClock;
     }
-    
+
     public Instant getValidationClockInstant() {
       if (this.validationClock == null) {
         return null;
@@ -423,7 +474,7 @@ public class TestStatement {
     public void setValidationClock(final String validationClock) {
       this.validationClock = validationClock;
     }
-    
+
     public void setValidationClock(final Instant validationClock) {
       this.validationClock = validationClock.toString();
     }
@@ -445,18 +496,12 @@ public class TestStatement {
   @JsonIgnoreProperties(ignoreUnknown = true)
   public static class ExpectedResults {
 
-    @JsonProperty("EXPECTEDVALIDOBJECT")
-    public Boolean expectedValidObject;
-
     @JsonProperty("EXPECTEDSCHEMAVALIDATION")
     public Boolean expectedSchemaValidation;
 
-    @JsonProperty("EXPECTEDENCODE")
-    public Boolean expectedEncode;
-
     @JsonProperty("EXPECTEDDECODE")
-    public Boolean expectedDecode;
-
+    public Boolean expectedDecode;    
+    
     @JsonProperty("EXPECTEDVERIFY")
     public Boolean expectedVerify;
 
@@ -465,6 +510,9 @@ public class TestStatement {
 
     @JsonProperty("EXPECTEDVALIDJSON")
     public Boolean expectedValidJson;
+    
+    @JsonProperty("EXPECTEDCOMPRESSION")
+    public Boolean expectedCompression;
 
     @JsonProperty("EXPECTEDB45DECODE")
     public Boolean expectedBase45Decode;
@@ -475,15 +523,17 @@ public class TestStatement {
     @JsonProperty("EXPECTEDEXPIRATIONCHECK")
     public Boolean expectedExpirationCheck;
     
+    // EXPECTEDKEYUSAGE
+
     @JsonIgnore
     public void setAllPositive() {
       this.expectedValidJson = true;
       this.expectedSchemaValidation = true;
-      this.expectedEncode = true;
       this.expectedDecode = true;
       this.expectedVerify = true;
       this.expectedUnprefix = true;
       this.expectedValidJson = true;
+      this.expectedCompression = true;
       this.expectedBase45Decode = true;
       this.expectedPictureDecode = true;
       this.expectedExpirationCheck = true;

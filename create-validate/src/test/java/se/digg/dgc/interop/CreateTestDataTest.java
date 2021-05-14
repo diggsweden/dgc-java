@@ -216,10 +216,14 @@ public class CreateTestDataTest {
     final String base45;
     if (compress == null || compress.booleanValue()) {
       final byte[] compressed = Zlib.compress(cose);
+      test.setCompressed(compressed);
       base45 = Base45.getEncoder().encodeToString(compressed);
       test.setBase45(base45);
     }
     else {
+      // This tests an error case, so set the compressed to the uncompressed cose
+      test.setCompressed(cose);
+      
       base45 = Base45.getEncoder().encodeToString(cose);
       test.setBase45(base45);
     }
