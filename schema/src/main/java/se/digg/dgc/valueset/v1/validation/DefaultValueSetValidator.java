@@ -103,7 +103,7 @@ public class DefaultValueSetValidator implements ValueSetValidator {
   private ValueSetValidationResult validate(final TestEntry testEntry, final String propertyName) {
     final ValueSetValidationResult result = new ValueSetValidationResult(propertyName);
     result.addChildResult(this.checkValue(testEntry.getTg(), "tg", ValueSetConstants.DISEASE_AGENT_TARGETED_ID));
-    result.addChildResult(this.checkValue(testEntry.getMa(), "ma", ValueSetConstants.MARKETING_AUTH_HOLDERS_ID));
+    result.addChildResult(this.checkValue(testEntry.getMa(), "ma", ValueSetConstants.TEST_MANUFACTURER_AND_NAME_ID));
     result.addChildResult(this.checkValue(testEntry.getTr(), "tr", ValueSetConstants.LAB_RESULT_ID));
 
     return result;
