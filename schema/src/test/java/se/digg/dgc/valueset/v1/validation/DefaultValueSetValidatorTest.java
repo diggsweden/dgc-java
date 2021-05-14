@@ -146,11 +146,11 @@ public class DefaultValueSetValidatorTest {
     final DefaultValueSetValidator v = new DefaultValueSetValidator(Arrays.asList(
       ValueSetConstants.diseaseAgentTargeted(),
       ValueSetConstants.testResult(),
-      ValueSetConstants.marketingAuthorizationHolder()));
+      ValueSetConstants.testManufacturer()));
     
     final TestEntry e = new TestEntry()        
         .withTg("840539006")
-        .withMa("ORG-100030215")
+        .withMa("1304")
         .withTr("260373001");
     
     ValueSetValidationResult res = v.validate(e);
