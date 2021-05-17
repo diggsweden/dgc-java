@@ -43,6 +43,7 @@ public class DGCPayloadValidator {
   private static final ValueSet diseaseAgentTargetedVS = ValueSetConstants.diseaseAgentTargeted();
   private static final ValueSet testManufacturerVS = ValueSetConstants.testManufacturer();
   private static final ValueSet testResultVS = ValueSetConstants.testResult();
+  private static final ValueSet testTypeVS = ValueSetConstants.testType();
   private static final ValueSet marketingAuthorizationHolderVS = ValueSetConstants.marketingAuthorizationHolder();
   private static final ValueSet medicalProductVS = ValueSetConstants.medicalProduct();
   private static final ValueSet vaccineProphylaxisVS = ValueSetConstants.vaccineProphylaxis();
@@ -286,7 +287,9 @@ public class DGCPayloadValidator {
     final String tg = assertString(t.get("tg"), item + ".tg", true, errors);
     validateAgainstValueset(tg, item + ".tg", diseaseAgentTargetedVS, errors);
 
-    assertString(t.get("tt"), item + ".tt", false, errors);
+    final String tt = assertString(t.get("tt"), item + ".tt", true, errors);
+    validateAgainstValueset(tt, item + ".tt", testTypeVS, errors);
+    
     assertString(t.get("nm"), item + ".nm", false, errors);
 
     final String ma = assertString(t.get("ma"), item + ".ma", false, errors);

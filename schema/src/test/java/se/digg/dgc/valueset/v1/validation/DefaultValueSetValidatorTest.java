@@ -146,16 +146,18 @@ public class DefaultValueSetValidatorTest {
     final DefaultValueSetValidator v = new DefaultValueSetValidator(Arrays.asList(
       ValueSetConstants.diseaseAgentTargeted(),
       ValueSetConstants.testResult(),
+      ValueSetConstants.testType(),
       ValueSetConstants.testManufacturer()));
     
     final TestEntry e = new TestEntry()        
         .withTg("840539006")
+        .withTt("LP6464-4")
         .withMa("1304")
         .withTr("260373001");
     
     ValueSetValidationResult res = v.validate(e);
     Assert.assertTrue(res.isSuccess());
-    Assert.assertEquals(3, res.getChildren().size());
+    Assert.assertEquals(4, res.getChildren().size());
     
     Eudgc dgc = new Eudgc();
     dgc.setT(Arrays.asList(e));

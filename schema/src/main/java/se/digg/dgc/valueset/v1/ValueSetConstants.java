@@ -20,25 +20,28 @@ import java.io.UncheckedIOException;
  * @author Henric Norlander (extern.henric.norlander@digg.se)
  */
 public class ValueSetConstants {
-  
+
   /** ID for the "disease agent targeted" value set. */
   public static final String DISEASE_AGENT_TARGETED_ID = "disease-agent-targeted";
 
   /** ID for "Covid-19 lab test manufacturer (and name)" value set. */
   public static final String TEST_MANUFACTURER_AND_NAME_ID = "covid-19-lab-test-manufacturer-and-name";
-  
+
   /** ID for "Covid-19 lab result" value set. */
   public static final String LAB_RESULT_ID = "covid-19-lab-result";
-  
+
+  /** ID for "Covid-19 lab test type" value set. */
+  public static final String TEST_TYPE = "covid-19-lab-test-type";
+
   /** ID for "Covid-19 marketing authorization holders" value set. */
   public static final String MARKETING_AUTH_HOLDERS_ID = "vaccines-covid-19-auth-holders";
-  
+
   /** ID for "Vaccine medical product" value set. */
   public static final String MEDICAL_PRODUCT_ID = "vaccines-covid-19-names";
-  
+
   /** ID for "Vaccine Prophylaxis" value set. */
-  public static final String VACCINE_PROPHYLAXIS = "sct-vaccines-covid-19";  
-  
+  public static final String VACCINE_PROPHYLAXIS = "sct-vaccines-covid-19";
+
   /**
    * Gets a static representation of the <b>disease-agent-targeted</b> value set.
    * 
@@ -64,6 +67,15 @@ public class ValueSetConstants {
    */
   public static ValueSet testResult() {
     return createValueSet("/v1-valuesets/test-result.json");
+  }
+
+  /**
+   * Gets a static representation of the <b>covid-19-lab-test-type</b> value set.
+   * 
+   * @return covid-19-lab-test-type
+   */
+  public static ValueSet testType() {
+    return createValueSet("/v1-valuesets/test-type.json");
   }
 
   /**
