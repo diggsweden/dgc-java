@@ -88,7 +88,7 @@ public class CreateTestDataTest {
     final DGCSigner signer = new DefaultDGCSigner(this.ecdsaVacPurpose);
 
     final TestStatement test =
-        createTestStatement(dgc, dgc.encode(), issueTime, expiration, signer, null, null, this.ecdsaVacPurpose.getCertificate());
+        createTestStatement(dgc, dgc.encode(), issueTime, expiration, signer, null, null, this.ecdsaAllPurposes.getCertificate());
     test.getTestCtx().setDescription("2: Two vaccination entries - Everything should verify fine");
 
     // Before we write the test we want to make sure that we can handle it ...
@@ -124,7 +124,7 @@ public class CreateTestDataTest {
     signer.setIncludeCoseTag(false);
 
     final TestStatement test =
-        createTestStatement(dgc, dgc.encode(), issueTime, expiration, signer, null, null, this.ecdsaVacPurpose.getCertificate());
+        createTestStatement(dgc, dgc.encode(), issueTime, expiration, signer, null, null, this.ecdsaAllPurposes.getCertificate());
     test.getTestCtx().setDescription("4: One vaccination entry - No tag for COSE object. Everything should verify fine.");
 
     // Before we write the test we want to make sure that we can handle it ...
@@ -144,7 +144,7 @@ public class CreateTestDataTest {
     signer.setIncludeCwtTag(true);
 
     final TestStatement test =
-        createTestStatement(dgc, dgc.encode(), issueTime, expiration, signer, null, null, this.ecdsaVacPurpose.getCertificate());
+        createTestStatement(dgc, dgc.encode(), issueTime, expiration, signer, null, null, this.ecdsaAllPurposes.getCertificate());
     test.getTestCtx().setDescription("5: One vaccination entry - Both CWT and Cose_Sign1 tags present. Everything should verify fine.");
 
     // Before we write the test we want to make sure that we can handle it ...

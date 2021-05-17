@@ -150,9 +150,9 @@ public class DGCTestDataVerifier {
         if (errors) {
           Assert.fail(String.format("[%s]: %s", testName, report));
         }
-        else {
-          System.out.println(testName + ": " + report);
-        }
+//        else {
+//          System.out.println(testName + ": " + report);
+//        }
       }
     }
 
