@@ -59,7 +59,7 @@ public class MrzEncoder {
    */
   public static String encode(final String input) {
     
-    final StringBuffer sb = new StringBuffer();
+    final StringBuilder sb = new StringBuilder();
     
     for (int i = 0; i < input.trim().length(); i++) {
       final char c = input.charAt(i);
@@ -82,7 +82,7 @@ public class MrzEncoder {
         .normalize(sb.toString(), Normalizer.Form.NFD)
         .replaceAll("[^\\p{ASCII}]", "")
         .toUpperCase()
-        .replaceAll("[^<[A-Z][0-9]]", "<");
+        .replaceAll("[^<A-Z0-9]", "<");
   }
 
 }
