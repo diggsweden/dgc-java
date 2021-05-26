@@ -10,10 +10,12 @@ import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Date;
 
+import org.apache.commons.codec.binary.Hex;
 import org.junit.Assert;
 import org.junit.Test;
 
 import com.upokecenter.cbor.CBORObject;
+import com.upokecenter.cbor.CBORType;
 
 /**
  * Test cases for encoding/decoding of DigitalGreenCertificate.
@@ -141,6 +143,7 @@ public class DigitalGreenCertificateTest {
     final CBORObject object = CBORObject.DecodeFromBytes(cbor);
 
     System.out.println(object.ToJSONString());
+    System.out.println(Hex.encodeHexString(object.EncodeToBytes()));
 
     final CBORObject dateObject = object.get("t").get(0).get("dr");
     Assert.assertNotNull(dateObject);
@@ -150,6 +153,7 @@ public class DigitalGreenCertificateTest {
     //
     Assert.assertTrue(dateObject.isTagged());
     Assert.assertTrue(dateObject.HasMostOuterTag(0));
+    Assert.assertTrue(dateObject.getType() == CBORType.TextString);
 
     Assert.assertEquals(dateTime, dateObject.AsString());
 

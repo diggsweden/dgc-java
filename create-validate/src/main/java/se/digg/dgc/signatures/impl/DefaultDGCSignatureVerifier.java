@@ -82,7 +82,7 @@ public class DefaultDGCSignatureVerifier implements DGCSignatureVerifier {
             throw new SignatureException("No DGC payload available in CWT");
           }
 
-          return new DGCSignatureVerifier.Result(dgcPayload, cert, country, cwt.getIssuedAt(), cwt.getExpiration());
+          return new DGCSignatureVerifier.Result(dgcPayload, cert, kid, country, cwt.getIssuedAt(), cwt.getExpiration());
         }
         catch (CBORException | SignatureException e) {
           log.info("DGC signature verification failed using certificate '{}' - {}",

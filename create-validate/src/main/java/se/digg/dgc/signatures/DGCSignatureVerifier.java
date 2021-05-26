@@ -36,7 +36,7 @@ public interface DGCSignatureVerifier {
    * @throws CertificateExpiredException
    *           if the DGC has expired
    */
-  Result verify(final byte[] signedCwt, final CertificateProvider certificateProvider) 
+  Result verify(final byte[] signedCwt, final CertificateProvider certificateProvider)
       throws SignatureException, CertificateExpiredException;
 
   /**
@@ -49,6 +49,9 @@ public interface DGCSignatureVerifier {
 
     /** The certificate that was used to verify the signature. */
     private final X509Certificate signerCertificate;
+
+    /** The key id that was used to locate the signer certificate. */
+    private final byte[] kid;
 
     /** The ISO-3166 code for the issuing country. */
     private final String country;
@@ -66,6 +69,8 @@ public interface DGCSignatureVerifier {
      *          the CBOR encoded DGC payload
      * @param signerCertificate
      *          the certificate that was used to verify the signature
+     * @param kid
+     *          he key id that was used to locate the signer certificate
      * @param country
      *          the ISO-3166 code for the issuing country
      * @param issuedAt
@@ -73,10 +78,11 @@ public interface DGCSignatureVerifier {
      * @param expires
      *          the expiration time of the DGC
      */
-    public Result(final byte[] dgcPayload, final X509Certificate signerCertificate, 
-        final String country, final Instant issuedAt, final Instant expires) {
+    public Result(final byte[] dgcPayload, final X509Certificate signerCertificate,
+        final byte[] kid, final String country, final Instant issuedAt, final Instant expires) {
       this.dgcPayload = dgcPayload;
       this.signerCertificate = signerCertificate;
+      this.kid = kid;
       this.country = country;
       this.issuedAt = issuedAt;
       this.expires = expires;
@@ -98,6 +104,15 @@ public interface DGCSignatureVerifier {
      */
     public X509Certificate getSignerCertificate() {
       return this.signerCertificate;
+    }
+
+    /**
+     * Gets the key identifier that was used to locate the signer certificate.
+     * 
+     * @return the key identifier
+     */
+    public byte[] getKid() {
+      return this.kid;
     }
 
     /**
@@ -125,8 +140,8 @@ public interface DGCSignatureVerifier {
      */
     public Instant getExpires() {
       return this.expires;
-    }    
-    
+    }
+
   }
 
 }
