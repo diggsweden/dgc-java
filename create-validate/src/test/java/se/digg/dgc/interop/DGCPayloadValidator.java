@@ -18,6 +18,7 @@ import com.upokecenter.cbor.CBORException;
 import com.upokecenter.cbor.CBORObject;
 import com.upokecenter.cbor.CBORType;
 
+import se.digg.dgc.payload.v1.DateOfBirth;
 import se.digg.dgc.valueset.v1.ValueSet;
 import se.digg.dgc.valueset.v1.ValueSetConstants;
 
@@ -71,7 +72,7 @@ public class DGCPayloadValidator {
 
     // date-of-birth
     //
-    assertDate(dgc.get("dob"), "dob", true, errors);
+    assertDate(dgc.get("dob"), "dob", true, errors, true);
 
     // OK, now check the different entries.
     //
@@ -243,7 +244,7 @@ public class DGCPayloadValidator {
       errors.add(Report.warning(item, "dn is larger than sd. This doesn't make sense"));
     }
 
-    assertDate(v.get("dt"), item + ".dt", true, errors);
+    assertDate(v.get("dt"), item + ".dt", true, errors, false);
 
     final String co = assertString(v.get("co"), item + ".co", true, errors);
     if (co != null && !co.matches("[A-Z]{1,10}")) {
@@ -285,15 +286,7 @@ public class DGCPayloadValidator {
     final String ma = assertString(t.get("ma"), item + ".ma", false, errors);
     validateAgainstValueset(ma, item + ".ma", testManufacturerVS, errors);
 
-    Instant sc = assertDateTime(t.get("sc"), item + ".sc", true, errors);
-    
-    Instant dr = assertDateTime(t.get("dr"), item + ".dr", false, errors);
-    
-    if (sc != null && dr != null) {
-      if (sc.isAfter(dr)) {
-        errors.add(Report.warning(item, "sc (sample collection) is after dr (date of result). This doesn't make sense"));
-      }
-    }
+    assertDateTime(t.get("sc"), item + ".sc", true, errors);
     
     final String tr = assertString(t.get("tr"), item + ".tr", true, errors);
     validateAgainstValueset(tr, item + ".tr", testResultVS, errors);
@@ -410,11 +403,16 @@ public class DGCPayloadValidator {
     return null;
   }
 
-  private static void assertDate(final CBORObject obj, final String item, final boolean required, final List<Report> errors) {
+  private static void assertDate(final CBORObject obj, final String item, final boolean required, final List<Report> errors, boolean dob) {
     final String s = assertString(obj, item, required, errors);
     if (s != null) {
       try {
-        LocalDate.parse(s);
+        if (dob) {
+          new DateOfBirth(s);
+        }
+        else {
+          LocalDate.parse(s);
+        }
       }
       catch (Exception e) {
         errors.add(Report.error(item, String.format("Bad format for date - %s", s)));
