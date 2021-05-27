@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.security.cert.X509Certificate;
 import java.time.Duration;
 import java.time.Instant;
-import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.util.Arrays;
 import java.util.Base64;
@@ -187,13 +186,12 @@ public class CreateTestDataTest {
     final DigitalGreenCertificate dgc = (DigitalGreenCertificate) new DigitalGreenCertificate()
       .withVer(DGCSchemaVersion.DGC_SCHEMA_VERSION)
       .withNam(new PersonName().withGn("Oscar").withFn("Lövström"))
-      .withDob(LocalDate.parse("1958-11-11"))
+      .withDob("1958-11-11")
       .withT(Arrays.asList(new TestEntry()
         .withTg("840539006")
         .withTt("LP6464-4")
         .withMa("1218")
         .withSc(issueTime.minus(Duration.ofHours(4).minus(Duration.ofMinutes(34))))
-        .withDr(issueTime.minus(Duration.ofMinutes(34)))
         .withTr("260415000")
         .withTc("Arlanda Airport Covid Center 1")
         .withCo("SE")
@@ -223,7 +221,7 @@ public class CreateTestDataTest {
     final DigitalGreenCertificate dgc = (DigitalGreenCertificate) new DigitalGreenCertificate()
         .withVer(DGCSchemaVersion.DGC_SCHEMA_VERSION)
         .withNam(new PersonName().withGn("Oscar").withFn("Lövström"))
-        .withDob(LocalDate.parse("1958-11-11"))
+        .withDob("1958-11-11")
         .withR(Arrays.asList(new RecoveryEntry()
           .withTg("840539006")
           .withFr(issueTime.minus(Duration.ofDays(11)).atZone(ZoneOffset.UTC).toLocalDate())
