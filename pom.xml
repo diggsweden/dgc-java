@@ -50,9 +50,8 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <java.version>11</java.version>
-
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>        
+    
     <!-- Versions on dependencies -->
     <jackson.version>2.11.4</jackson.version>
     <slf4j.version>1.7.30</slf4j.version>
@@ -203,6 +202,30 @@
   </build>
   
   <profiles>
+  
+    <profile>
+      <id>default</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      
+      <properties>
+        <java.version>11</java.version>
+      </properties>
+    </profile>
+    
+    <profile>
+      <id>j8-build</id>
+      
+      <properties>
+        <java.version>1.8</java.version>
+      </properties>
+      
+      <build>
+        <finalName>${project.artifactId}-java8-${project.version}</finalName>
+      </build>
+      
+    </profile>
 
     <profile>
       <id>release</id>
@@ -298,5 +321,5 @@
     <module>schema</module>
     <module>create-validate</module>
   </modules>
-
+  
 </project>
