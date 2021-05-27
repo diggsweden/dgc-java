@@ -75,7 +75,12 @@ public class Zlib {
           final InflaterInputStream iis = new InflaterInputStream(bis, inflater);
           final ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
 
-        bos.write(iis.readAllBytes());
+        final byte[] buffer = new byte[2056];
+        int len = iis.read(buffer);
+        while (len != -1) {
+          bos.write(buffer, 0, len);
+          len = iis.read(buffer);
+        }
         bos.flush();
 
         return bos.toByteArray();

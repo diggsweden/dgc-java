@@ -82,7 +82,7 @@ public class MrzEncoder {
         .normalize(sb.toString(), Normalizer.Form.NFD)
         .replaceAll("[^\\p{ASCII}]", "")
         .toUpperCase()
-        .replaceAll("[^<[A-Z][0-9]]", "<");
+        .replaceAll("[^<A-Z0-9]", "<");
   }
 
 }

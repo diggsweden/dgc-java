@@ -226,11 +226,11 @@ public class CreateTestDataTest {
         .withDob(LocalDate.parse("1958-11-11"))
         .withR(Arrays.asList(new RecoveryEntry()
           .withTg("840539006")
-          .withFr(LocalDate.ofInstant(issueTime.minus(Duration.ofDays(11)), ZoneOffset.UTC))
+          .withFr(issueTime.minus(Duration.ofDays(11)).atZone(ZoneOffset.UTC).toLocalDate())
           .withCo("SE")
           .withIs("Swedish eHealth Agency")
-          .withDf(LocalDate.ofInstant(issueTime, ZoneOffset.UTC))
-          .withDu(LocalDate.ofInstant(expiration, ZoneOffset.UTC))
+          .withDf(issueTime.atZone(ZoneOffset.UTC).toLocalDate())
+          .withDu(expiration.atZone(ZoneOffset.UTC).toLocalDate())
           .withCi("URN:UVCI:01:SE:EHN/189005439PP7")));
     
     final DefaultDGCSigner signer = new DefaultDGCSigner(this.ecdsaAllPurposes);
