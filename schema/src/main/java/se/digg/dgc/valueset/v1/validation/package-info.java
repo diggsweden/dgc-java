@@ -1,4 +1,4 @@
 /**
- * Support for validating Digital Green Certificates against value sets.
+ * Support for validating Digital Covid Certificates against value sets.
  */
 package se.digg.dgc.valueset.v1.validation;

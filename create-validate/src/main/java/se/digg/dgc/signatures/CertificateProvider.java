@@ -9,8 +9,7 @@ import java.security.cert.X509Certificate;
 import java.util.List;
 
 /**
- * A functional interface for finding certificates that may be used to verify the signature of a DGC (see
- * {@link DefaultHcertVerifier}).
+ * A functional interface for finding certificates that may be used to verify the signature of a DCC.
  * 
  * @author Martin Lindström (martin@idsec.se)
  * @author Henrik Bengtsson (extern.henrik.bengtsson@digg.se)

@@ -19,7 +19,7 @@ import se.digg.dgc.encoding.Base45;
 import se.digg.dgc.encoding.DGCConstants;
 import se.digg.dgc.encoding.Zlib;
 import se.digg.dgc.payload.v1.DGCSchemaException;
-import se.digg.dgc.payload.v1.DigitalGreenCertificate;
+import se.digg.dgc.payload.v1.DigitalCovidCertificate;
 import se.digg.dgc.service.DGCDecoder;
 import se.digg.dgc.signatures.CertificateProvider;
 import se.digg.dgc.signatures.DGCSignatureVerifier;
@@ -37,7 +37,7 @@ public class DefaultDGCDecoder implements DGCDecoder {
   /** Logger */
   private static final Logger log = LoggerFactory.getLogger(DefaultDGCDecoder.class);
 
-  /** The DGC signature verifier. */
+  /** The DCC signature verifier. */
   private final DGCSignatureVerifier dgcSignatureVerifier;
 
   /** The certificate provider for locating certificates for use when verifying signatures. */
@@ -62,16 +62,16 @@ public class DefaultDGCDecoder implements DGCDecoder {
   
   /** {@inheritDoc} */
   @Override
-  public DigitalGreenCertificate decode(final String base45) 
+  public DigitalCovidCertificate decode(final String base45) 
       throws DGCSchemaException, SignatureException, CertificateExpiredException, IOException {
 
-    final byte[] dgcEncoding = this.decodeToBytes(base45);
+    final byte[] dccEncoding = this.decodeToBytes(base45);
     
-    log.trace("CBOR decoding DGC ...");
-    final DigitalGreenCertificate dgc = DigitalGreenCertificate.decode(dgcEncoding); 
-    log.trace("Decoded into: {}", dgc);
+    log.trace("CBOR decoding DCC ...");
+    final DigitalCovidCertificate dcc = DigitalCovidCertificate.decode(dccEncoding); 
+    log.trace("Decoded into: {}", dcc);
     
-    return dgc;
+    return dcc;
   }
 
   /** {@inheritDoc} */
@@ -110,16 +110,16 @@ public class DefaultDGCDecoder implements DGCDecoder {
   
   /** {@inheritDoc} */
   @Override
-  public DigitalGreenCertificate decodeRaw(final byte[] cwt)
+  public DigitalCovidCertificate decodeRaw(final byte[] cwt)
       throws DGCSchemaException, SignatureException, CertificateExpiredException, IOException {
 
-    final byte[] encodedDgc = this.decodeRawToBytes(cwt);
+    final byte[] encodedDcc = this.decodeRawToBytes(cwt);
 
-    log.trace("CBOR decoding DGC ...");
-    final DigitalGreenCertificate dgc = DigitalGreenCertificate.decode(encodedDgc);
-    log.trace("Decoded into: {}", dgc);
+    log.trace("CBOR decoding DCC ...");
+    final DigitalCovidCertificate dcc = DigitalCovidCertificate.decode(encodedDcc);
+    log.trace("Decoded into: {}", dcc);
 
-    return dgc;
+    return dcc;
   }
 
   /** {@inheritDoc} */

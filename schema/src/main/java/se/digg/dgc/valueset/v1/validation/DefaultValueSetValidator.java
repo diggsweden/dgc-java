@@ -8,7 +8,7 @@ package se.digg.dgc.valueset.v1.validation;
 import java.util.List;
 import java.util.Optional;
 
-import se.digg.dgc.payload.v1.Eudgc;
+import se.digg.dgc.payload.v1.Eudcc;
 import se.digg.dgc.payload.v1.RecoveryEntry;
 import se.digg.dgc.payload.v1.TestEntry;
 import se.digg.dgc.payload.v1.VaccinationEntry;
@@ -40,21 +40,21 @@ public class DefaultValueSetValidator implements ValueSetValidator {
 
   /** {@inheritDoc} */
   @Override
-  public ValueSetValidationResult validate(final Eudgc dgc) {
+  public ValueSetValidationResult validate(final Eudcc dcc) {
     final ValueSetValidationResult result = new ValueSetValidationResult();
-    if (dgc.getV() != null) {
-      for (int i = 0; i < dgc.getV().size(); i++) {
-        result.addChildResult(this.validate(dgc.getV().get(i), "v[" + i + "]"));
+    if (dcc.getV() != null) {
+      for (int i = 0; i < dcc.getV().size(); i++) {
+        result.addChildResult(this.validate(dcc.getV().get(i), "v[" + i + "]"));
       }
     }
-    if (dgc.getT() != null) {
-      for (int i = 0; i < dgc.getT().size(); i++) {
-        result.addChildResult(this.validate(dgc.getT().get(i), "t[" + i + "]"));
+    if (dcc.getT() != null) {
+      for (int i = 0; i < dcc.getT().size(); i++) {
+        result.addChildResult(this.validate(dcc.getT().get(i), "t[" + i + "]"));
       }
     }
-    if (dgc.getR() != null) {
-      for (int i = 0; i < dgc.getR().size(); i++) {
-        result.addChildResult(this.validate(dgc.getR().get(i), "r[" + i + "]"));
+    if (dcc.getR() != null) {
+      for (int i = 0; i < dcc.getR().size(); i++) {
+        result.addChildResult(this.validate(dcc.getR().get(i), "r[" + i + "]"));
       }
     }
     return result;

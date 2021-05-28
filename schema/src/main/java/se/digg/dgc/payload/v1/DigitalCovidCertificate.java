@@ -36,11 +36,11 @@ import se.digg.dgc.transliteration.MrzEncoder;
  * </p>
  * <p>
  * If you are using the builder pattern (withXX-methods) you need to cast the result to a
- * {@code DigitalGreenCertificate} instance.
+ * {@code DigitalCovidCertificate} instance.
  * </p>
  * 
  * <pre>
- * final DigitalGreenCertificate dgc = (DigitalGreenCertificate) new DigitalGreenCertificate()
+ * final DigitalCovidCertificate dcc = (DigitalCovidCertificate) new DigitalCovidCertificate()
  *       .withNam(new PersonName().withGn("...").withFn("..."))
  *       .withDob(LocalDate.parse("1969-11-11"))
  *       .withV(Arrays.asList(new VaccinationEntry()
@@ -54,7 +54,7 @@ import se.digg.dgc.transliteration.MrzEncoder;
  * @author Henrik Bengtsson (extern.henrik.bengtsson@digg.se)
  * @author Henric Norlander (extern.henric.norlander@digg.se)
  */
-public class DigitalGreenCertificate extends Eudgc {
+public class DigitalCovidCertificate extends Eudcc {
 
   /** The CBOR mapper. */
   private static CBORMapper cborMapper = new CBORMapper();
@@ -80,7 +80,7 @@ public class DigitalGreenCertificate extends Eudgc {
   /**
    * Default constructor.
    */
-  public DigitalGreenCertificate() {
+  public DigitalCovidCertificate() {
     super();
     this.setVer(DGCSchemaVersion.DGC_SCHEMA_VERSION);
   }
@@ -93,7 +93,7 @@ public class DigitalGreenCertificate extends Eudgc {
    * @param dateOfBirth
    *          the date of birth of the subject
    */
-  public DigitalGreenCertificate(final PersonName name, final LocalDate dateOfBirth) {
+  public DigitalCovidCertificate(final PersonName name, final LocalDate dateOfBirth) {
     this();
     this.setVer(DGCSchemaVersion.DGC_SCHEMA_VERSION);
     this.setNam(name);
@@ -112,7 +112,7 @@ public class DigitalGreenCertificate extends Eudgc {
    * Makes sure that the names supplied are transliterated.
    */
   @Override
-  public Eudgc withNam(final PersonName name) {
+  public Eudcc withNam(final PersonName name) {
     return super.withNam(transliterate(name));
   }
 
@@ -152,24 +152,24 @@ public class DigitalGreenCertificate extends Eudgc {
   }
 
   /**
-   * An alternative to {@link Eudgc#withDob(String)} where the date of birth is represented as a {@link LocalDate}.
+   * An alternative to {@link Eudcc#withDob(String)} where the date of birth is represented as a {@link LocalDate}.
    * 
    * @param dob
    *          the date of birth
    * @return this object
    */
-  public Eudgc withDob(final LocalDate dob) {
+  public Eudcc withDob(final LocalDate dob) {
     return super.withDob(dob != null ? dob.toString() : null);
   }
 
   /**
-   * An alternative to {@link Eudgc#withDob(String)} where the date of birth is represented as a {@link DateOfBirth}.
+   * An alternative to {@link Eudcc#withDob(String)} where the date of birth is represented as a {@link DateOfBirth}.
    * 
    * @param dob
    *          the date of birth
    * @return this object
    */
-  public Eudgc withDob(final DateOfBirth dob) {
+  public Eudcc withDob(final DateOfBirth dob) {
     return super.withDob(dob != null ? dob.toString() : null);
   }
 
@@ -218,10 +218,6 @@ public class DigitalGreenCertificate extends Eudgc {
         if (sc != null && !sc.HasMostOuterTag(0)) {
           tObj.set("sc", CBORObject.FromObjectAndTag(sc, 0));
         }
-        final CBORObject dr = tObj.get("dr");
-        if (dr != null && !dr.HasMostOuterTag(0)) {
-          tObj.set("dr", CBORObject.FromObjectAndTag(dr, 0));
-        }
       }
       return obj.EncodeToBytes();
     }
@@ -231,20 +227,20 @@ public class DigitalGreenCertificate extends Eudgc {
   }
 
   /**
-   * Decodes a CBOR encoding to a {@link DigitalGreenCertificate}.
+   * Decodes a CBOR encoding to a {@link DigitalCovidCertificate}.
    * 
    * @param cbor
    *          the CBOR encoding
-   * @return a DigitalGreenCertificate
+   * @return a DigitalCovidCertificate
    * @throws DGCSchemaException
    *           for decoding errors
    */
-  public static DigitalGreenCertificate decode(final byte[] cbor) throws DGCSchemaException {
+  public static DigitalCovidCertificate decode(final byte[] cbor) throws DGCSchemaException {
     try {
-      return cborMapper.readValue(cbor, DigitalGreenCertificate.class);
+      return cborMapper.readValue(cbor, DigitalCovidCertificate.class);
     }
     catch (final IOException e) {
-      throw new DGCSchemaException("Failed to decode DGC from CBOR encoding", e);
+      throw new DGCSchemaException("Failed to decode DCC from CBOR encoding", e);
     }
   }
 
@@ -268,20 +264,20 @@ public class DigitalGreenCertificate extends Eudgc {
   }
 
   /**
-   * Decodes a JSON string into a {@link DigitalGreenCertificate}.
+   * Decodes a JSON string into a {@link DigitalCovidCertificate}.
    * 
    * @param json
    *          the JSON representation
-   * @return a DigitalGreenCertificate
+   * @return a DigitalCovidCertificate
    * @throws DGCSchemaException
    *           for decoding errors
    */
-  public static DigitalGreenCertificate fromJsonString(final String json) throws DGCSchemaException {
+  public static DigitalCovidCertificate fromJsonString(final String json) throws DGCSchemaException {
     try {
-      return jsonMapper.readValue(json, DigitalGreenCertificate.class);
+      return jsonMapper.readValue(json, DigitalCovidCertificate.class);
     }
     catch (final IOException e) {
-      throw new DGCSchemaException("Failed to decode DGC from JSON", e);
+      throw new DGCSchemaException("Failed to decode DCC from JSON", e);
     }
   }
 

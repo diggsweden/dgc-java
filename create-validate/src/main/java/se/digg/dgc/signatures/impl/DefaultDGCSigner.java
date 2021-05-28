@@ -131,10 +131,10 @@ public class DefaultDGCSigner implements DGCSigner {
 
   /** {@inheritDoc} */
   @Override
-  public byte[] sign(final byte[] dgcPayload, final Instant expiration) throws SignatureException {
+  public byte[] sign(final byte[] dccPayload, final Instant expiration) throws SignatureException {
 
     if (expiration.isAfter(this.signerExpiration)) {
-      log.warn("Expiration of DGC goes beyond the signer certificate validity");
+      log.warn("Expiration of DCC goes beyond the signer certificate validity");
     }
 
     try {
@@ -142,7 +142,7 @@ public class DefaultDGCSigner implements DGCSigner {
         .issuer(this.country)
         .issuedAt(Instant.now())
         .expiration(expiration)
-        .dgcV1(dgcPayload)
+        .dgcV1(dccPayload)
         .build();
 
       final CoseSign1_Object coseObject = CoseSign1_Object.builder()

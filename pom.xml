@@ -8,8 +8,8 @@
   <version>0.9.8-SNAPSHOT</version>
   <packaging>pom</packaging>
 
-  <name>DIGG :: Digital Green Certificate :: DGC Java</name>
-  <description>Schema representation, issuance and validation of Digital Green Certificates</description>
+  <name>DIGG :: EU Digital Covid Certificate :: DCC Java</name>
+  <description>Schema representation, issuance and validation of EU Digital Covid Certificates</description>
   <url>https://github.com/diggsweden/dgc-java</url>
   
   <licenses>

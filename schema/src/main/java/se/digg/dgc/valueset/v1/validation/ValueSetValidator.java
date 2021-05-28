@@ -8,13 +8,13 @@ package se.digg.dgc.valueset.v1.validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 
-import se.digg.dgc.payload.v1.Eudgc;
+import se.digg.dgc.payload.v1.Eudcc;
 import se.digg.dgc.payload.v1.RecoveryEntry;
 import se.digg.dgc.payload.v1.TestEntry;
 import se.digg.dgc.payload.v1.VaccinationEntry;
 
 /**
- * An interface describing a validator that can be used to ensure that data present in a DGC is in accordance with the
+ * An interface describing a validator that can be used to ensure that data present in a DCC is in accordance with the
  * configured value sets.
  * <p>
  * Note: This type of validator only validates present data against value sets. For a validation against the schema, use
@@ -28,13 +28,13 @@ import se.digg.dgc.payload.v1.VaccinationEntry;
 public interface ValueSetValidator {
 
   /**
-   * Validates a DGC against the value sets configured for this validator.
+   * Validates a DCC against the value sets configured for this validator.
    * 
-   * @param dgc
-   *          the DGC to validate
+   * @param dcc
+   *          the DCC to validate
    * @return validation result
    */
-  ValueSetValidationResult validate(final Eudgc dgc);
+  ValueSetValidationResult validate(final Eudcc dcc);
 
   /**
    * Validates a {@link VaccinationEntry} against the value sets configured for this validator.

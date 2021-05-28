@@ -10,10 +10,10 @@ import java.security.SignatureException;
 import java.time.Instant;
 
 import se.digg.dgc.payload.v1.DGCSchemaException;
-import se.digg.dgc.payload.v1.DigitalGreenCertificate;
+import se.digg.dgc.payload.v1.DigitalCovidCertificate;
 
 /**
- * Service for creating Digital Green Certificates.
+ * Service for creating Digital Covid Certificates.
  * 
  * @author Martin Lindström (martin@idsec.se)
  * @author Henrik Bengtsson (extern.henrik.bengtsson@digg.se)
@@ -22,70 +22,70 @@ import se.digg.dgc.payload.v1.DigitalGreenCertificate;
 public interface DGCEncoder {
 
   /**
-   * Based on the DGC payload and a expiration time, the method encodes the payload to CBOR, signs it, deflates it, and
+   * Based on the DCC payload and a expiration time, the method encodes the payload to CBOR, signs it, deflates it, and
    * delivers it in Base45 encoding (with a HCERT header).
    * 
-   * @param dgc
-   *          the contents of the DGC
+   * @param dcc
+   *          the contents of the DCC
    * @param expiration
-   *          the expiration of the DGC
-   * @return the Base45 encoding of the signed DGC
+   *          the expiration of the DCC
+   * @return the Base45 encoding of the signed DCC
    * @throws DGCSchemaException
-   *           for DGC schema errors
+   *           for DCC schema errors
    * @throws IOException
    *           for errors encoding data, for example CBOR related errors
    * @throws SignatureException
-   *           errors concerning signing the DGC
+   *           errors concerning signing the DCC
    */
-  String encode(final DigitalGreenCertificate dgc, final Instant expiration)
+  String encode(final DigitalCovidCertificate dcc, final Instant expiration)
       throws DGCSchemaException, IOException, SignatureException;
 
   /**
-   * Based on the CBOR encoded DGC payload and a expiration time, the method signs it, deflates it, and delivers it in
+   * Based on the CBOR encoded DCC payload and a expiration time, the method signs it, deflates it, and delivers it in
    * Base45 encoding (with a HCERT header).
    * 
-   * @param dgc
-   *          the contents of the DGC in its CBOR encoding
+   * @param dcc
+   *          the contents of the DCC in its CBOR encoding
    * @param expiration
-   *          the expiration of the DGC
-   * @return the Base45 encoding of the signed DGC
+   *          the expiration of the DCC
+   * @return the Base45 encoding of the signed DCC
    * @throws IOException
    *           for errors encoding data, for example CBOR related errors
    * @throws SignatureException
-   *           errors concerning signing the DGC
+   *           errors concerning signing the DCC
    */
-  String encode(final byte[] dgc, final Instant expiration) throws IOException, SignatureException;
+  String encode(final byte[] dcc, final Instant expiration) throws IOException, SignatureException;
 
   /**
-   * Given the DGC payload the method creates a CWT and signs it.
+   * Given the DCC payload the method creates a CWT and signs it.
    * 
-   * @param dgc
-   *          the DGC payload
+   * @param dcc
+   *          the DCC payload
    * @param expiration
-   *          the expiration time of the DGC
-   * @return the CBOR encoding of the signed DGC (CWT)
+   *          the expiration time of the DCC
+   * @return the CBOR encoding of the signed DCC (CWT)
    * @throws DGCSchemaException
-   *           for DGC schema errors
+   *           for DCC schema errors
    * @throws IOException
    *           for errors encoding data, for example CBOR related errors
    * @throws SignatureException
-   *           errors concerning signing the DGC
+   *           errors concerning signing the DCC
    */
-  byte[] sign(final DigitalGreenCertificate dgc, final Instant expiration) throws DGCSchemaException, IOException, SignatureException;
+  byte[] sign(final DigitalCovidCertificate dcc, final Instant expiration) throws DGCSchemaException, IOException, SignatureException;
 
   /**
-   * Given the CBOR-encoding of the DGC payload the method creates a CWT and signs it.
+   * Given the CBOR-encoding of the DCC payload the method creates a CWT and signs it.
    * 
-   * @param dgc
-   *          the DGC payload in its CBOR encoding
+   * @param dcc
+   *          the DCC payload in its CBOR encoding
    * @param expiration
-   *          the expiration of the DGC
-   * @return the CBOR encoding of the signed DGC (CWT)
+   *          the expiration of the DCC
+   * @return the CBOR encoding of the signed DCC (CWT)
    * @throws IOException
    *           for errors encoding data, for example CBOR related errors
    * @throws SignatureException
-   *           errors concerning signing the DGC
+   *           errors concerning signing the DCC
    */
-  byte[] sign(final byte[] dgc, final Instant expiration) throws IOException, SignatureException;
+  byte[] sign(final byte[] dcc, final Instant expiration) throws IOException, SignatureException;
 
 }

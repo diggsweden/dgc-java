@@ -27,7 +27,7 @@ import se.digg.dgc.encoding.DGCConstants;
 import se.digg.dgc.encoding.Zlib;
 import se.digg.dgc.encoding.impl.DefaultBarcodeCreator;
 import se.digg.dgc.payload.v1.DGCSchemaVersion;
-import se.digg.dgc.payload.v1.DigitalGreenCertificate;
+import se.digg.dgc.payload.v1.DigitalCovidCertificate;
 import se.digg.dgc.payload.v1.PersonName;
 import se.digg.dgc.payload.v1.RecoveryEntry;
 import se.digg.dgc.payload.v1.TestEntry;
@@ -69,7 +69,7 @@ public class CreateTestDataTest {
   // One vac-entry
   @Test
   public void test1() throws Exception {
-    final DigitalGreenCertificate dgc = readDgcFile("dgc-simple-one-entry.json", DigitalGreenCertificate.class);
+    final DigitalCovidCertificate dgc = readDgcFile("dgc-simple-one-entry.json", DigitalCovidCertificate.class);
     final Instant issueTime = Instant.now();
     final Instant expiration = issueTime.plus(Duration.ofDays(90));
     final DGCSigner signer = new DefaultDGCSigner(this.ecdsaVacPurpose);
@@ -87,7 +87,7 @@ public class CreateTestDataTest {
   // Two vac-entries
   @Test
   public void test2() throws Exception {
-    final DigitalGreenCertificate dgc = readDgcFile("dgc-simple-two-entries.json", DigitalGreenCertificate.class);
+    final DigitalCovidCertificate dgc = readDgcFile("dgc-simple-two-entries.json", DigitalCovidCertificate.class);
     final Instant issueTime = Instant.now();
     final Instant expiration = issueTime.plus(Duration.ofDays(90));
     final DGCSigner signer = new DefaultDGCSigner(this.ecdsaAllPurposes);
@@ -105,7 +105,7 @@ public class CreateTestDataTest {
   // One vac-entry, signed using an RSA key
   @Test
   public void test3() throws Exception {
-    final DigitalGreenCertificate dgc = readDgcFile("dgc-simple-one-entry.json", DigitalGreenCertificate.class);
+    final DigitalCovidCertificate dgc = readDgcFile("dgc-simple-one-entry.json", DigitalCovidCertificate.class);
     final Instant issueTime = Instant.now();
     final Instant expiration = issueTime.plus(Duration.ofDays(90));
     final DGCSigner signer = new DefaultDGCSigner(this.rsa);
@@ -122,7 +122,7 @@ public class CreateTestDataTest {
   // One vac-entry, no COSE message tag included
   @Test
   public void test4() throws Exception {
-    final DigitalGreenCertificate dgc = readDgcFile("dgc-simple-one-entry.json", DigitalGreenCertificate.class);
+    final DigitalCovidCertificate dgc = readDgcFile("dgc-simple-one-entry.json", DigitalCovidCertificate.class);
     final Instant issueTime = Instant.now();
     final Instant expiration = issueTime.plus(Duration.ofDays(90));
     final DefaultDGCSigner signer = new DefaultDGCSigner(this.ecdsaAllPurposes);
@@ -141,7 +141,7 @@ public class CreateTestDataTest {
   // One vac-entry, Both CWT and COSE message tags included
   @Test
   public void test5() throws Exception {
-    final DigitalGreenCertificate dgc = readDgcFile("dgc-simple-one-entry.json", DigitalGreenCertificate.class);
+    final DigitalCovidCertificate dgc = readDgcFile("dgc-simple-one-entry.json", DigitalCovidCertificate.class);
     final Instant issueTime = Instant.now();
     final Instant expiration = issueTime.plus(Duration.ofDays(90));
     final DefaultDGCSigner signer = new DefaultDGCSigner(this.ecdsaAllPurposes);
@@ -161,7 +161,7 @@ public class CreateTestDataTest {
   // One vac-entry, Signature validation will fail
   @Test
   public void test6() throws Exception {
-    final DigitalGreenCertificate dgc = readDgcFile("dgc-simple-one-entry.json", DigitalGreenCertificate.class);
+    final DigitalCovidCertificate dgc = readDgcFile("dgc-simple-one-entry.json", DigitalCovidCertificate.class);
     final Instant issueTime = Instant.now();
     final Instant expiration = issueTime.plus(Duration.ofDays(90));
     final DefaultDGCSigner signer = new DefaultDGCSigner(this.ecdsaOther);
@@ -183,7 +183,7 @@ public class CreateTestDataTest {
     
     final Instant issueTime = Instant.now();
     
-    final DigitalGreenCertificate dgc = (DigitalGreenCertificate) new DigitalGreenCertificate()
+    final DigitalCovidCertificate dgc = (DigitalCovidCertificate) new DigitalCovidCertificate()
       .withVer(DGCSchemaVersion.DGC_SCHEMA_VERSION)
       .withNam(new PersonName().withGn("Oscar").withFn("Lövström"))
       .withDob("1958-11-11")
@@ -218,7 +218,7 @@ public class CreateTestDataTest {
     final Instant issueTime = Instant.now();
     final Instant expiration = issueTime.plus(Duration.ofDays(90));
     
-    final DigitalGreenCertificate dgc = (DigitalGreenCertificate) new DigitalGreenCertificate()
+    final DigitalCovidCertificate dgc = (DigitalCovidCertificate) new DigitalCovidCertificate()
         .withVer(DGCSchemaVersion.DGC_SCHEMA_VERSION)
         .withNam(new PersonName().withGn("Oscar").withFn("Lövström"))
         .withDob("1958-11-11")
@@ -346,7 +346,7 @@ public class CreateTestDataTest {
   }
 
   private static <T> T readDgcFile(final String file, final Class<T> clazz) throws IOException {
-    return DigitalGreenCertificate.getJSONMapper().readValue(new File(SRC_DIR + "/" + file), clazz);
+    return DigitalCovidCertificate.getJSONMapper().readValue(new File(SRC_DIR + "/" + file), clazz);
   }
 
 }

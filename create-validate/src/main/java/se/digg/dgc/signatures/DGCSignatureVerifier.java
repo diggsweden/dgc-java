@@ -11,7 +11,7 @@ import java.security.cert.X509Certificate;
 import java.time.Instant;
 
 /**
- * An interface for a DGC signature verifier.
+ * An interface for a DCC signature verifier.
  * 
  * @author Martin Lindström (martin@idsec.se)
  * @author Henrik Bengtsson (extern.henrik.bengtsson@digg.se)
@@ -20,21 +20,21 @@ import java.time.Instant;
 public interface DGCSignatureVerifier {
 
   /**
-   * Verifies the signature and validity of the supplied signed DGC.
+   * Verifies the signature and validity of the supplied signed DCC.
    * <p>
-   * Note: This method only checks the signature and the validity of the DGC. Any other checks must be done after this
+   * Note: This method only checks the signature and the validity of the DCC. Any other checks must be done after this
    * method has completed successfully.
    * </p>
    * 
    * @param signedCwt
-   *          the signed CWT holding the DGC
+   *          the signed CWT holding the DCC
    * @param certificateProvider
    *          the provider that is used to find the certificate(s) to use when validating the signature
-   * @return if signature verification a Result object containing the DGC payload along with its metadata is returned
+   * @return if signature verification a Result object containing the DCC payload along with its metadata is returned
    * @throws SignatureException
    *           for signature validation errors
    * @throws CertificateExpiredException
-   *           if the DGC has expired
+   *           if the DCC has expired
    */
   Result verify(final byte[] signedCwt, final CertificateProvider certificateProvider)
       throws SignatureException, CertificateExpiredException;
@@ -56,17 +56,17 @@ public interface DGCSignatureVerifier {
     /** The ISO-3166 code for the issuing country. */
     private final String country;
 
-    /** The issuance time of the DGC. */
+    /** The issuance time of the DCC. */
     private final Instant issuedAt;
 
-    /** The expiration time of the DGC. */
+    /** The expiration time of the DCC. */
     private final Instant expires;
 
     /**
      * Constructor.
      * 
-     * @param dgcPayload
-     *          the CBOR encoded DGC payload
+     * @param dccPayload
+     *          the CBOR encoded DCC payload
      * @param signerCertificate
      *          the certificate that was used to verify the signature
      * @param kid
@@ -74,13 +74,13 @@ public interface DGCSignatureVerifier {
      * @param country
      *          the ISO-3166 code for the issuing country
      * @param issuedAt
-     *          the issuance time of the DGC
+     *          the issuance time of the DCC
      * @param expires
-     *          the expiration time of the DGC
+     *          the expiration time of the DCC
      */
-    public Result(final byte[] dgcPayload, final X509Certificate signerCertificate,
+    public Result(final byte[] dccPayload, final X509Certificate signerCertificate,
         final byte[] kid, final String country, final Instant issuedAt, final Instant expires) {
-      this.dgcPayload = dgcPayload;
+      this.dgcPayload = dccPayload;
       this.signerCertificate = signerCertificate;
       this.kid = kid;
       this.country = country;
@@ -89,9 +89,9 @@ public interface DGCSignatureVerifier {
     }
 
     /**
-     * Gets the CBOR encoded DGC payload.
+     * Gets the CBOR encoded DCC payload.
      * 
-     * @return the CBOR encoded DGC payload
+     * @return the CBOR encoded DCC payload
      */
     public byte[] getDgcPayload() {
       return this.dgcPayload;
