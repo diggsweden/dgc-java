@@ -36,6 +36,8 @@ The code is structured into the following parts:
 
 - QR code generation - Support for creating/reading QR-codes. **dgc-create-validate**
 
+- UVCI generation including Luhn mod N checksum calculation. **dgc-create-validate**
+
 - Service layer - A service that ties all the above components together and presents high-level methods for creating and validating Digital Green Certificates. **dgc-create-validate**
 
 ## Maven
