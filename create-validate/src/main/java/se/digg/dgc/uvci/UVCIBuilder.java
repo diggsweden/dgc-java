@@ -17,7 +17,7 @@ package se.digg.dgc.uvci;
 public class UVCIBuilder {
 
   /** Prefix for UVCI strings. */
-  public static final String UVCI_PREFIX = "URN:UVCI:";
+  public static final String UVCI_PREFIX = "URN:UVCI";
 
   /** The current versin of the UVCI. */
   public static final String UVCI_VERSION = "01";
