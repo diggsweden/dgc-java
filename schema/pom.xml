@@ -11,8 +11,8 @@
 
   <artifactId>dgc-schema</artifactId>
 
-  <name>DIGG :: Digital Green Certificate :: DGC Schema</name>
-  <description>Java representation of Schema for Digital Green Certificate</description>
+  <name>DIGG :: EU Digital Covid Certificate :: DCC Schema</name>
+  <description>Java representation of Schema for EU Digital Covid Certificates</description>
   <url>https://github.com/diggsweden/dgc-java</url>
   
   <licenses>
@@ -157,8 +157,8 @@
               </execution>
             </executions>
             <configuration>
-              <doctitle>Digital Green Certificate - DGC Schema - ${project.version}</doctitle>
-              <windowtitle>Digital Green Certificate - DGC Schema - ${project.version}</windowtitle>
+              <doctitle>EU Digital Covid Certificate - DCC Schema - ${project.version}</doctitle>
+              <windowtitle>EU Digital Covid Certificate - DCC Schema - ${project.version}</windowtitle>
               <detectJavaApiLink>true</detectJavaApiLink>
               <additionalparam>-Xdoclint:all -Xdoclint:-missing</additionalparam>
               <additionalOptions>-Xdoclint:all -Xdoclint:-missing</additionalOptions>

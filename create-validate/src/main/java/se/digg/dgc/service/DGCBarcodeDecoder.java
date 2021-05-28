@@ -11,7 +11,7 @@ import java.security.cert.CertificateExpiredException;
 
 import se.digg.dgc.encoding.BarcodeException;
 import se.digg.dgc.payload.v1.DGCSchemaException;
-import se.digg.dgc.payload.v1.DigitalGreenCertificate;
+import se.digg.dgc.payload.v1.DigitalCovidCertificate;
 
 /**
  * An extension to the {@link DGCDecoder} interface that defines methods for decoding from a barcode image. 
@@ -23,36 +23,36 @@ import se.digg.dgc.payload.v1.DigitalGreenCertificate;
 public interface DGCBarcodeDecoder extends DGCDecoder {
   
   /**
-   * Given a barcode image the method verifies amd decodes the contents into its DGC payload representation.
+   * Given a barcode image the method verifies amd decodes the contents into its DCC payload representation.
    * 
    * @param image
-   *          the barcode image holding the encoded and signed DGC
-   * @return the DGC payload
+   *          the barcode image holding the encoded and signed DCC
+   * @return the DCC payload
    * @throws DGCSchemaException
-   *           for DGC schema errors
+   *           for DCC schema errors
    * @throws SignatureException
    *           for signature verification errors
    * @throws CertificateExpiredException
-   *           if the DGC has expired
+   *           if the DCC has expired
    * @throws BarcodeException
    *           for errors reading the barcode
    * @throws IOException
    *           for errors decoding data, for example CBOR related errors
    * @see #decodeBarcodeToBytes(byte[])
    */
-  DigitalGreenCertificate decodeBarcode(final byte[] image)
+  DigitalCovidCertificate decodeBarcode(final byte[] image)
       throws DGCSchemaException, SignatureException, CertificateExpiredException, BarcodeException, IOException;
 
   /**
-   * Given a barcode image the method verifies and decodes the contents into the CBOR encoding of the DGC payload.
+   * Given a barcode image the method verifies and decodes the contents into the CBOR encoding of the DCC payload.
    * 
    * @param image
-   *          the barcode image holding the encoded and signed DGC
-   * @return the DGC payload in its CBOR representation
+   *          the barcode image holding the encoded and signed DCC
+   * @return the DCC payload in its CBOR representation
    * @throws SignatureException
    *           for signature verification errors
    * @throws CertificateExpiredException
-   *           if the DGC has expired
+   *           if the DCC has expired
    * @throws BarcodeException
    *           for errors reading the barcode
    * @throws IOException

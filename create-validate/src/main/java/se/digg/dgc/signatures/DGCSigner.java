@@ -9,7 +9,7 @@ import java.security.SignatureException;
 import java.time.Instant;
 
 /**
- * An interface for a DGC signer.
+ * An interface for a DCC signer.
  * 
  * @author Martin Lindström (martin@idsec.se)
  * @author Henrik Bengtsson (extern.henrik.bengtsson@digg.se)
@@ -18,25 +18,25 @@ import java.time.Instant;
 public interface DGCSigner {
 
   /**
-   * Creates a CWT including the CBOR encoded DGC payload and signs it.
+   * Creates a CWT including the CBOR encoded DCC payload and signs it.
    * <p>
-   * Note: It is the caller's responsibility to ensure that the validity of the issued DGC does not exceed the
+   * Note: It is the caller's responsibility to ensure that the validity of the issued DCC does not exceed the
    * validity of the signer's certificate (see {@link #getSignerExpiration()}).
    * </p>
    * 
-   * @param dgcPayload
-   *          the CBOR encoding of the DGC payload
+   * @param dccPayload
+   *          the CBOR encoding of the DCC payload
    * @param expiration
-   *          the expiration time for the DGC
-   * @return the CBOR encoding of the signed CWT holding the DGC payload
+   *          the expiration time for the DCC
+   * @return the CBOR encoding of the signed CWT holding the DCC payload
    * @throws SignatureException
    *           for signature errors
    */
-  byte[] sign(final byte[] dgcPayload, final Instant expiration) throws SignatureException;
+  byte[] sign(final byte[] dccPayload, final Instant expiration) throws SignatureException;
 
   /**
    * Gets the point in time when this signer's certificate expires. For maximum interoperability, the validity of a
-   * DGC should not stretch beyond this time.
+   * DCC should not stretch beyond this time.
    * 
    * @return the signer certificate expiration time
    */

@@ -20,7 +20,7 @@ import se.digg.dgc.encoding.DGCConstants;
 import se.digg.dgc.encoding.Zlib;
 import se.digg.dgc.payload.v1.DGCSchemaException;
 import se.digg.dgc.payload.v1.DGCSchemaVersion;
-import se.digg.dgc.payload.v1.DigitalGreenCertificate;
+import se.digg.dgc.payload.v1.DigitalCovidCertificate;
 import se.digg.dgc.service.DGCEncoder;
 import se.digg.dgc.signatures.DGCSigner;
 
@@ -36,14 +36,14 @@ public class DefaultDGCEncoder implements DGCEncoder {
   /** Logger */
   private static final Logger log = LoggerFactory.getLogger(DefaultDGCEncoder.class);
 
-  /** The DGC signer instance. */
+  /** The DCC signer instance. */
   private final DGCSigner dgcSigner;
 
   /**
    * Constructor.
    * 
    * @param dgcSigner
-   *          a signer for signing the DGC:s
+   *          a signer for signing the DCC:s
    */
   public DefaultDGCEncoder(final DGCSigner dgcSigner) {
     this.dgcSigner = Optional.ofNullable(dgcSigner).orElseThrow(() -> new IllegalArgumentException("dgcSigner must not be null"));
@@ -51,29 +51,29 @@ public class DefaultDGCEncoder implements DGCEncoder {
 
   /** {@inheritDoc} */
   @Override
-  public String encode(final DigitalGreenCertificate dgc, final Instant expiration) throws DGCSchemaException, IOException,
+  public String encode(final DigitalCovidCertificate dcc, final Instant expiration) throws DGCSchemaException, IOException,
       SignatureException {
 
-    if (dgc.getVer() == null) {
-      dgc.setVer(DGCSchemaVersion.DGC_SCHEMA_VERSION);
+    if (dcc.getVer() == null) {
+      dcc.setVer(DGCSchemaVersion.DGC_SCHEMA_VERSION);
     }
 
-    log.trace("Encoding DGC payload to CBOR ...");
-    final byte[] cborDgc = dgc.encode(); 
-    log.trace("Encoded DGC into {} bytes", cborDgc.length);
+    log.trace("Encoding DCC payload to CBOR ...");
+    final byte[] cborDcc = dcc.encode(); 
+    log.trace("Encoded DCC into {} bytes", cborDcc.length);
 
-    return this.encode(cborDgc, expiration);
+    return this.encode(cborDcc, expiration);
   }
 
   /** {@inheritDoc} */
   @Override
-  public String encode(final byte[] dgc, final Instant expiration) throws IOException, SignatureException {
+  public String encode(final byte[] dcc, final Instant expiration) throws IOException, SignatureException {
 
-    log.trace("Encoding to Base45 from CBOR-encoded DGC-payload (length: {}) ...", dgc.length);
+    log.trace("Encoding to Base45 from CBOR-encoded DCC-payload (length: {}) ...", dcc.length);
 
     // Create a signed CWT ...
     //
-    byte[] cwt = this.sign(dgc, expiration);
+    byte[] cwt = this.sign(dcc, expiration);
 
     // Compression and Base45 encoding ...
     //
@@ -90,28 +90,28 @@ public class DefaultDGCEncoder implements DGCEncoder {
 
   /** {@inheritDoc} */
   @Override
-  public byte[] sign(final DigitalGreenCertificate dgc, final Instant expiration)
+  public byte[] sign(final DigitalCovidCertificate dcc, final Instant expiration)
       throws DGCSchemaException, IOException, SignatureException {
 
-    log.trace("Signing DGC: {}", dgc);
+    log.trace("Signing DCC: {}", dcc);
 
     // Transform the DGC payload into its CBOR encoding ...
-    log.trace("CBOR encoding DGC ...");
-    final byte[] cborDgc = dgc.encode(); 
-    log.trace("Encoded DGC into {} bytes", cborDgc.length);
+    log.trace("CBOR encoding DCC ...");
+    final byte[] cborDcc = dcc.encode(); 
+    log.trace("Encoded DCC into {} bytes", cborDcc.length);
 
-    return this.sign(cborDgc, expiration);
+    return this.sign(cborDcc, expiration);
   }
 
   /** {@inheritDoc} */
   @Override
-  public byte[] sign(final byte[] dgc, final Instant expiration) throws IOException, SignatureException {
+  public byte[] sign(final byte[] dcc, final Instant expiration) throws IOException, SignatureException {
 
     try {
       // Sign the DGC ...
       //
-      log.trace("Creating CWT and signing CBOR-encoded DGC (length: {}) ...", dgc.length);
-      return this.dgcSigner.sign(dgc, expiration);
+      log.trace("Creating CWT and signing CBOR-encoded DCC (length: {}) ...", dcc.length);
+      return this.dgcSigner.sign(dcc, expiration);
     }
     catch (final CBORException e) {
       log.info("Internal CBOR error - {}", e.getMessage(), e);

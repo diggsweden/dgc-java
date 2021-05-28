@@ -16,7 +16,7 @@ import se.digg.dgc.encoding.Barcode;
 import se.digg.dgc.encoding.BarcodeDecoder;
 import se.digg.dgc.encoding.BarcodeException;
 import se.digg.dgc.payload.v1.DGCSchemaException;
-import se.digg.dgc.payload.v1.DigitalGreenCertificate;
+import se.digg.dgc.payload.v1.DigitalCovidCertificate;
 import se.digg.dgc.service.DGCBarcodeDecoder;
 import se.digg.dgc.signatures.CertificateProvider;
 import se.digg.dgc.signatures.DGCSignatureVerifier;
@@ -56,15 +56,15 @@ public class DefaultDGCBarcodeDecoder extends DefaultDGCDecoder implements DGCBa
 
   /** {@inheritDoc} */
   @Override
-  public DigitalGreenCertificate decodeBarcode(final byte[] image)
+  public DigitalCovidCertificate decodeBarcode(final byte[] image)
       throws DGCSchemaException, SignatureException, CertificateExpiredException, BarcodeException, IOException {
 
-    final byte[] encodedDgc = this.decodeBarcodeToBytes(image);
+    final byte[] encodedDcc = this.decodeBarcodeToBytes(image);
 
     log.trace("CBOR decoding DGC ...");
     
     // TODO: In the future, we'll have to handle different versions...
-    final DigitalGreenCertificate dgc = DigitalGreenCertificate.decode(encodedDgc); 
+    final DigitalCovidCertificate dgc = DigitalCovidCertificate.decode(encodedDcc); 
     
     log.trace("Decoded into: {}", dgc);
 

@@ -18,7 +18,7 @@ import org.springframework.core.io.ClassPathResource;
 import se.digg.dgc.encoding.Barcode;
 import se.digg.dgc.encoding.impl.DefaultBarcodeCreator;
 import se.digg.dgc.encoding.impl.DefaultBarcodeDecoder;
-import se.digg.dgc.payload.v1.DigitalGreenCertificate;
+import se.digg.dgc.payload.v1.DigitalCovidCertificate;
 import se.digg.dgc.payload.v1.PersonName;
 import se.digg.dgc.payload.v1.VaccinationEntry;
 import se.digg.dgc.signatures.impl.DefaultDGCSignatureVerifier;
@@ -48,7 +48,7 @@ public class DefaultDGCBarcodeEncoderDecoderTest {
   public void testEncodeDecodeBarcode() throws Exception {
     
     final Instant expire = Instant.now().plus(Duration.ofDays(30));
-    final DigitalGreenCertificate dgc = getTestDGC();
+    final DigitalCovidCertificate dgc = getTestDGC();
     
     final DefaultDGCBarcodeEncoder encoder = new DefaultDGCBarcodeEncoder(new DefaultDGCSigner(this.ecdsa), new DefaultBarcodeCreator());
     
@@ -57,14 +57,14 @@ public class DefaultDGCBarcodeEncoderDecoderTest {
     final DefaultDGCBarcodeDecoder decoder = new DefaultDGCBarcodeDecoder(
       new DefaultDGCSignatureVerifier(), (x,y) -> Arrays.asList(this.ecdsa.getCertificate()), new DefaultBarcodeDecoder());
     
-    final DigitalGreenCertificate dgc2 = decoder.decodeBarcode(barcode.getImage());
+    final DigitalCovidCertificate dgc2 = decoder.decodeBarcode(barcode.getImage());
     Assert.assertEquals(dgc, dgc2);
     Assert.assertEquals("KARL<MAARTEN", dgc2.getNam().getGnt());
     Assert.assertEquals("LINDSTROEM", dgc2.getNam().getFnt());
   }
   
-  private DigitalGreenCertificate getTestDGC() {
-    DigitalGreenCertificate dgc = new DigitalGreenCertificate();
+  private DigitalCovidCertificate getTestDGC() {
+    DigitalCovidCertificate dgc = new DigitalCovidCertificate();
     dgc.setVer("1.0.0");
     
     dgc.setNam(new PersonName().withGn("Karl Mårten").withFn("Lindström"));

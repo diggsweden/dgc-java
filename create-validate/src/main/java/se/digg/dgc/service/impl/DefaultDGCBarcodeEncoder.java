@@ -18,7 +18,7 @@ import se.digg.dgc.encoding.Barcode;
 import se.digg.dgc.encoding.BarcodeCreator;
 import se.digg.dgc.encoding.BarcodeException;
 import se.digg.dgc.payload.v1.DGCSchemaException;
-import se.digg.dgc.payload.v1.DigitalGreenCertificate;
+import se.digg.dgc.payload.v1.DigitalCovidCertificate;
 import se.digg.dgc.service.DGCBarcodeEncoder;
 import se.digg.dgc.signatures.DGCSigner;
 
@@ -52,12 +52,12 @@ public class DefaultDGCBarcodeEncoder extends DefaultDGCEncoder implements DGCBa
 
   /** {@inheritDoc} */
   @Override
-  public Barcode encodeToBarcode(final DigitalGreenCertificate dgc, final Instant expiration)
+  public Barcode encodeToBarcode(final DigitalCovidCertificate dcc, final Instant expiration)
       throws DGCSchemaException, IOException, SignatureException, BarcodeException {
     
-    log.trace("Creating barcode from DGC payload: {}", dgc);
+    log.trace("Creating barcode from DCC payload: {}", dcc);
 
-    final String base45 = this.encode(dgc, expiration);
+    final String base45 = this.encode(dcc, expiration);
     
     // Create the Barcode ...
     //
@@ -70,9 +70,9 @@ public class DefaultDGCBarcodeEncoder extends DefaultDGCEncoder implements DGCBa
 
   /** {@inheritDoc} */
   @Override
-  public Barcode encodeToBarcode(final byte[] dgc, final Instant expiration) throws IOException, SignatureException, BarcodeException {
+  public Barcode encodeToBarcode(final byte[] dcc, final Instant expiration) throws IOException, SignatureException, BarcodeException {
 
-    final String base45 = this.encode(dgc, expiration);
+    final String base45 = this.encode(dcc, expiration);
 
     // Create the Barcode ...
     //

@@ -74,7 +74,7 @@ public abstract class AbstractValueSetSupplier<T> implements Supplier<ValueSet> 
         this.update();
       }
       catch (final IOException e) {
-        log.error("Failed to update DGC ValueSet '{}' from {} - Using cache",
+        log.error("Failed to update DCC ValueSet '{}' from {} - Using cache",
           this.cache.getId(), this.getResourceString(this.resource), e);
       }
     }

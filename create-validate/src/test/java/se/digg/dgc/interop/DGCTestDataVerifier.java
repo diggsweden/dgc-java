@@ -40,7 +40,7 @@ import se.digg.dgc.encoding.DGCConstants;
 import se.digg.dgc.encoding.Zlib;
 import se.digg.dgc.encoding.impl.DefaultBarcodeDecoder;
 import se.digg.dgc.interop.DGCPayloadValidator.Report;
-import se.digg.dgc.payload.v1.DigitalGreenCertificate;
+import se.digg.dgc.payload.v1.DigitalCovidCertificate;
 import se.digg.dgc.signatures.CertificateProvider;
 import se.digg.dgc.signatures.DGCSignatureVerifier;
 import se.digg.dgc.signatures.cose.CoseSign1_Object;
@@ -57,7 +57,7 @@ import se.digg.dgc.signatures.impl.DefaultDGCSignatureVerifier;
  */
 public class DGCTestDataVerifier {
 
-  private static ObjectMapper jsonMapper = DigitalGreenCertificate.getJSONMapper();
+  private static ObjectMapper jsonMapper = DigitalCovidCertificate.getJSONMapper();
 
   static {
     jsonMapper.configure(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES, true);
