@@ -125,7 +125,7 @@ public class DefaultValueSetValidatorTest {
         .withMa(erroneousManufacturer);
 
     final Eudgc eudgc = new Eudgc();
-    eudgc.setV(List.of(e1, e2));
+    eudgc.setV(Arrays.asList(e1, e2));
 
     ValueSetValidationResult res = v.validate(eudgc);
     Assert.assertEquals(ValueSetValidationResult.Status.ERROR, res.getResult());

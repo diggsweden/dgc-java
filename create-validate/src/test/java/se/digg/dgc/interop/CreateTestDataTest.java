@@ -11,6 +11,8 @@ import java.io.IOException;
 import java.security.cert.X509Certificate;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.ZoneOffset;
+import java.util.Arrays;
 import java.util.Base64;
 
 import org.junit.Test;
@@ -26,6 +28,9 @@ import se.digg.dgc.encoding.Zlib;
 import se.digg.dgc.encoding.impl.DefaultBarcodeCreator;
 import se.digg.dgc.payload.v1.DGCSchemaVersion;
 import se.digg.dgc.payload.v1.DigitalGreenCertificate;
+import se.digg.dgc.payload.v1.PersonName;
+import se.digg.dgc.payload.v1.RecoveryEntry;
+import se.digg.dgc.payload.v1.TestEntry;
 import se.digg.dgc.signatures.DGCSigner;
 import se.digg.dgc.signatures.impl.DefaultDGCSigner;
 import se.swedenconnect.security.credential.KeyStoreCredential;
@@ -69,8 +74,8 @@ public class CreateTestDataTest {
     final Instant expiration = issueTime.plus(Duration.ofDays(90));
     final DGCSigner signer = new DefaultDGCSigner(this.ecdsaVacPurpose);
 
-    final TestStatement test =
-        createTestStatement(dgc, dgc.encode(), issueTime, expiration, signer, null, null, this.ecdsaVacPurpose.getCertificate());
+    final TestStatement test = createTestStatement(dgc, dgc.encode(), issueTime, expiration, signer, null, null, this.ecdsaVacPurpose
+      .getCertificate());
     test.getTestCtx().setDescription("1: One vaccination entry - Everything should verify fine");
 
     // Before we write the test we want to make sure that we can handle it ...
@@ -85,10 +90,10 @@ public class CreateTestDataTest {
     final DigitalGreenCertificate dgc = readDgcFile("dgc-simple-two-entries.json", DigitalGreenCertificate.class);
     final Instant issueTime = Instant.now();
     final Instant expiration = issueTime.plus(Duration.ofDays(90));
-    final DGCSigner signer = new DefaultDGCSigner(this.ecdsaVacPurpose);
+    final DGCSigner signer = new DefaultDGCSigner(this.ecdsaAllPurposes);
 
-    final TestStatement test =
-        createTestStatement(dgc, dgc.encode(), issueTime, expiration, signer, null, null, this.ecdsaAllPurposes.getCertificate());
+    final TestStatement test = createTestStatement(dgc, dgc.encode(), issueTime, expiration, signer, null, null, this.ecdsaAllPurposes
+      .getCertificate());
     test.getTestCtx().setDescription("2: Two vaccination entries - Everything should verify fine");
 
     // Before we write the test we want to make sure that we can handle it ...
@@ -120,11 +125,11 @@ public class CreateTestDataTest {
     final DigitalGreenCertificate dgc = readDgcFile("dgc-simple-one-entry.json", DigitalGreenCertificate.class);
     final Instant issueTime = Instant.now();
     final Instant expiration = issueTime.plus(Duration.ofDays(90));
-    final DefaultDGCSigner signer = new DefaultDGCSigner(this.ecdsaVacPurpose);
+    final DefaultDGCSigner signer = new DefaultDGCSigner(this.ecdsaAllPurposes);
     signer.setIncludeCoseTag(false);
 
-    final TestStatement test =
-        createTestStatement(dgc, dgc.encode(), issueTime, expiration, signer, null, null, this.ecdsaAllPurposes.getCertificate());
+    final TestStatement test = createTestStatement(dgc, dgc.encode(), issueTime, expiration, signer, null, null, this.ecdsaAllPurposes
+      .getCertificate());
     test.getTestCtx().setDescription("4: One vaccination entry - No tag for COSE object. Everything should verify fine.");
 
     // Before we write the test we want to make sure that we can handle it ...
@@ -139,12 +144,12 @@ public class CreateTestDataTest {
     final DigitalGreenCertificate dgc = readDgcFile("dgc-simple-one-entry.json", DigitalGreenCertificate.class);
     final Instant issueTime = Instant.now();
     final Instant expiration = issueTime.plus(Duration.ofDays(90));
-    final DefaultDGCSigner signer = new DefaultDGCSigner(this.ecdsaVacPurpose);
+    final DefaultDGCSigner signer = new DefaultDGCSigner(this.ecdsaAllPurposes);
     signer.setIncludeCoseTag(true);
     signer.setIncludeCwtTag(true);
 
-    final TestStatement test =
-        createTestStatement(dgc, dgc.encode(), issueTime, expiration, signer, null, null, this.ecdsaAllPurposes.getCertificate());
+    final TestStatement test = createTestStatement(dgc, dgc.encode(), issueTime, expiration, signer, null, null, this.ecdsaAllPurposes
+      .getCertificate());
     test.getTestCtx().setDescription("5: One vaccination entry - Both CWT and Cose_Sign1 tags present. Everything should verify fine.");
 
     // Before we write the test we want to make sure that we can handle it ...
@@ -161,8 +166,8 @@ public class CreateTestDataTest {
     final Instant expiration = issueTime.plus(Duration.ofDays(90));
     final DefaultDGCSigner signer = new DefaultDGCSigner(this.ecdsaOther);
 
-    final TestStatement test =
-        createTestStatement(dgc, dgc.encode(), issueTime, expiration, signer, null, null, this.ecdsaVacPurpose.getCertificate());
+    final TestStatement test = createTestStatement(dgc, dgc.encode(), issueTime, expiration, signer, null, null, this.ecdsaVacPurpose
+      .getCertificate());
     test.getTestCtx().setDescription("6: One vaccination entry - Signature validation should fail.");
 
     test.getExpectedResults().expectedVerify = false;
@@ -171,6 +176,71 @@ public class CreateTestDataTest {
     DGCTestDataVerifier.validate("Test #6", test);
 
     writeTestFile("6", test);
+  }
+
+  @Test
+  public void test7_testEntry() throws Exception {
+    
+    final Instant issueTime = Instant.now();
+    
+    final DigitalGreenCertificate dgc = (DigitalGreenCertificate) new DigitalGreenCertificate()
+      .withVer(DGCSchemaVersion.DGC_SCHEMA_VERSION)
+      .withNam(new PersonName().withGn("Oscar").withFn("Lövström"))
+      .withDob("1958-11-11")
+      .withT(Arrays.asList(new TestEntry()
+        .withTg("840539006")
+        .withTt("LP6464-4")
+        .withMa("1218")
+        .withSc(issueTime.minus(Duration.ofHours(4).minus(Duration.ofMinutes(34))))
+        .withTr("260415000")
+        .withTc("Arlanda Airport Covid Center 1")
+        .withCo("SE")
+        .withIs("Swedish eHealth Agency")
+        .withCi("URN:UVCI:01:SE:ARN/89875439877")));
+    
+    final Instant expiration = issueTime.plus(Duration.ofHours(72));
+    final Instant validationClock = issueTime.plus(Duration.ofHours(27));
+    final DefaultDGCSigner signer = new DefaultDGCSigner(this.ecdsaAllPurposes);
+
+    final TestStatement test = createTestStatement(dgc, dgc.encode(), issueTime, expiration, signer, null, validationClock, 
+      this.ecdsaAllPurposes.getCertificate());
+    test.getTestCtx().setDescription("7: One test entry - Everything should verify fine.");
+
+    // Before we write the test we want to make sure that we can handle it ...
+    DGCTestDataVerifier.validate("Test #7", test);
+
+    writeTestFile("7", test);
+  }
+  
+  @Test
+  public void test8_recoveryEntry() throws Exception {
+    
+    final Instant issueTime = Instant.now();
+    final Instant expiration = issueTime.plus(Duration.ofDays(90));
+    
+    final DigitalGreenCertificate dgc = (DigitalGreenCertificate) new DigitalGreenCertificate()
+        .withVer(DGCSchemaVersion.DGC_SCHEMA_VERSION)
+        .withNam(new PersonName().withGn("Oscar").withFn("Lövström"))
+        .withDob("1958-11-11")
+        .withR(Arrays.asList(new RecoveryEntry()
+          .withTg("840539006")
+          .withFr(issueTime.minus(Duration.ofDays(11)).atZone(ZoneOffset.UTC).toLocalDate())
+          .withCo("SE")
+          .withIs("Swedish eHealth Agency")
+          .withDf(issueTime.atZone(ZoneOffset.UTC).toLocalDate())
+          .withDu(expiration.atZone(ZoneOffset.UTC).toLocalDate())
+          .withCi("URN:UVCI:01:SE:EHN/189005439PP7")));
+    
+    final DefaultDGCSigner signer = new DefaultDGCSigner(this.ecdsaAllPurposes);
+
+    final TestStatement test = createTestStatement(dgc, dgc.encode(), issueTime, expiration, signer, null, issueTime.plus(Duration.ofDays(5)), 
+      this.ecdsaAllPurposes.getCertificate());
+    test.getTestCtx().setDescription("8: One recovery entry - Everything should verify fine.");
+
+    // Before we write the test we want to make sure that we can handle it ...
+    DGCTestDataVerifier.validate("Test #8", test);
+
+    writeTestFile("8", test);
   }
 
   /**
@@ -223,7 +293,7 @@ public class CreateTestDataTest {
     else {
       // This tests an error case, so set the compressed to the uncompressed cose
       test.setCompressed(cose);
-      
+
       base45 = Base45.getEncoder().encodeToString(cose);
       test.setBase45(base45);
     }

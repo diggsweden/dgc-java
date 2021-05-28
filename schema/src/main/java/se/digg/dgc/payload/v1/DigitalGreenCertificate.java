@@ -6,6 +6,7 @@
 package se.digg.dgc.payload.v1;
 
 import java.io.IOException;
+import java.time.DateTimeException;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -14,6 +15,7 @@ import java.time.temporal.TemporalAccessor;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -115,6 +117,63 @@ public class DigitalGreenCertificate extends Eudgc {
   }
 
   /**
+   * Gets the {@code dob} field as a {@link DateOfBirth} object.
+   * 
+   * @return a DateOfBirth object or null if the dob field is not present
+   * @throws DateTimeException
+   *           for date parsing errors
+   */
+  @JsonIgnore
+  public DateOfBirth getDateOfBirth() throws DateTimeException {
+    final String dob = this.getDob();
+    return dob != null ? new DateOfBirth(dob) : null;
+  }
+
+  /**
+   * Setter that takes a {@link LocalDate} representing the date of birth instead of string.
+   * 
+   * @param dob
+   *          the date of birth
+   */
+  @JsonIgnore
+  public void setDob(final LocalDate dob) {
+    super.setDob(dob != null ? dob.toString() : null);
+  }
+
+  /**
+   * Setter that takes a {@link DateOfBirth} representing the date of birth instead of string.
+   * 
+   * @param dob
+   *          the date of birth
+   */
+  @JsonIgnore
+  public void setDob(final DateOfBirth dob) {
+    super.setDob(dob != null ? dob.toString() : null);
+  }
+
+  /**
+   * An alternative to {@link Eudgc#withDob(String)} where the date of birth is represented as a {@link LocalDate}.
+   * 
+   * @param dob
+   *          the date of birth
+   * @return this object
+   */
+  public Eudgc withDob(final LocalDate dob) {
+    return super.withDob(dob != null ? dob.toString() : null);
+  }
+
+  /**
+   * An alternative to {@link Eudgc#withDob(String)} where the date of birth is represented as a {@link DateOfBirth}.
+   * 
+   * @param dob
+   *          the date of birth
+   * @return this object
+   */
+  public Eudgc withDob(final DateOfBirth dob) {
+    return super.withDob(dob != null ? dob.toString() : null);
+  }
+
+  /**
    * Ensures that the parts of the supplied name are transliterated.
    * 
    * @param name
@@ -140,11 +199,11 @@ public class DigitalGreenCertificate extends Eudgc {
    * @throws DGCSchemaException
    *           for encoding errors
    */
-  public byte[] encode() throws DGCSchemaException {    
+  public byte[] encode() throws DGCSchemaException {
     try {
       final boolean containsTestEntries = this.getT() != null && this.getT().size() > 0;
       final byte[] encoding = cborMapper.writeValueAsBytes(this);
-      
+
       // If this object contains test entries we use CBORObject to make sure that
       // all Instant's are encoded as tagged strings. FasterXML won't include the tag.
       //

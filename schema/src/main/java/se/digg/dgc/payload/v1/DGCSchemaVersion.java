@@ -17,7 +17,7 @@ public class DGCSchemaVersion {
   /**
    * The version of the schema that we used to generate the {@link DigitalGreenCertificate} class.
    */
-  public static final String DGC_SCHEMA_VERSION = "1.0.1";
+  public static final String DGC_SCHEMA_VERSION = "1.2.0";
 
   private DGCSchemaVersion() {
   }

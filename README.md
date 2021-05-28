@@ -74,6 +74,20 @@ The **dgc-create-validate** library offers a barcode (QR) implementation using t
 
 > At least version 3.4.1 of the ZXing libraries are required.
 
+Note: Only the Java 11 build is published to Maven central (see Java 8 note below).
+
+## For Java 8 users
+
+On request, the libraries can also be built with Java 8. However, they are not published to Maven central.
+
+To build:
+
+```
+>mvn clean install -P\!default,j8-build
+```
+
+Now, the artifacts `dgc-schema-java8` and `dgc-create-validate-java8` will be built.
+
 ## Documentation
 
 Java API documentation of the library: 

@@ -8,7 +8,10 @@ package se.digg.dgc.interop;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.security.SignatureException;
+import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.X509Certificate;
 import java.time.Instant;
@@ -347,6 +350,7 @@ public class DGCTestDataVerifier {
 
       try {
         final DGCSignatureVerifier.Result vResult = verifier.verify(cose, certProvider);
+        
         if (!expectedSignatureCheck.booleanValue()) {
           Assert.fail(String.format("[%s]: Signature validation was successful but expected failure", testName));
         }
@@ -355,6 +359,14 @@ public class DGCTestDataVerifier {
         }
         if (expectedExpirationCheck != null && vResult.getExpires() == null) {
           Assert.fail(String.format("[%s]: Expiration check failed - Missing expiration field in CWT", testName));
+        }
+        
+        // Check kid
+        final byte[] kid = vResult.getKid();
+        if (kid != null) {
+          final byte[] expectedKid = calculateKid(vResult.getSignerCertificate());
+          Assert.assertArrayEquals(String.format("[%s]: KID does not correspond with certificate", testName),
+            expectedKid, kid);
         }
       }
       catch (CertificateExpiredException e) {
@@ -498,6 +510,28 @@ public class DGCTestDataVerifier {
     else {
       Assert.assertNotEquals(String.format("[%s]: CBOR decode test failed - Match but expected error", testName),
         jsonNormalized, cborNormalizedJson);
+    }
+  }
+  
+  /**
+   * Given a certificate a 8-byte KID is calculated that is the SHA-256 digest over the certificate DER-encoding.
+   * 
+   * @param cert
+   *          the certificate
+   * @return a 8 byte KID
+   */  
+  private static byte[] calculateKid(final X509Certificate cert) {
+
+    try {
+      final MessageDigest digest = MessageDigest.getInstance("SHA-256");
+
+      final byte[] sha256 = digest.digest(cert.getEncoded());
+      final byte[] kid = new byte[8];
+      System.arraycopy(sha256, 0, kid, 0, 8);
+      return kid;
+    }
+    catch (NoSuchAlgorithmException | CertificateEncodingException e) {
+      throw new SecurityException(e);
     }
   }
 

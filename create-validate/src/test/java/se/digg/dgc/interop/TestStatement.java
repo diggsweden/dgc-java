@@ -452,6 +452,7 @@ public class TestStatement {
       return this.validationClock;
     }
 
+    @JsonIgnore
     public Instant getValidationClockInstant() {
       if (this.validationClock == null) {
         return null;

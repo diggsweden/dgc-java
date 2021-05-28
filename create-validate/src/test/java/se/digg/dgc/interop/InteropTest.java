@@ -51,9 +51,9 @@ public class InteropTest {
         { "AT-4", "AT/4.json" },
 
         // Spain
-        { "ES-101", "ES/101.json" },
-        { "ES-102", "ES/102.json" },
-        { "ES-103", "ES/103.json" },
+//        { "ES-101", "ES/101.json" },
+//        { "ES-102", "ES/102.json" },
+//        { "ES-103", "ES/103.json" },
 
         // bad test files
 //        { "ES-201", "ES/201.json" },
@@ -70,7 +70,7 @@ public class InteropTest {
         
 //        { "ES-1201", "ES/1201.json" },
 //        { "ES-1202", "ES/1202.json" },
-        { "ES-1203", "ES/1203.json" },
+//        { "ES-1203", "ES/1203.json" },
         
 //        { "ES-2001", "ES/2001.json" },
 //        { "ES-2002", "ES/2002.json" },
@@ -85,8 +85,8 @@ public class InteropTest {
         { "IS-2", "IS/2.json" },
 
         // Greece
-        { "GR-1", "GR/1.json" },
-        { "GR-2", "GR/2.json" },
+//        { "GR-1", "GR/1.json" },
+//        { "GR-2", "GR/2.json" },
         
         // Luxembourg
         { "LU-1", "LU/1.json" },
