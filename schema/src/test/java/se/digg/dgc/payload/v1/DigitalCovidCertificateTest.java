@@ -10,7 +10,6 @@ import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Date;
 
-import org.apache.commons.codec.binary.Hex;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -131,21 +130,19 @@ public class DigitalCovidCertificateTest {
     final String dateTime = "2021-04-14T14:17:50.525450Z";
 
     // Encode
-    final DigitalCovidCertificate dgc = new DigitalCovidCertificate(); 
+    final DigitalCovidCertificate dgc = new DigitalCovidCertificate();
+    dgc.setTagDateTimes(true); // This is the default
     final TestEntry tst = new TestEntry();
     tst.setCo("SE");
     tst.setSc(Instant.parse(dateTime));
     dgc.setT(Arrays.asList(tst));
-    final byte[] cbor = dgc.encode();
+    byte[] cbor = dgc.encode();
 
     // Assert using the detailed com.upokecenter.cbor library.
     //
-    final CBORObject object = CBORObject.DecodeFromBytes(cbor);
+    CBORObject object = CBORObject.DecodeFromBytes(cbor);
 
-    System.out.println(object.ToJSONString());
-    System.out.println(Hex.encodeHexString(object.EncodeToBytes()));
-
-    final CBORObject dateObject = object.get("t").get(0).get("sc");
+    CBORObject dateObject = object.get("t").get(0).get("sc");
     Assert.assertNotNull(dateObject);
 
     //
@@ -158,7 +155,31 @@ public class DigitalCovidCertificateTest {
     Assert.assertEquals(dateTime, dateObject.AsString());
 
     // Decode
-    final DigitalCovidCertificate dgc2 = DigitalCovidCertificate.decode(cbor);  
+    DigitalCovidCertificate dgc2 = DigitalCovidCertificate.decode(cbor);  
+    Assert.assertEquals(dateTime, dgc2.getT().get(0).getSc().toString());
+    
+    //
+    // Test "interop-mode".
+    //
+    dgc.setTagDateTimes(false);    
+    cbor = dgc.encode();
+
+    object = CBORObject.DecodeFromBytes(cbor);
+
+    dateObject = object.get("t").get(0).get("sc");
+    Assert.assertNotNull(dateObject);
+
+    //
+    // Assert that the tag is NOT there ...
+    //
+    Assert.assertFalse(dateObject.isTagged());
+    Assert.assertFalse(dateObject.HasMostOuterTag(0));
+    Assert.assertTrue(dateObject.getType() == CBORType.TextString);
+
+    Assert.assertEquals(dateTime, dateObject.AsString());
+
+    // Decode
+    dgc2 = DigitalCovidCertificate.decode(cbor);  
     Assert.assertEquals(dateTime, dgc2.getT().get(0).getSc().toString());
   }
   

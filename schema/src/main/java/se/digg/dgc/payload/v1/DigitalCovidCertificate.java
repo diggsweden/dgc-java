@@ -78,6 +78,12 @@ public class DigitalCovidCertificate extends Eudcc {
   }
 
   /**
+   * The specification dictates that we should tag date-time strings with 0, but during interoperability testing some
+   * validator apps have had problems with this. Therefore, it is possible to turn off tagging.
+   */
+  private boolean tagDateTimes = true;
+
+  /**
    * Default constructor.
    */
   public DigitalCovidCertificate() {
@@ -200,26 +206,32 @@ public class DigitalCovidCertificate extends Eudcc {
    *           for encoding errors
    */
   public byte[] encode() throws DGCSchemaException {
-    try {
-      final boolean containsTestEntries = this.getT() != null && this.getT().size() > 0;
+    try {      
       final byte[] encoding = cborMapper.writeValueAsBytes(this);
 
-      // If this object contains test entries we use CBORObject to make sure that
-      // all Instant's are encoded as tagged strings. FasterXML won't include the tag.
-      //
-      if (!containsTestEntries) {
+      if (this.tagDateTimes) {
+        final boolean containsTestEntries = this.getT() != null && this.getT().size() > 0;
+        
+        // If this object contains test entries we use CBORObject to make sure that
+        // all Instant's are encoded as tagged strings. FasterXML won't include the tag.
+        //
+        if (!containsTestEntries) {
+          return encoding;
+        }
+        final CBORObject obj = CBORObject.DecodeFromBytes(encoding);
+        final CBORObject tArr = obj.get("t");
+        for (int i = 0; i < tArr.size(); i++) {
+          final CBORObject tObj = tArr.get(i);
+          final CBORObject sc = tObj.get("sc");
+          if (sc != null && !sc.HasMostOuterTag(0)) {
+            tObj.set("sc", CBORObject.FromObjectAndTag(sc, 0));
+          }
+        }
+        return obj.EncodeToBytes();
+      }
+      else {
         return encoding;
       }
-      final CBORObject obj = CBORObject.DecodeFromBytes(encoding);
-      final CBORObject tArr = obj.get("t");
-      for (int i = 0; i < tArr.size(); i++) {
-        final CBORObject tObj = tArr.get(i);
-        final CBORObject sc = tObj.get("sc");
-        if (sc != null && !sc.HasMostOuterTag(0)) {
-          tObj.set("sc", CBORObject.FromObjectAndTag(sc, 0));
-        }
-      }
-      return obj.EncodeToBytes();
     }
     catch (final JsonProcessingException e) {
       throw new DGCSchemaException("Failed to serialize to CBOR", e);
@@ -303,6 +315,20 @@ public class DigitalCovidCertificate extends Eudcc {
   @Override
   public String toString() {
     return super.toString();
+  }
+
+  /**
+   * The specification dictates that we should tag date-time strings with 0, but during interoperability testing some
+   * validator apps have had problems with this. Therefore, it is possible to turn off tagging.
+   * <p>
+   * The default is to add the CBOR tag 0 for date-times.
+   * </p>
+   * 
+   * @param tagDateTimes
+   *          whether to tag date-times.
+   */
+  public void setTagDateTimes(final boolean tagDateTimes) {
+    this.tagDateTimes = tagDateTimes;
   }
 
   /**
