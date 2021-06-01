@@ -26,6 +26,9 @@ public class Barcode {
   /** The byte array representing the barcode image according to the selected image format. */
   private final byte[] image;
 
+  /** The barcode image in SVG format. */
+  private final String svgImage;
+
   /** The width of the barcode in pixels. */
   private final int width;
 
@@ -44,6 +47,8 @@ public class Barcode {
    *          byte array representing the barcode image according to the selected image format
    * @param imageFormat
    *          the image format of the code
+   * @param svgImage
+   *          the barcode image in SVG format
    * @param width
    *          the width in pixels
    * @param height
@@ -51,13 +56,14 @@ public class Barcode {
    * @param payload
    *          the barcode payload (content)
    */
-  public Barcode(final BarcodeType type, final byte[] image, final ImageFormat imageFormat, 
-      final int width, final int height, final String payload) {
+  public Barcode(final BarcodeType type, final byte[] image, final ImageFormat imageFormat,
+      final String svgImage, final int width, final int height, final String payload) {
     this.type = Optional.ofNullable(type).orElseThrow(() -> new IllegalArgumentException("type must not be null"));
     this.image = Optional.ofNullable(image)
       .filter(c -> c.length > 0)
       .orElseThrow(() -> new IllegalArgumentException("code must not be null or empty"));
     this.imageFormat = Optional.ofNullable(imageFormat).orElseThrow(() -> new IllegalArgumentException("imageFormat must not be null"));
+    this.svgImage = Optional.ofNullable(svgImage).orElseThrow(() -> new IllegalArgumentException("svgImage must not be null"));
     this.width = width;
     this.height = height;
     this.payload = Optional.ofNullable(payload).orElseThrow(() -> new IllegalArgumentException("payload must not be null"));
@@ -89,12 +95,21 @@ public class Barcode {
   }
 
   /**
-   * Gets the contents that is the barcode image according to the selected image format
+   * Gets the contents that is the barcode image according to the selected image format.
    * 
    * @return the image contents representing the barcode
    */
   public byte[] getImage() {
     return this.image;
+  }
+
+  /**
+   * Gets the barcode image as an SVG image.
+   * 
+   * @return the image in SVG format
+   */
+  public String getSvgImage() {
+    return this.svgImage;
   }
 
   /**

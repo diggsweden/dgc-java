@@ -25,18 +25,16 @@ public class DefaultBarcodeCreatorTest {
   public void testSimpleCreate() throws Exception {
     final DefaultBarcodeCreator creator = new DefaultBarcodeCreator();
     
-    final Barcode barcode = creator.create("LINDSTRÖM");
+    final Barcode barcode = creator.create("FOOBAR");
     
-//    try (FileOutputStream fos = new FileOutputStream("target/barcode." + barcode.getImageFormat().getName())) {
-//      fos.write(barcode.getCode());
-//    }
-    
+    Assert.assertNotNull(barcode.getImage());
+    Assert.assertNotNull(barcode.getSvgImage());
+        
     final DefaultBarcodeDecoder decoder = new DefaultBarcodeDecoder();
     
-    //final String value = decoder.decodeToString(barcode.getCode(), StandardCharsets.US_ASCII.name());
     final String value = decoder.decodeToString(barcode.getImage(), Barcode.BarcodeType.QR, StandardCharsets.UTF_8);
     
-    Assert.assertEquals("LINDSTRÖM", value);
+    Assert.assertEquals("FOOBAR", value);
   }
 
 }
