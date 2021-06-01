@@ -18,6 +18,7 @@ import com.google.zxing.Writer;
 import com.google.zxing.WriterException;
 import com.google.zxing.aztec.AztecWriter;
 import com.google.zxing.client.j2se.MatrixToImageWriter;
+import com.google.zxing.common.BitArray;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
@@ -82,20 +83,60 @@ public class DefaultBarcodeCreator implements BarcodeCreator {
     }
     try {
       final BitMatrix bitMatrix = writer.encode(contents, this.zxingBarcodeFormat(), this.widthAndHeight, this.widthAndHeight, hints);
-      
+
       try (final ByteArrayOutputStream stream = new ByteArrayOutputStream()) {
         MatrixToImageWriter.writeToStream(bitMatrix, imageFormat.getName(), stream);
         byte[] bytes = stream.toByteArray();
-        return new Barcode(this.type, bytes, this.imageFormat, this.widthAndHeight, this.widthAndHeight, contents);
+        return new Barcode(this.type, bytes, this.imageFormat, this.toSvgImage(bitMatrix), this.widthAndHeight, this.widthAndHeight,
+          contents);
       }
       catch (final IOException e) {
         throw new BarcodeException("Failed to create barcode - " + e.getMessage(), e);
       }
-      
+
     }
     catch (final WriterException e) {
       throw new BarcodeException("Failed to create barcode - " + e.getMessage(), e);
     }
+  }
+
+  /**
+   * Transforms the supplied bit matrix into an SVG image.
+   * 
+   * @param image
+   *          the bit matrix
+   * @return SVG image
+   */
+  private String toSvgImage(final BitMatrix image) {
+    final int width = image.getWidth();
+    final int height = image.getHeight();
+    StringBuilder sb = new StringBuilder();
+    sb.append("<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" viewBox=\"0 0 ")
+      .append(width)
+      .append(" ")
+      .append(height)
+      .append("\">")
+      .append(System.lineSeparator());
+
+    BitArray row = new BitArray(width);
+    for (int y = 0; y < height; ++y) {
+      StringBuilder sbPath = new StringBuilder();
+      row = image.getRow(y, row);
+      for (int x = 0; x < width; ++x) {
+        if (row.get(x)) {
+          sbPath.append(" M" + x + "," + y + "h1v1h-1z");
+        }
+      }
+      if (sbPath.length() > 0) {
+        sb.append("<path d=\"")
+          .append(sbPath.toString())
+          .append("\"></path>")
+          .append(System.lineSeparator());
+      }
+    }
+    sb.append("</svg>").append(System.lineSeparator());
+
+    return sb.toString();
   }
 
   /**
