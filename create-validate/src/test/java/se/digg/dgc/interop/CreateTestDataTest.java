@@ -26,13 +26,13 @@ import se.digg.dgc.encoding.Base45;
 import se.digg.dgc.encoding.DGCConstants;
 import se.digg.dgc.encoding.Zlib;
 import se.digg.dgc.encoding.impl.DefaultBarcodeCreator;
-import se.digg.dgc.payload.v1.DGCSchemaVersion;
 import se.digg.dgc.payload.v1.DigitalCovidCertificate;
 import se.digg.dgc.payload.v1.PersonName;
 import se.digg.dgc.payload.v1.RecoveryEntry;
 import se.digg.dgc.payload.v1.TestEntry;
 import se.digg.dgc.signatures.DGCSigner;
 import se.digg.dgc.signatures.impl.DefaultDGCSigner;
+import se.digg.dgc.uvci.UVCIBuilder;
 import se.swedenconnect.security.credential.KeyStoreCredential;
 import se.swedenconnect.security.credential.PkiCredential;
 
@@ -68,8 +68,9 @@ public class CreateTestDataTest {
 
   // One vac-entry
   @Test
-  public void test1() throws Exception {
+  public void test1_vacEntry() throws Exception {
     final DigitalCovidCertificate dgc = readDgcFile("dgc-simple-one-entry.json", DigitalCovidCertificate.class);
+    dgc.setVer("1.0.0");
     final Instant issueTime = Instant.now();
     final Instant expiration = issueTime.plus(Duration.ofDays(90));
     final DGCSigner signer = new DefaultDGCSigner(this.ecdsaVacPurpose);
@@ -83,120 +84,78 @@ public class CreateTestDataTest {
 
     writeTestFile("1", test);
   }
-
-  // Two vac-entries
+  
   @Test
-  public void test2() throws Exception {
-    final DigitalCovidCertificate dgc = readDgcFile("dgc-simple-two-entries.json", DigitalCovidCertificate.class);
-    final Instant issueTime = Instant.now();
-    final Instant expiration = issueTime.plus(Duration.ofDays(90));
-    final DGCSigner signer = new DefaultDGCSigner(this.ecdsaAllPurposes);
-
-    final TestStatement test = createTestStatement(dgc, dgc.encode(), issueTime, expiration, signer, null, null, this.ecdsaAllPurposes
-      .getCertificate());
-    test.getTestCtx().setDescription("2: Two vaccination entries - Everything should verify fine");
-
-    // Before we write the test we want to make sure that we can handle it ...
-    DGCTestDataVerifier.validate("Test #2", test);
-
-    writeTestFile("2", test);
-  }
-
-  // One vac-entry, signed using an RSA key
-  @Test
-  public void test3() throws Exception {
-    final DigitalCovidCertificate dgc = readDgcFile("dgc-simple-one-entry.json", DigitalCovidCertificate.class);
-    final Instant issueTime = Instant.now();
-    final Instant expiration = issueTime.plus(Duration.ofDays(90));
-    final DGCSigner signer = new DefaultDGCSigner(this.rsa);
-
-    final TestStatement test = createTestStatement(dgc, dgc.encode(), issueTime, expiration, signer, null, null, this.rsa.getCertificate());
-    test.getTestCtx().setDescription("3: One vaccination entry - RSA signature. Everything should verify fine");
-
-    // Before we write the test we want to make sure that we can handle it ...
-    DGCTestDataVerifier.validate("Test #3", test);
-
-    writeTestFile("3", test);
-  }
-
-  // One vac-entry, no COSE message tag included
-  @Test
-  public void test4() throws Exception {
-    final DigitalCovidCertificate dgc = readDgcFile("dgc-simple-one-entry.json", DigitalCovidCertificate.class);
-    final Instant issueTime = Instant.now();
-    final Instant expiration = issueTime.plus(Duration.ofDays(90));
-    final DefaultDGCSigner signer = new DefaultDGCSigner(this.ecdsaAllPurposes);
-    signer.setIncludeCoseTag(false);
-
-    final TestStatement test = createTestStatement(dgc, dgc.encode(), issueTime, expiration, signer, null, null, this.ecdsaAllPurposes
-      .getCertificate());
-    test.getTestCtx().setDescription("4: One vaccination entry - No tag for COSE object. Everything should verify fine.");
-
-    // Before we write the test we want to make sure that we can handle it ...
-    DGCTestDataVerifier.validate("Test #4", test);
-
-    writeTestFile("4", test);
-  }
-
-  // One vac-entry, Both CWT and COSE message tags included
-  @Test
-  public void test5() throws Exception {
-    final DigitalCovidCertificate dgc = readDgcFile("dgc-simple-one-entry.json", DigitalCovidCertificate.class);
-    final Instant issueTime = Instant.now();
-    final Instant expiration = issueTime.plus(Duration.ofDays(90));
-    final DefaultDGCSigner signer = new DefaultDGCSigner(this.ecdsaAllPurposes);
-    signer.setIncludeCoseTag(true);
-    signer.setIncludeCwtTag(true);
-
-    final TestStatement test = createTestStatement(dgc, dgc.encode(), issueTime, expiration, signer, null, null, this.ecdsaAllPurposes
-      .getCertificate());
-    test.getTestCtx().setDescription("5: One vaccination entry - Both CWT and Cose_Sign1 tags present. Everything should verify fine.");
-
-    // Before we write the test we want to make sure that we can handle it ...
-    DGCTestDataVerifier.validate("Test #5", test);
-
-    writeTestFile("5", test);
-  }
-
-  // One vac-entry, Signature validation will fail
-  @Test
-  public void test6() throws Exception {
-    final DigitalCovidCertificate dgc = readDgcFile("dgc-simple-one-entry.json", DigitalCovidCertificate.class);
-    final Instant issueTime = Instant.now();
-    final Instant expiration = issueTime.plus(Duration.ofDays(90));
-    final DefaultDGCSigner signer = new DefaultDGCSigner(this.ecdsaOther);
-
-    final TestStatement test = createTestStatement(dgc, dgc.encode(), issueTime, expiration, signer, null, null, this.ecdsaVacPurpose
-      .getCertificate());
-    test.getTestCtx().setDescription("6: One vaccination entry - Signature validation should fail.");
-
-    test.getExpectedResults().expectedVerify = false;
-
-    // Before we write the test we want to make sure that we can handle it ...
-    DGCTestDataVerifier.validate("Test #6", test);
-
-    writeTestFile("6", test);
-  }
-
-  @Test
-  public void test7_testEntry() throws Exception {
+  public void test2_and_3_naaTestEntry() throws Exception {
     
     final Instant issueTime = Instant.now();
     
     final DigitalCovidCertificate dgc = (DigitalCovidCertificate) new DigitalCovidCertificate()
-      .withVer(DGCSchemaVersion.DGC_SCHEMA_VERSION)
+      .withVer("1.0.0")
       .withNam(new PersonName().withGn("Oscar").withFn("Lövström"))
       .withDob("1958-11-11")
       .withT(Arrays.asList(new TestEntry()
         .withTg("840539006")
         .withTt("LP6464-4")
-        .withMa("1218")
-        .withSc(issueTime.minus(Duration.ofHours(4).minus(Duration.ofMinutes(34))))
+        .withNm("Roche LightCycler qPCR")
         .withTr("260415000")
+        .withSc(issueTime.minus(Duration.ofHours(1).minus(Duration.ofMinutes(34))))        
         .withTc("Arlanda Airport Covid Center 1")
         .withCo("SE")
         .withIs("Swedish eHealth Agency")
-        .withCi("URN:UVCI:01:SE:ARN/89875439877")));
+        .withCi(UVCIBuilder.builder()
+          .country("SE")
+          .issuer("EHM")
+          .uniqueString("TARN89875439877")
+          .build())));
+    
+    final Instant expiration = issueTime.plus(Duration.ofHours(72));
+    final Instant validationClock = issueTime.plus(Duration.ofHours(27));
+    final DefaultDGCSigner signer = new DefaultDGCSigner(this.ecdsaAllPurposes);
+
+    final TestStatement test2 = createTestStatement(dgc, dgc.encode(), issueTime, expiration, signer, null, validationClock, 
+      this.ecdsaAllPurposes.getCertificate());
+    test2.getTestCtx().setDescription("2: One NAA test entry - sc attribute is tagged");
+
+    // Before we write the test we want to make sure that we can handle it ...
+    DGCTestDataVerifier.validate("Test #2", test2);
+
+    writeTestFile("2", test2);
+    
+    dgc.setTagDateTimes(false);
+    final TestStatement test3 = createTestStatement(dgc, dgc.encode(), issueTime, expiration, signer, null, validationClock, 
+      this.ecdsaAllPurposes.getCertificate());
+    test3.getTestCtx().setDescription("3: One NAA test entry - sc attribute is not tagged");
+
+    // Before we write the test we want to make sure that we can handle it ...
+    DGCTestDataVerifier.validate("Test #3", test3);
+
+    writeTestFile("3", test3);
+  }
+  
+  @Test
+  public void test4_ratTestEntry() throws Exception {
+    
+    final Instant issueTime = Instant.now();
+    
+    final DigitalCovidCertificate dgc = (DigitalCovidCertificate) new DigitalCovidCertificate()
+      .withVer("1.0.0")
+      .withNam(new PersonName().withGn("Oscar").withFn("Lövström"))
+      .withDob("1958-11-11")
+      .withT(Arrays.asList(new TestEntry()
+        .withTg("840539006")
+        .withTt("LP217198-3")
+        .withMa("1232")
+        .withTr("260415000")
+        .withSc(issueTime.minus(Duration.ofHours(2).minus(Duration.ofMinutes(3))))        
+        .withTc("Axelsbergs vårdcentral")
+        .withCo("SE")
+        .withIs("Swedish eHealth Agency")
+        .withCi(UVCIBuilder.builder()
+          .country("SE")
+          .issuer("EHM")
+          .uniqueString("TSTAX67554312")
+          .build())));
     
     final Instant expiration = issueTime.plus(Duration.ofHours(72));
     final Instant validationClock = issueTime.plus(Duration.ofHours(27));
@@ -204,22 +163,22 @@ public class CreateTestDataTest {
 
     final TestStatement test = createTestStatement(dgc, dgc.encode(), issueTime, expiration, signer, null, validationClock, 
       this.ecdsaAllPurposes.getCertificate());
-    test.getTestCtx().setDescription("7: One test entry - Everything should verify fine.");
+    test.getTestCtx().setDescription("4: One RAT test entry - Everything should verify fine.");
 
     // Before we write the test we want to make sure that we can handle it ...
-    DGCTestDataVerifier.validate("Test #7", test);
+    DGCTestDataVerifier.validate("Test #4", test);
 
-    writeTestFile("7", test);
-  }
+    writeTestFile("4", test);
+  }  
   
   @Test
-  public void test8_recoveryEntry() throws Exception {
+  public void test5_recoveryEntry() throws Exception {
     
     final Instant issueTime = Instant.now();
     final Instant expiration = issueTime.plus(Duration.ofDays(90));
     
     final DigitalCovidCertificate dgc = (DigitalCovidCertificate) new DigitalCovidCertificate()
-        .withVer(DGCSchemaVersion.DGC_SCHEMA_VERSION)
+        .withVer("1.0.0")
         .withNam(new PersonName().withGn("Oscar").withFn("Lövström"))
         .withDob("1958-11-11")
         .withR(Arrays.asList(new RecoveryEntry()
@@ -229,19 +188,118 @@ public class CreateTestDataTest {
           .withIs("Swedish eHealth Agency")
           .withDf(issueTime.atZone(ZoneOffset.UTC).toLocalDate())
           .withDu(expiration.atZone(ZoneOffset.UTC).toLocalDate())
-          .withCi("URN:UVCI:01:SE:EHN/189005439PP7")));
+          .withCi(UVCIBuilder.builder()
+            .country("SE")
+            .issuer("EHM")
+            .uniqueString("R987765321")
+            .build())));
     
     final DefaultDGCSigner signer = new DefaultDGCSigner(this.ecdsaAllPurposes);
 
     final TestStatement test = createTestStatement(dgc, dgc.encode(), issueTime, expiration, signer, null, issueTime.plus(Duration.ofDays(5)), 
       this.ecdsaAllPurposes.getCertificate());
-    test.getTestCtx().setDescription("8: One recovery entry - Everything should verify fine.");
+    test.getTestCtx().setDescription("5: One recovery entry - Everything should verify fine.");
 
     // Before we write the test we want to make sure that we can handle it ...
-    DGCTestDataVerifier.validate("Test #8", test);
+    DGCTestDataVerifier.validate("Test #5", test);
 
-    writeTestFile("8", test);
+    writeTestFile("5", test);
   }
+  
+
+  // Two vac-entries
+//  @Test
+//  public void test2() throws Exception {
+//    final DigitalCovidCertificate dgc = readDgcFile("dgc-simple-two-entries.json", DigitalCovidCertificate.class);
+//    final Instant issueTime = Instant.now();
+//    final Instant expiration = issueTime.plus(Duration.ofDays(90));
+//    final DGCSigner signer = new DefaultDGCSigner(this.ecdsaAllPurposes);
+//
+//    final TestStatement test = createTestStatement(dgc, dgc.encode(), issueTime, expiration, signer, null, null, this.ecdsaAllPurposes
+//      .getCertificate());
+//    test.getTestCtx().setDescription("2: Two vaccination entries - Everything should verify fine");
+//
+//    // Before we write the test we want to make sure that we can handle it ...
+//    DGCTestDataVerifier.validate("Test #2", test);
+//
+//    writeTestFile("2", test);
+//  }
+
+  // One vac-entry, signed using an RSA key
+//  @Test
+//  public void test3() throws Exception {
+//    final DigitalCovidCertificate dgc = readDgcFile("dgc-simple-one-entry.json", DigitalCovidCertificate.class);
+//    final Instant issueTime = Instant.now();
+//    final Instant expiration = issueTime.plus(Duration.ofDays(90));
+//    final DGCSigner signer = new DefaultDGCSigner(this.rsa);
+//
+//    final TestStatement test = createTestStatement(dgc, dgc.encode(), issueTime, expiration, signer, null, null, this.rsa.getCertificate());
+//    test.getTestCtx().setDescription("3: One vaccination entry - RSA signature. Everything should verify fine");
+//
+//    // Before we write the test we want to make sure that we can handle it ...
+//    DGCTestDataVerifier.validate("Test #3", test);
+//
+//    writeTestFile("3", test);
+//  }
+
+  // One vac-entry, no COSE message tag included
+//  @Test
+//  public void test4() throws Exception {
+//    final DigitalCovidCertificate dgc = readDgcFile("dgc-simple-one-entry.json", DigitalCovidCertificate.class);
+//    final Instant issueTime = Instant.now();
+//    final Instant expiration = issueTime.plus(Duration.ofDays(90));
+//    final DefaultDGCSigner signer = new DefaultDGCSigner(this.ecdsaAllPurposes);
+//    signer.setIncludeCoseTag(false);
+//
+//    final TestStatement test = createTestStatement(dgc, dgc.encode(), issueTime, expiration, signer, null, null, this.ecdsaAllPurposes
+//      .getCertificate());
+//    test.getTestCtx().setDescription("4: One vaccination entry - No tag for COSE object. Everything should verify fine.");
+//
+//    // Before we write the test we want to make sure that we can handle it ...
+//    DGCTestDataVerifier.validate("Test #4", test);
+//
+//    writeTestFile("4", test);
+//  }
+
+  // One vac-entry, Both CWT and COSE message tags included
+//  @Test
+//  public void test5() throws Exception {
+//    final DigitalCovidCertificate dgc = readDgcFile("dgc-simple-one-entry.json", DigitalCovidCertificate.class);
+//    final Instant issueTime = Instant.now();
+//    final Instant expiration = issueTime.plus(Duration.ofDays(90));
+//    final DefaultDGCSigner signer = new DefaultDGCSigner(this.ecdsaAllPurposes);
+//    signer.setIncludeCoseTag(true);
+//    signer.setIncludeCwtTag(true);
+//
+//    final TestStatement test = createTestStatement(dgc, dgc.encode(), issueTime, expiration, signer, null, null, this.ecdsaAllPurposes
+//      .getCertificate());
+//    test.getTestCtx().setDescription("5: One vaccination entry - Both CWT and Cose_Sign1 tags present. Everything should verify fine.");
+//
+//    // Before we write the test we want to make sure that we can handle it ...
+//    DGCTestDataVerifier.validate("Test #5", test);
+//
+//    writeTestFile("5", test);
+//  }
+
+  // One vac-entry, Signature validation will fail
+//  @Test
+//  public void test6() throws Exception {
+//    final DigitalCovidCertificate dgc = readDgcFile("dgc-simple-one-entry.json", DigitalCovidCertificate.class);
+//    final Instant issueTime = Instant.now();
+//    final Instant expiration = issueTime.plus(Duration.ofDays(90));
+//    final DefaultDGCSigner signer = new DefaultDGCSigner(this.ecdsaOther);
+//
+//    final TestStatement test = createTestStatement(dgc, dgc.encode(), issueTime, expiration, signer, null, null, this.ecdsaVacPurpose
+//      .getCertificate());
+//    test.getTestCtx().setDescription("6: One vaccination entry - Signature validation should fail.");
+//
+//    test.getExpectedResults().expectedVerify = false;
+//
+//    // Before we write the test we want to make sure that we can handle it ...
+//    DGCTestDataVerifier.validate("Test #6", test);
+//
+//    writeTestFile("6", test);
+//  }
 
   /**
    * Creates a test statement.
@@ -309,7 +367,7 @@ public class CreateTestDataTest {
     // Test context
     TestStatement.TestCtx testCtx = new TestStatement.TestCtx();
     testCtx.setVersion(1);
-    testCtx.setSchema(DGCSchemaVersion.DGC_SCHEMA_VERSION);
+    testCtx.setSchema("1.0.0" /*DGCSchemaVersion.DGC_SCHEMA_VERSION*/);    
     if (validationClock != null) {
       testCtx.setValidationClock(validationClock);
     }

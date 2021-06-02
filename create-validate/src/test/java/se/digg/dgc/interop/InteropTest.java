@@ -118,8 +118,7 @@ public class InteropTest {
         { "SE-2", "SE/2.json" },
         { "SE-3", "SE/3.json" },
         { "SE-4", "SE/4.json" },
-        { "SE-5", "SE/5.json" },
-        { "SE-6", "SE/6.json" }
+        { "SE-5", "SE/5.json" }
     });
   }
 
