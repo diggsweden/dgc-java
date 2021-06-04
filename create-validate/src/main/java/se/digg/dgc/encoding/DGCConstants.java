@@ -6,7 +6,7 @@
 package se.digg.dgc.encoding;
 
 /**
- * Constants for Digital Green Certificates.
+ * Constants for Digital Covid Certificates.
  * 
  * @author Martin Lindström (martin@idsec.se)
  * @author Henrik Bengtsson (extern.henrik.bengtsson@digg.se)
@@ -15,7 +15,7 @@ package se.digg.dgc.encoding;
 public class DGCConstants {
 
   /**
-   * Header string that is prefixed to Base45 encoded health care certificates containing version 1 of the Digital Green
+   * Header string that is prefixed to Base45 encoded health care certificates containing version 1 of the Digital Covid
    * Certificate payloads.
    */
   public static final String DGC_V1_HEADER = "HC1:";

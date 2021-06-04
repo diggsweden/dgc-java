@@ -4,21 +4,23 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![Maven Central](https://maven-badges.herokuapp.com/maven-central/se.digg.dgc/dgc-create-validate/badge.svg)](https://maven-badges.herokuapp.com/maven-central/se.digg.dgc/dgc-create-validate) 
 
-An implementation in Java for creating and validating a Digital Green Certificate.
+An implementation in Java for creating and validating a EU Digital Covid Certificate.
 
 ---
 
 ## About
 
-This repository contains the Java libraries **dgc-schema** and **dgc-create-validate** for creating and validating Digital Green Certificates. It is maintained by the [Swedish Agency for Digital Government](https://www.digg.se/en).
+This repository contains the Java libraries **dgc-schema** and **dgc-create-validate** for creating and validating EU Digital Covid Certificates. It is maintained by the [Swedish Agency for Digital Government](https://www.digg.se/en).
+
+**Note:** The commission has decided on a late name change where the Digital Green Certificate was renamed to EU Digital Covid Certificate. Therefore, you'll find a lot of code in this library where the abbreviation DGC is used instead of DCC.
 
 ## Resources
 
 - [Electronic Health Certificate Specification](https://github.com/ehn-digital-green-development/hcert-spec).
 
-- [Electronic Health Certificate Schema](https://github.com/ehn-digital-green-development/hcert-schema).
+- [EU Digital Covid Certificate Schema](https://github.com/ehn-digital-green-development/ehn-dgc-schema).
 
-- [Test data](https://github.com/ehn-digital-green-development/hcert-testdata).
+- [Test data](https://github.com/eu-digital-green-certificates/dgc-testdata).
 
 - Misc. implementations can be found at <https://github.com/ehn-digital-green-development>.
 
@@ -26,7 +28,7 @@ This repository contains the Java libraries **dgc-schema** and **dgc-create-vali
 
 The code is structured into the following parts:
 
-- API - Java POJO:s generated from the [schema](https://github.com/ehn-digital-green-development/hcert-schema). **dgc-schema**
+- API - Java POJO:s generated from the [schema](https://github.com/ehn-digital-green-development/ehn-dgc-schema). **dgc-schema**
 
 - CBOR, CWT/COSE - Support for representing the DGC in CBOR and to sign/validate it. **dgc-create-validate**
 
@@ -36,7 +38,9 @@ The code is structured into the following parts:
 
 - QR code generation - Support for creating/reading QR-codes. **dgc-create-validate**
 
-- Service layer - A service that ties all the above components together and presents high-level methods for creating and validating Digital Green Certificates. **dgc-create-validate**
+- UVCI generation including Luhn mod N checksum calculation. **dgc-create-validate**
+
+- Service layer - A service that ties all the above components together and presents high-level methods for creating and validating EU Digital Covid Certificates. **dgc-create-validate**
 
 ## Maven
 

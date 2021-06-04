@@ -28,11 +28,11 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
-import se.digg.dgc.payload.v1.DigitalGreenCertificate;
+import se.digg.dgc.payload.v1.DigitalCovidCertificate;
 
 /**
  * A representation of a test statement, see
- * <a href="https://github.com/eu-digital-green-certificates/dgc-testdata/blob/main/README.md">DGC Test Data Repository
+ * <a href="https://github.com/eu-digital-green-certificates/dgc-testdata/blob/main/README.md">DCC Test Data Repository
  * for Test Automation</a>
  * 
  * @author Martin Lindström (martin@idsec.se)
@@ -43,15 +43,15 @@ import se.digg.dgc.payload.v1.DigitalGreenCertificate;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class TestStatement {
 
-  /** The JSON holding the DGC payload. */
+  /** The JSON holding the DCC payload. */
   @JsonProperty("JSON")
   private Object json;
 
-  /** The CBOR-encoding of the DGC payload (as a hex-encoded string). */
+  /** The CBOR-encoding of the DCC payload (as a hex-encoded string). */
   @JsonProperty("CBOR")
   private String cbor;
 
-  /** The signed DGC represented as a Cose_Sign1 object (as a hex-encoded string). */
+  /** The signed DCC represented as a Cose_Sign1 object (as a hex-encoded string). */
   @JsonProperty("COSE")
   private String cose;
 
@@ -93,20 +93,20 @@ public class TestStatement {
    *           for JSON processing errors
    */
   public String toJson() throws JsonProcessingException {
-    return DigitalGreenCertificate.getJSONMapper().writeValueAsString(this);
+    return DigitalCovidCertificate.getJSONMapper().writeValueAsString(this);
   }
 
   /**
-   * Gets the JSON holding the DGC payload.
+   * Gets the JSON holding the DCC payload.
    * 
-   * @return the DGC payload as a JSON object
+   * @return the DCC payload as a JSON object
    */
   public Object getJson() {
     return this.json;
   }
 
   /**
-   * Gets the JSON string representing the DGC payload.
+   * Gets the JSON string representing the DCC payload.
    * 
    * @return a JSON string
    * @throws JsonProcessingException
@@ -115,33 +115,33 @@ public class TestStatement {
   @JsonIgnore
   public String getJsonString() throws JsonProcessingException {
     return this.json != null
-        ? DigitalGreenCertificate.getJSONMapper().writeValueAsString(this.json)
+        ? DigitalCovidCertificate.getJSONMapper().writeValueAsString(this.json)
         : null;
   }
 
   /**
-   * Sets the JSON object holding the DGC payload.
+   * Sets the JSON object holding the DCC payload.
    * 
    * @param json
-   *          the DGC payload as a JSON object
+   *          the DCC payload as a JSON object
    */
   public void setJson(final Object json) {
     this.json = json;
   }
 
   /**
-   * Gets the CBOR-encoding of the DGC payload (as a hex-encoded string).
+   * Gets the CBOR-encoding of the DCC payload (as a hex-encoded string).
    * 
-   * @return the CBOR encoding of the DGC payload
+   * @return the CBOR encoding of the DCC payload
    */
   public String getCbor() {
     return this.cbor;
   }
 
   /**
-   * Gets the CBOR-encoding of the DGC payload.
+   * Gets the CBOR-encoding of the DCC payload.
    * 
-   * @return the CBOR encoding of the DGC payload
+   * @return the CBOR encoding of the DCC payload
    */
   @JsonIgnore
   public byte[] getCborBytes() {
@@ -156,20 +156,20 @@ public class TestStatement {
   }
 
   /**
-   * Sets the CBOR-encoding of the DGC payload (as a hex-encoded string).
+   * Sets the CBOR-encoding of the DCC payload (as a hex-encoded string).
    * 
    * @param cbor
-   *          the CBOR encoding of the DGC payload
+   *          the CBOR encoding of the DCC payload
    */
   public void setCbor(final String cbor) {
     this.cbor = cbor;
   }
 
   /**
-   * Sets the CBOR-encoding of the DGC payload.
+   * Sets the CBOR-encoding of the DCC payload.
    * 
    * @param cbor
-   *          the CBOR encoding of the DGC payload
+   *          the CBOR encoding of the DCC payload
    */
   @JsonIgnore
   public void setCbor(final byte[] cbor) {
@@ -177,7 +177,7 @@ public class TestStatement {
   }
 
   /**
-   * Gets the signed DGC represented as a Cose_Sign1 object (as a hex-encoded string).
+   * Gets the signed DCC represented as a Cose_Sign1 object (as a hex-encoded string).
    * 
    * @return the Cose_Sign1 object (in hex-encoding)
    */
@@ -186,7 +186,7 @@ public class TestStatement {
   }
 
   /**
-   * Gets the signed DGC represented as a Cose_Sign1 object.
+   * Gets the signed DCC represented as a Cose_Sign1 object.
    * 
    * @return the Cose_Sign1 object
    */
@@ -203,7 +203,7 @@ public class TestStatement {
   }
 
   /**
-   * Sets the signed DGC represented as a Cose_Sign1 object (as a hex-encoded string).
+   * Sets the signed DCC represented as a Cose_Sign1 object (as a hex-encoded string).
    * 
    * @param cose
    *          the Cose_Sign1 object (in hex-encoding)
@@ -213,7 +213,7 @@ public class TestStatement {
   }
 
   /**
-   * Sets the signed DGC represented as a Cose_Sign1 object.
+   * Sets the signed DCC represented as a Cose_Sign1 object.
    * 
    * @param cose
    *          the Cose_Sign1 object
@@ -387,7 +387,7 @@ public class TestStatement {
     @JsonProperty("VERSION")
     private int version;
 
-    /** The DGC schema version. */
+    /** The DCC schema version. */
     @JsonProperty("SCHEMA")
     private String schema;
 

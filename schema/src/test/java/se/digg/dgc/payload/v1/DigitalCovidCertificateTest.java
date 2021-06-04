@@ -10,7 +10,6 @@ import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Date;
 
-import org.apache.commons.codec.binary.Hex;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -18,13 +17,13 @@ import com.upokecenter.cbor.CBORObject;
 import com.upokecenter.cbor.CBORType;
 
 /**
- * Test cases for encoding/decoding of DigitalGreenCertificate.
+ * Test cases for encoding/decoding of DigitalCovidCertificate.
  * 
  * @author Martin Lindström (martin@idsec.se)
  * @author Henrik Bengtsson (extern.henrik.bengtsson@digg.se)
  * @author Henric Norlander (extern.henric.norlander@digg.se)
  */
-public class DigitalGreenCertificateTest {
+public class DigitalCovidCertificateTest {
 
   /**
    * Test CBOR encode/decode.
@@ -34,7 +33,7 @@ public class DigitalGreenCertificateTest {
    */
   @Test
   public void testEncodeDecode() throws Exception {
-    final DigitalGreenCertificate dgc = (DigitalGreenCertificate) new DigitalGreenCertificate()
+    final DigitalCovidCertificate dgc = (DigitalCovidCertificate) new DigitalCovidCertificate()
       .withNam(new PersonName().withGn("Martin").withFn("Lindström"))
       .withDob("1969-11-11")
       .withV(Arrays.asList(new VaccinationEntry()
@@ -51,7 +50,7 @@ public class DigitalGreenCertificateTest {
 
     byte[] encoding = dgc.encode();
     
-    DigitalGreenCertificate dgc2 = DigitalGreenCertificate.decode(encoding);
+    DigitalCovidCertificate dgc2 = DigitalCovidCertificate.decode(encoding);
     
     Assert.assertEquals(dgc, dgc2);
   }
@@ -64,7 +63,7 @@ public class DigitalGreenCertificateTest {
    */
   @Test
   public void testJson() throws Exception {
-    final DigitalGreenCertificate dgc = (DigitalGreenCertificate) new DigitalGreenCertificate()
+    final DigitalCovidCertificate dgc = (DigitalCovidCertificate) new DigitalCovidCertificate()
       .withNam(new PersonName().withGn("Martin").withFn("Lindström"))
       .withDob("1969-11-11")
       .withV(Arrays.asList(new VaccinationEntry()
@@ -81,7 +80,7 @@ public class DigitalGreenCertificateTest {
 
     String json = dgc.toJSONString();
 
-    DigitalGreenCertificate dgc2 = DigitalGreenCertificate.fromJsonString(json);
+    DigitalCovidCertificate dgc2 = DigitalCovidCertificate.fromJsonString(json);
     
     Assert.assertEquals(dgc, dgc2);
   }
@@ -99,9 +98,9 @@ public class DigitalGreenCertificateTest {
     final String date = "1969-11-29";
 
     // Encode
-    final DigitalGreenCertificate dgc = new DigitalGreenCertificate();
+    final DigitalCovidCertificate dgc = new DigitalCovidCertificate();
     dgc.setDob(LocalDate.parse(date));
-    final byte[] cbor = DigitalGreenCertificate.getCBORMapper().writeValueAsBytes(dgc);
+    final byte[] cbor = DigitalCovidCertificate.getCBORMapper().writeValueAsBytes(dgc);
 
     // Assert using the detailed com.upokecenter.cbor library.
     //
@@ -111,7 +110,7 @@ public class DigitalGreenCertificateTest {
     Assert.assertEquals(date, dateObject.AsString());
 
     // Decode
-    final DigitalGreenCertificate dgc2 = DigitalGreenCertificate.getCBORMapper().readValue(cbor, DigitalGreenCertificate.class);
+    final DigitalCovidCertificate dgc2 = DigitalCovidCertificate.getCBORMapper().readValue(cbor, DigitalCovidCertificate.class);
     Assert.assertEquals(date, dgc2.getDob().toString());
   }
 
@@ -131,21 +130,19 @@ public class DigitalGreenCertificateTest {
     final String dateTime = "2021-04-14T14:17:50.525450Z";
 
     // Encode
-    final DigitalGreenCertificate dgc = new DigitalGreenCertificate(); 
+    final DigitalCovidCertificate dgc = new DigitalCovidCertificate();
+    dgc.setTagDateTimes(true); // This is the default
     final TestEntry tst = new TestEntry();
     tst.setCo("SE");
     tst.setSc(Instant.parse(dateTime));
     dgc.setT(Arrays.asList(tst));
-    final byte[] cbor = dgc.encode();
+    byte[] cbor = dgc.encode();
 
     // Assert using the detailed com.upokecenter.cbor library.
     //
-    final CBORObject object = CBORObject.DecodeFromBytes(cbor);
+    CBORObject object = CBORObject.DecodeFromBytes(cbor);
 
-    System.out.println(object.ToJSONString());
-    System.out.println(Hex.encodeHexString(object.EncodeToBytes()));
-
-    final CBORObject dateObject = object.get("t").get(0).get("sc");
+    CBORObject dateObject = object.get("t").get(0).get("sc");
     Assert.assertNotNull(dateObject);
 
     //
@@ -158,7 +155,31 @@ public class DigitalGreenCertificateTest {
     Assert.assertEquals(dateTime, dateObject.AsString());
 
     // Decode
-    final DigitalGreenCertificate dgc2 = DigitalGreenCertificate.decode(cbor);  
+    DigitalCovidCertificate dgc2 = DigitalCovidCertificate.decode(cbor);  
+    Assert.assertEquals(dateTime, dgc2.getT().get(0).getSc().toString());
+    
+    //
+    // Test "interop-mode".
+    //
+    dgc.setTagDateTimes(false);    
+    cbor = dgc.encode();
+
+    object = CBORObject.DecodeFromBytes(cbor);
+
+    dateObject = object.get("t").get(0).get("sc");
+    Assert.assertNotNull(dateObject);
+
+    //
+    // Assert that the tag is NOT there ...
+    //
+    Assert.assertFalse(dateObject.isTagged());
+    Assert.assertFalse(dateObject.HasMostOuterTag(0));
+    Assert.assertTrue(dateObject.getType() == CBORType.TextString);
+
+    Assert.assertEquals(dateTime, dateObject.AsString());
+
+    // Decode
+    dgc2 = DigitalCovidCertificate.decode(cbor);  
     Assert.assertEquals(dateTime, dgc2.getT().get(0).getSc().toString());
   }
   
@@ -176,7 +197,7 @@ public class DigitalGreenCertificateTest {
     byte[] cbor = tst.EncodeToBytes();
     
     // Make sure that our CBOR mapper can handle the offset time
-    TestEntry tst2 = DigitalGreenCertificate.getCBORMapper().readValue(cbor, TestEntry.class);
+    TestEntry tst2 = DigitalCovidCertificate.getCBORMapper().readValue(cbor, TestEntry.class);
     
     // Assert that that it is serialized with no offset
     Assert.assertTrue(tst2.getSc().toString().endsWith("Z"));
@@ -199,7 +220,7 @@ public class DigitalGreenCertificateTest {
     Assert.assertEquals(dateTime, dtrObject.AsString());
 
     // Decode using FasterXML
-    final TestEntry tst = DigitalGreenCertificate.getCBORMapper().readValue(object.EncodeToBytes(), TestEntry.class);
+    final TestEntry tst = DigitalCovidCertificate.getCBORMapper().readValue(object.EncodeToBytes(), TestEntry.class);
     Assert.assertEquals(dateTime, tst.getSc().toString());
   }
 
@@ -221,7 +242,7 @@ public class DigitalGreenCertificateTest {
     Assert.assertEquals(seconds, dtrObject2.AsInt32Value());
 
     // Decode using FasterXML
-    final TestEntry tst = DigitalGreenCertificate.getCBORMapper().readValue(object.EncodeToBytes(), TestEntry.class);
+    final TestEntry tst = DigitalCovidCertificate.getCBORMapper().readValue(object.EncodeToBytes(), TestEntry.class);
     Assert.assertEquals((long) seconds, tst.getSc().getEpochSecond());
   }
 

@@ -6,7 +6,7 @@
 package se.digg.dgc.payload.v1;
 
 /**
- * Exception for DGC schema errors, i.e., if a DGC encoding cannot be mapped into the Java classes for the DGC schema.
+ * Exception for DCC schema errors, i.e., if a DCC encoding cannot be mapped into the Java classes for the DCC schema.
  * 
  * @author Martin Lindström (martin@idsec.se)
  * @author Henrik Bengtsson (extern.henrik.bengtsson@digg.se)

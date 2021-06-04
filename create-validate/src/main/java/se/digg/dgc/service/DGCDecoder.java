@@ -10,10 +10,10 @@ import java.security.SignatureException;
 import java.security.cert.CertificateExpiredException;
 
 import se.digg.dgc.payload.v1.DGCSchemaException;
-import se.digg.dgc.payload.v1.DigitalGreenCertificate;
+import se.digg.dgc.payload.v1.DigitalCovidCertificate;
 
 /**
- * Service for decoding a Digital Green Certificate from its image representation into the actual DGC payload.
+ * Service for decoding a Digital Covid Certificate from its image representation into the actual DCC payload.
  * 
  * @author Martin Lindström (martin@idsec.se)
  * @author Henrik Bengtsson (extern.henrik.bengtsson@digg.se)
@@ -22,34 +22,34 @@ import se.digg.dgc.payload.v1.DigitalGreenCertificate;
 public interface DGCDecoder {
   
   /**
-   * Given the base45-encoding of a signed DGC the method verifies and decodes it into the DGC payload representation. 
+   * Given the base45-encoding of a signed DCC the method verifies and decodes it into the DCC payload representation. 
    * 
    * @param base45
-   *          the base45-encoding of the signed DGC (including the HCERT header)
-   * @return the DGC payload
+   *          the base45-encoding of the signed DCC (including the HCERT header)
+   * @return the DCC payload
    * @throws DGCSchemaException
-   *           for DGC schema errors
+   *           for DCC schema errors
    * @throws SignatureException
    *           for signature verification errors
    * @throws CertificateExpiredException
-   *           if the DGC has expired
+   *           if the DCC has expired
    * @throws IOException
    *           for errors decoding data, for example CBOR related errors
    * @see #decodeBarcodeToBytes(byte[])
    */
-  DigitalGreenCertificate decode(final String base45)
+  DigitalCovidCertificate decode(final String base45)
       throws DGCSchemaException, SignatureException, CertificateExpiredException, IOException;
 
   /**
-   * Given the base45-encoding of a signed DGC the method verifies and decodes it into the CBOR encoding of the DGC payload.
+   * Given the base45-encoding of a signed DCC the method verifies and decodes it into the CBOR encoding of the DCC payload.
    * 
    * @param base45
-   *          the base45-encoding of the signed DGC (including the HCERT header)
-   * @return the CBOR encoding of the DGC payload
+   *          the base45-encoding of the signed DCC (including the HCERT header)
+   * @return the CBOR encoding of the DCC payload
    * @throws SignatureException
    *           for signature verification errors
    * @throws CertificateExpiredException
-   *           if the DGC has expired
+   *           if the DCC has expired
    * @throws IOException
    *           for errors decoding data, for example CBOR related errors
    * @see #decodeBarcode(byte[])
@@ -57,34 +57,34 @@ public interface DGCDecoder {
   byte[] decodeToBytes(final String base45) throws SignatureException, CertificateExpiredException, IOException;
 
   /**
-   * Verifies a "raw" DGC (i.e., a signed CWT holding the DGC payload) and decodes it to the actual DGC payload.
+   * Verifies a "raw" DCC (i.e., a signed CWT holding the DCC payload) and decodes it to the actual DCC payload.
    * 
    * @param cwt
-   *          the signed CWT holding the DGC
-   * @return the DGC payload
+   *          the signed CWT holding the DCC
+   * @return the DCC payload
    * @throws DGCSchemaException
-   *           for DGC schema errors
+   *           for DCC schema errors
    * @throws SignatureException
    *           for signature verification errors
    * @throws CertificateExpiredException
-   *           if the DGC has expired
+   *           if the DCC has expired
    * @throws IOException
    *           for errors decoding data, for example CBOR related errors
    * @see #decodeRawToBytes(byte[])
    */
-  DigitalGreenCertificate decodeRaw(final byte[] cwt)
+  DigitalCovidCertificate decodeRaw(final byte[] cwt)
       throws DGCSchemaException, SignatureException, CertificateExpiredException, IOException;
 
   /**
-   * Verifies a "raw" DGC (i.e., a signed CWT holding the DGC payload) and returns the CBOR encoding of the DGC payload.
+   * Verifies a "raw" DCC (i.e., a signed CWT holding the DCC payload) and returns the CBOR encoding of the DCC payload.
    * 
    * @param cwt
-   *          the signed CWT holding the DGC
-   * @return the CBOR encoded DGC payload
+   *          the signed CWT holding the DCC
+   * @return the CBOR encoded DCC payload
    * @throws SignatureException
    *           for signature verification errors
    * @throws CertificateExpiredException
-   *           if the DGC has expired
+   *           if the DCC has expired
    * @throws IOException
    *           for errors decoding data, for example CBOR related errors
    * @see #decodeRaw(byte[])

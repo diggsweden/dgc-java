@@ -1,4 +1,4 @@
 /**
- * Contains top-level interfaces and classes for issuing and validating Digital Green Certificates.
+ * Contains top-level interfaces and classes for issuing and validating Digital Covid Certificates.
  */
 package se.digg.dgc.service;

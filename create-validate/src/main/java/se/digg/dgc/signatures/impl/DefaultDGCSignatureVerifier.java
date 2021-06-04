@@ -58,11 +58,11 @@ public class DefaultDGCSignatureVerifier implements DGCSignatureVerifier {
       final List<X509Certificate> certs = certificateProvider.getCertificates(country, kid);
 
       for (final X509Certificate cert : certs) {
-        log.trace("Attempting DGC signature verification using certificate '{}'", cert.getSubjectX500Principal().getName());
+        log.trace("Attempting DCC signature verification using certificate '{}'", cert.getSubjectX500Principal().getName());
 
         try {
           coseObject.verifySignature(cert.getPublicKey());
-          log.debug("DGC signature verification succeeded using certificate '{}'", cert.getSubjectX500Principal().getName());
+          log.debug("DCC signature verification succeeded using certificate '{}'", cert.getSubjectX500Principal().getName());
 
           // OK, before we are done - let's ensure that the HCERT hasn't expired.
           final Cwt cwt = coseObject.getCwt();
@@ -70,7 +70,7 @@ public class DefaultDGCSignatureVerifier implements DGCSignatureVerifier {
           final Instant expiration = cwt.getExpiration();
           if (expiration != null) {
             if (this.getNow().isAfter(expiration)) {
-              throw new CertificateExpiredException("Signed DGC has expired");
+              throw new CertificateExpiredException("Signed DCC has expired");
             }
           }
           else {
@@ -79,7 +79,7 @@ public class DefaultDGCSignatureVerifier implements DGCSignatureVerifier {
 
           final byte[] dgcPayload = cwt.getDgcV1();
           if (dgcPayload == null) {
-            throw new SignatureException("No DGC payload available in CWT");
+            throw new SignatureException("No DCC payload available in CWT");
           }
 
           return new DGCSignatureVerifier.Result(dgcPayload, cert, kid, country, cwt.getIssuedAt(), cwt.getExpiration());

@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 import org.junit.Assert;
 import org.junit.Test;
 
-import se.digg.dgc.payload.v1.Eudgc;
+import se.digg.dgc.payload.v1.Eudcc;
 import se.digg.dgc.payload.v1.RecoveryEntry;
 import se.digg.dgc.payload.v1.TestEntry;
 import se.digg.dgc.payload.v1.VaccinationEntry;
@@ -45,7 +45,7 @@ public class DefaultValueSetValidatorTest {
     Assert.assertTrue(res.isSuccess());
     Assert.assertEquals(4, res.getChildren().size());
     
-    Eudgc dgc = new Eudgc();
+    Eudcc dgc = new Eudcc();
     dgc.setV(Arrays.asList(e));
     res = v.validate(dgc);
 
@@ -76,7 +76,7 @@ public class DefaultValueSetValidatorTest {
     Assert.assertTrue(res.getChildren().get(2).isSuccess());
     Assert.assertTrue(res.getChildren().get(3).isSuccess());
     
-    Eudgc dgc = new Eudgc();
+    Eudcc dgc = new Eudcc();
     dgc.setV(Arrays.asList(e));
     res = v.validate(dgc);
 
@@ -124,7 +124,7 @@ public class DefaultValueSetValidatorTest {
         .withMp("EU/1/20/1507")
         .withMa(erroneousManufacturer);
 
-    final Eudgc eudgc = new Eudgc();
+    final Eudcc eudgc = new Eudcc();
     eudgc.setV(Arrays.asList(e1, e2));
 
     ValueSetValidationResult res = v.validate(eudgc);
@@ -159,7 +159,7 @@ public class DefaultValueSetValidatorTest {
     Assert.assertTrue(res.isSuccess());
     Assert.assertEquals(4, res.getChildren().size());
     
-    Eudgc dgc = new Eudgc();
+    Eudcc dgc = new Eudcc();
     dgc.setT(Arrays.asList(e));
     res = v.validate(dgc);
 
@@ -180,7 +180,7 @@ public class DefaultValueSetValidatorTest {
     Assert.assertTrue(res.isSuccess());
     Assert.assertEquals(1, res.getChildren().size());
     
-    Eudgc dgc = new Eudgc();
+    Eudcc dgc = new Eudcc();
     dgc.setR(Arrays.asList(e));
     res = v.validate(dgc);
 

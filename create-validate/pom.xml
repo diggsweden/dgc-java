@@ -6,13 +6,13 @@
   <parent>
     <groupId>se.digg.dgc</groupId>
     <artifactId>dgc-parent</artifactId>
-    <version>0.9.8-SNAPSHOT</version>
+    <version>1.0.0-SNAPSHOT</version>
   </parent>  
 
   <artifactId>dgc-create-validate</artifactId>
 
-  <name>DIGG :: Digital Green Certificate :: Issuance and Validation</name>
-  <description>Issuance and validation of Digital Green Certificate</description>
+  <name>DIGG :: EU Digital Covid Certificate :: Issuance and Validation</name>
+  <description>Issuance and validation of EU Digital Covid Certificates</description>
   <url>https://github.com/diggsweden/dgc-java</url>
   
   <licenses>
@@ -252,8 +252,8 @@
               </execution>
             </executions>
             <configuration>
-              <doctitle>Digital Green Certificate - Issuance and Validation - ${project.version}</doctitle>
-              <windowtitle>Digital Green Certificate - Issuance and Validation - ${project.version}</windowtitle>
+              <doctitle>EU Digital Covid Certificate - Issuance and Validation - ${project.version}</doctitle>
+              <windowtitle>EU Digital Covid Certificate - Issuance and Validation - ${project.version}</windowtitle>
               <detectJavaApiLink>true</detectJavaApiLink>
               <additionalparam>-Xdoclint:all -Xdoclint:-missing</additionalparam>
               <additionalOptions>-Xdoclint:all -Xdoclint:-missing</additionalOptions>
