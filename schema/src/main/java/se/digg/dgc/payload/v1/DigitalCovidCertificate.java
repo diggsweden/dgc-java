@@ -11,6 +11,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.TemporalAccessor;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -24,6 +25,7 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.dataformat.cbor.databind.CBORMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.datatype.jsr310.deser.InstantDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.InstantSerializer;
 import com.upokecenter.cbor.CBORObject;
 
 import se.digg.dgc.transliteration.MrzEncoder;
@@ -65,6 +67,7 @@ public class DigitalCovidCertificate extends Eudcc {
   static {
     SimpleModule timeModule = new JavaTimeModule();
     timeModule.addDeserializer(Instant.class, CustomInstantDeserializer.INSTANT);
+    timeModule.addSerializer(Instant.class, CustomInstantSerializer.INSTANCE);
 
     cborMapper.registerModule(timeModule);
     cborMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
@@ -206,12 +209,12 @@ public class DigitalCovidCertificate extends Eudcc {
    *           for encoding errors
    */
   public byte[] encode() throws DGCSchemaException {
-    try {      
+    try {
       final byte[] encoding = cborMapper.writeValueAsBytes(this);
 
       if (this.tagDateTimes) {
         final boolean containsTestEntries = this.getT() != null && this.getT().size() > 0;
-        
+
         // If this object contains test entries we use CBORObject to make sure that
         // all Instant's are encoded as tagged strings. FasterXML won't include the tag.
         //
@@ -356,6 +359,22 @@ public class DigitalCovidCertificate extends Eudcc {
 
       super(supportedType, formatter, parsedToValue, fromMilliseconds, fromNanoseconds, adjust, replaceZeroOffsetAsZ);
     }
+  }
+
+  /**
+   * Serializer that will output no fractions of seconds.
+   */
+  private static class CustomInstantSerializer extends InstantSerializer {
+    
+    private static final long serialVersionUID = 4972433067449374883L;
+    
+    public static final CustomInstantSerializer INSTANCE = new CustomInstantSerializer();
+
+    protected CustomInstantSerializer() {
+      super(InstantSerializer.INSTANCE, false, false, 
+        new DateTimeFormatterBuilder().appendInstant(0).toFormatter());
+    }
+
   }
 
 }
