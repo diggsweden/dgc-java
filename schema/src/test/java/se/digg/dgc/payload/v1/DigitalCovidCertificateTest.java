@@ -127,8 +127,8 @@ public class DigitalCovidCertificateTest {
   @Test
   public void testDateTime() throws Exception {
 
-    final String dateTime = "2021-04-14T14:17:50.525450Z";
-    final String expectedDateTime = "2021-04-14T14:17:50Z";
+    final String dateTime = "2021-04-14T14:17:50.525450002Z";
+    final String expectedDateTime = "2021-04-14T14:17:50.525450Z";
 
     // Encode
     final DigitalCovidCertificate dgc = new DigitalCovidCertificate();

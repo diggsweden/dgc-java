@@ -372,7 +372,7 @@ public class DigitalCovidCertificate extends Eudcc {
 
     protected CustomInstantSerializer() {
       super(InstantSerializer.INSTANCE, false, false, 
-        new DateTimeFormatterBuilder().appendInstant(0).toFormatter());
+        new DateTimeFormatterBuilder().appendInstant(6).toFormatter());
     }
 
   }
