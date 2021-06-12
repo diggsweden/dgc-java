@@ -13,7 +13,7 @@ import java.time.format.DateTimeParseException;
 import java.util.Optional;
 
 /**
- * A representation of a date of birth according to the schema (where YYYY-MM-DD, YYYY-MM and YYYY) is allowed.
+ * A representation of a date of birth according to the schema (where "YYYY-MM-DD", "YYYY-MM", "YYYY" and "") is allowed.
  *
  * @author Martin Lindström (martin@idsec.se)
  * @author Henrik Bengtsson (extern.henrik.bengtsson@digg.se)
@@ -24,7 +24,7 @@ public class DateOfBirth {
   /** A LocalDate is used for all cases where a complete date is used. */
   private LocalDate dob;
 
-  /** If this object doesn't hold a complete date, this field holds the year. */
+  /** If this object doesn't hold a complete date, this field holds the year (if available). */
   private Year year;
 
   /** If this object doesn't hold a complete date, this field holds the month (if available). */
@@ -39,6 +39,11 @@ public class DateOfBirth {
    *           for parse errors
    */
   public DateOfBirth(final String dob) throws DateTimeException {
+    
+    if (dob.trim().isEmpty()) {
+      // The silly case where date-of-birth is unknown ...
+      return;
+    }
 
     try {
       this.dob = LocalDate.parse(dob);
@@ -102,7 +107,7 @@ public class DateOfBirth {
   /**
    * Gets the year.
    *
-   * @return the year
+   * @return the year, or null if this is not available
    */
   public Year getYear() {
     return this.dob != null ? Year.from(this.dob) : this.year;
@@ -150,7 +155,7 @@ public class DateOfBirth {
   }
 
   /**
-   * Returns the date representation (YYYY-MM-DD, YYYY-MM or YYYY).
+   * Returns the date representation (YYYY-MM-DD, YYYY-MM, YYYY or unknown).
    */
   @Override
   public String toString() {
@@ -159,9 +164,12 @@ public class DateOfBirth {
     }
     else if (this.year != null && this.month != null) {
       return String.format("%04d-%02d", this.year.getValue(), this.month.getValue());
+    }    
+    else if (this.year != null) {
+      return String.format("%04d", this.year.getValue());
     }
     else {
-      return String.format("%04d", this.year.getValue());
+      return "unknown";
     }
   }
 

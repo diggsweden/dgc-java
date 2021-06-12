@@ -89,4 +89,14 @@ public class DateOfBirthTest {
     new DateOfBirth("1967-13");
   }
   
+  public void testUnknownDob() {
+    final DateOfBirth dob = new DateOfBirth("");
+    Assert.assertFalse(dob.isCompleteDate());
+    Assert.assertNull(dob.getYear());
+    Assert.assertNull(dob.getMonth());
+    Assert.assertNull(dob.getDayOfMonth());
+    Assert.assertNull(dob.asLocalDate());
+    Assert.assertEquals("unknown", dob.toString());
+  }
+  
 }

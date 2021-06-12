@@ -49,12 +49,12 @@ public class DigitalCovidCertificateTest {
         .withCi("01:SE:JKJKHJGHG6768686HGJGH#M")));
 
     byte[] encoding = dgc.encode();
-    
+
     DigitalCovidCertificate dgc2 = DigitalCovidCertificate.decode(encoding);
-    
+
     Assert.assertEquals(dgc, dgc2);
   }
-  
+
   /**
    * Test JSON representation.
    * 
@@ -81,7 +81,7 @@ public class DigitalCovidCertificateTest {
     String json = dgc.toJSONString();
 
     DigitalCovidCertificate dgc2 = DigitalCovidCertificate.fromJsonString(json);
-    
+
     Assert.assertEquals(dgc, dgc2);
   }
 
@@ -128,6 +128,7 @@ public class DigitalCovidCertificateTest {
   public void testDateTime() throws Exception {
 
     final String dateTime = "2021-04-14T14:17:50.525450Z";
+    final String expectedDateTime = "2021-04-14T14:17:50Z";
 
     // Encode
     final DigitalCovidCertificate dgc = new DigitalCovidCertificate();
@@ -152,16 +153,16 @@ public class DigitalCovidCertificateTest {
     Assert.assertTrue(dateObject.HasMostOuterTag(0));
     Assert.assertTrue(dateObject.getType() == CBORType.TextString);
 
-    Assert.assertEquals(dateTime, dateObject.AsString());
+    Assert.assertEquals(expectedDateTime, dateObject.AsString());
 
     // Decode
-    DigitalCovidCertificate dgc2 = DigitalCovidCertificate.decode(cbor);  
-    Assert.assertEquals(dateTime, dgc2.getT().get(0).getSc().toString());
-    
+    DigitalCovidCertificate dgc2 = DigitalCovidCertificate.decode(cbor);
+    Assert.assertEquals(expectedDateTime, dgc2.getT().get(0).getSc().toString());
+
     //
     // Test "interop-mode".
     //
-    dgc.setTagDateTimes(false);    
+    dgc.setTagDateTimes(false);
     cbor = dgc.encode();
 
     object = CBORObject.DecodeFromBytes(cbor);
@@ -176,13 +177,13 @@ public class DigitalCovidCertificateTest {
     Assert.assertFalse(dateObject.HasMostOuterTag(0));
     Assert.assertTrue(dateObject.getType() == CBORType.TextString);
 
-    Assert.assertEquals(dateTime, dateObject.AsString());
+    Assert.assertEquals(expectedDateTime, dateObject.AsString());
 
     // Decode
-    dgc2 = DigitalCovidCertificate.decode(cbor);  
-    Assert.assertEquals(dateTime, dgc2.getT().get(0).getSc().toString());
+    dgc2 = DigitalCovidCertificate.decode(cbor);
+    Assert.assertEquals(expectedDateTime, dgc2.getT().get(0).getSc().toString());
   }
-  
+
   @Test
   public void testDateTimeIsoOffset() throws Exception {
 
@@ -193,19 +194,19 @@ public class DigitalCovidCertificateTest {
     tst.set("co", CBORObject.FromObject("SE"));
     CBORObject dateObject = CBORObject.FromObject(dateTime);
     tst.set("sc", CBORObject.FromObjectAndTag(dateObject, 0));
-    
+
     byte[] cbor = tst.EncodeToBytes();
-    
+
     // Make sure that our CBOR mapper can handle the offset time
     TestEntry tst2 = DigitalCovidCertificate.getCBORMapper().readValue(cbor, TestEntry.class);
-    
+
     // Assert that that it is serialized with no offset
     Assert.assertTrue(tst2.getSc().toString().endsWith("Z"));
   }
 
   @Test
   public void testDecodeDateTimeWithTag0() throws Exception {
-    final String dateTime = "2021-04-14T14:17:50.525Z";
+    final String dateTime = "2021-04-14T14:17:50Z";
     final Date date = Date.from(Instant.parse(dateTime));
 
     CBORObject object = CBORObject.NewMap();

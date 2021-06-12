@@ -9,10 +9,6 @@ import java.text.Normalizer;
 import java.util.HashMap;
 import java.util.Map;
 
-/*
-From https://github.com/ZsBT/mrz-java/blob/master/src/main/java/com/innovatrics/mrz/MrzParser.java
- */
-
 /**
  * MRZ name encoder according to ICAO format.
  * <p>
@@ -26,6 +22,9 @@ From https://github.com/ZsBT/mrz-java/blob/master/src/main/java/com/innovatrics/
  */
 public class MrzEncoder {
 
+  /** Length restriction. */
+  public static final int LENGTH_RESTRICTION = 80;
+
   /** Character mappings */
   public static final Map<Character, String> CHAR_MAPPINGS = new HashMap<>();
 
@@ -35,16 +34,19 @@ public class MrzEncoder {
     CHAR_MAPPINGS.put('\u00E4', "AE"); // ä
     CHAR_MAPPINGS.put('\u00C4', "AE"); // Ä
     CHAR_MAPPINGS.put('\u00C6', "AE"); // Æ
-    CHAR_MAPPINGS.put('\u00E6', "AE"); // æ    
+    CHAR_MAPPINGS.put('\u00E6', "AE"); // æ
     CHAR_MAPPINGS.put('\u00F6', "OE"); // ö
     CHAR_MAPPINGS.put('\u00D6', "OE"); // Ö
     CHAR_MAPPINGS.put('\u00F8', "OE"); // ø
-    CHAR_MAPPINGS.put('\u00D8', "OE"); // Ø    
+    CHAR_MAPPINGS.put('\u00D8', "OE"); // Ø
     CHAR_MAPPINGS.put('\u0132', "IJ"); // Ĳ
     CHAR_MAPPINGS.put('\u0133', "IJ"); // ĳ
     CHAR_MAPPINGS.put('\u00DC', "UE"); // Ü
     CHAR_MAPPINGS.put('\u00FC', "UE"); // ü
     CHAR_MAPPINGS.put('\u00DF', "SS"); // ß
+    CHAR_MAPPINGS.put('\u0153', "OE"); // œ
+    CHAR_MAPPINGS.put('\u0152', "OE"); // Œ
+    CHAR_MAPPINGS.put('\u00D0', "D");  // Ð
   }
 
   /**
@@ -55,12 +57,13 @@ public class MrzEncoder {
    * </p>
    * 
    * @param input
-   * @return
+   *          the name to encode
+   * @return the MRZ encoded string
    */
   public static String encode(final String input) {
-    
-    final StringBuilder sb = new StringBuilder();
-    
+
+    final StringBuffer sb = new StringBuffer();
+
     for (int i = 0; i < input.trim().length(); i++) {
       final char c = input.charAt(i);
       final String mapping = CHAR_MAPPINGS.get(c);
@@ -78,11 +81,26 @@ public class MrzEncoder {
       }
     }
     // Remove all accents and replace all invalid characters with <
-    return Normalizer
-        .normalize(sb.toString(), Normalizer.Form.NFD)
-        .replaceAll("[^\\p{ASCII}]", "")
-        .toUpperCase()
-        .replaceAll("[^<A-Z0-9]", "<");
+    String mrz = Normalizer
+      .normalize(sb.toString(), Normalizer.Form.NFD)
+      .replaceAll("[^\\p{ASCII}]", "")
+      .toUpperCase()
+      .replaceAll("[^<A-Z0-9]", "<");
+
+    // Possible truncate ...
+    // https://www.icao.int/publications/Documents/9303_p4_cons_en.pdf
+    //
+    if (mrz.length() > LENGTH_RESTRICTION) {
+      mrz = mrz.substring(0, LENGTH_RESTRICTION);
+      if (mrz.endsWith("<")) {
+        // OK, now it gets tricky. We can't end with a delimitter, and the rules
+        // are rather complex. Let's just remove the `<`. It's not entirely correct,
+        // but ...
+        mrz = mrz.substring(0, LENGTH_RESTRICTION - 1);
+      }
+    }
+
+    return mrz;
   }
 
 }
