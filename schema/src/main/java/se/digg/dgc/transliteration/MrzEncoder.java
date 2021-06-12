@@ -94,7 +94,7 @@ public class MrzEncoder {
       mrz = mrz.substring(0, LENGTH_RESTRICTION);
       if (mrz.endsWith("<")) {
         // OK, now it gets tricky. We can't end with a delimitter, and the rules
-        // are rather complex. Let's just remove the `<`. It's not entirely correct,
+        // are rather complex. Let's just remove the `<`. It's not entirely correct, 
         // but ...
         mrz = mrz.substring(0, LENGTH_RESTRICTION - 1);
       }

@@ -11,14 +11,14 @@
   <name>DIGG :: EU Digital Covid Certificate :: DCC Java</name>
   <description>Schema representation, issuance and validation of EU Digital Covid Certificates</description>
   <url>https://github.com/diggsweden/dgc-java</url>
-
+  
   <licenses>
     <license>
       <name>MIT License</name>
       <url>http://www.opensource.org/licenses/mit-license.php</url>
       <distribution>repo</distribution>
     </license>
-  </licenses>
+  </licenses>  
 
   <scm>
     <connection>scm:https://github.com/diggsweden/dgc-java.git</connection>
@@ -40,65 +40,66 @@
       <email>extern.henric.norlander@digg.se</email>
     </developer>
   </developers>
-
+  
   <distributionManagement>
     <repository>
       <id>ossrh</id>
       <url>https://s01.oss.sonatype.org/content/groups/staging/</url>
     </repository>
-  </distributionManagement>
+  </distributionManagement>  
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>        
+    
     <!-- Versions on dependencies -->
     <jackson.version>2.11.4</jackson.version>
     <slf4j.version>1.7.30</slf4j.version>
     <junit.version>4.13.1</junit.version>
   </properties>
-
+  
   <dependencyManagement>
-
+  
     <dependencies>
-
+  
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-api</artifactId>
         <version>${slf4j.version}</version>
       </dependency>
-
+      
       <dependency>
         <groupId>javax.validation</groupId>
         <artifactId>validation-api</artifactId>
         <version>2.0.1.Final</version>
       </dependency>
-
+      
       <!-- Jackson -->
       <dependency>
         <groupId>com.fasterxml.jackson.core</groupId>
         <artifactId>jackson-databind</artifactId>
         <version>${jackson.version}</version>
       </dependency>
-
+  
       <dependency>
         <groupId>com.fasterxml.jackson.dataformat</groupId>
         <artifactId>jackson-dataformat-cbor</artifactId>
         <version>${jackson.version}</version>
       </dependency>
-
+      
       <dependency>
         <groupId>com.fasterxml.jackson.datatype</groupId>
         <artifactId>jackson-datatype-jsr310</artifactId>
         <version>${jackson.version}</version>
       </dependency>
-
+      
       <!-- CBOR and COSE -->
       <dependency>
         <groupId>com.upokecenter</groupId>
         <artifactId>cbor</artifactId>
         <version>4.4.1</version>
       </dependency>
-
+      
       <!-- Test -->
       <dependency>
         <groupId>junit</groupId>
@@ -106,20 +107,20 @@
         <version>${junit.version}</version>
         <scope>test</scope>
       </dependency>
-
+              
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-nop</artifactId>
         <version>${slf4j.version}</version>
         <scope>test</scope>
       </dependency>
-
+  
     </dependencies>
-
+  
   </dependencyManagement>
 
   <dependencies>
-
+  
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
@@ -130,7 +131,7 @@
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
     </dependency>
-
+        
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-nop</artifactId>
@@ -147,7 +148,7 @@
   </dependencies>
 
   <build>
-
+  
     <plugins>
 
       <plugin>
@@ -195,11 +196,11 @@
           </execution>
         </executions>
       </plugin>
-
+      
     </plugins>
 
   </build>
-
+  
   <profiles>
   
     <profile>
@@ -243,10 +244,10 @@
               <serverId>ossrh</serverId>
               <nexusUrl>https://s01.oss.sonatype.org/</nexusUrl>
               <autoReleaseAfterClose>false</autoReleaseAfterClose>
-              <!--
-                Allows manual inspection of the staging repo before deploying it to the central repo.
-                Use 'mvn nexus-staging:release -Prelease' to release and
-                'mvn nexus-staging:drop' to abort.
+              <!-- 
+                Allows manual inspection of the staging repo before deploying it to the central repo. 
+                Use 'mvn nexus-staging:release -Prelease' to release and 
+                'mvn nexus-staging:drop' to abort. 
               -->
             </configuration>
           </plugin>
@@ -315,7 +316,7 @@
     </profile>
 
   </profiles>
-
+  
   <modules>
     <module>schema</module>
     <module>create-validate</module>
