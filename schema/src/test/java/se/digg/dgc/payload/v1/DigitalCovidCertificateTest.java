@@ -154,6 +154,19 @@ public class DigitalCovidCertificateTest {
     Assert.assertTrue(dateObject.getType() == CBORType.TextString);
 
     Assert.assertEquals(expectedDateTime, dateObject.AsString());
+    
+    // Use the CBOR lib and encode the object and make sure that the date-time is still ok
+    {
+      byte[] objectBytes = object.EncodeToBytes();
+      CBORObject object2 = CBORObject.DecodeFromBytes(objectBytes);
+      
+      CBORObject dateObject2 = object2.get("t").get(0).get("sc");
+      Assert.assertTrue(dateObject2.isTagged());
+      Assert.assertTrue(dateObject2.HasMostOuterTag(0));
+      Assert.assertTrue(dateObject2.getType() == CBORType.TextString);
+
+      Assert.assertEquals(expectedDateTime, dateObject2.AsString());
+    }
 
     // Decode
     DigitalCovidCertificate dgc2 = DigitalCovidCertificate.decode(cbor);
