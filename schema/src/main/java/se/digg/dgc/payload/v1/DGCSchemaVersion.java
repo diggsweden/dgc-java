@@ -17,7 +17,7 @@ public class DGCSchemaVersion {
   /**
    * The version of the schema that we used to generate the {@link DigitalCovidCertificate} class.
    */
-  public static final String DGC_SCHEMA_VERSION = "1.2.0";
+  public static final String DGC_SCHEMA_VERSION = "1.3.0";
 
   private DGCSchemaVersion() {
   }

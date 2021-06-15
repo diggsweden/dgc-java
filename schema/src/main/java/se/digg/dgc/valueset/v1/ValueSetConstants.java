@@ -41,6 +41,9 @@ public class ValueSetConstants {
 
   /** ID for "Vaccine Prophylaxis" value set. */
   public static final String VACCINE_PROPHYLAXIS = "sct-vaccines-covid-19";
+  
+  /** ID for the country code value set. */
+  public static final String COUNTRY_CODES = "country-2-codes";
 
   /**
    * Gets a static representation of the <b>disease-agent-targeted</b> value set.
@@ -96,7 +99,6 @@ public class ValueSetConstants {
     return createValueSet("/v1-valuesets/vaccine-medicinal-product.json");
   }
 
-  //
   /**
    * Gets a static representation of the <b>sct-vaccines-covid-19</b> value set.
    * 
@@ -104,6 +106,15 @@ public class ValueSetConstants {
    */
   public static ValueSet vaccineProphylaxis() {
     return createValueSet("/v1-valuesets/vaccine-prophylaxis.json");
+  }
+  
+  /**
+   * Gets a static representation of the <b>country-2-codes</b> value set.
+   * 
+   * @return country-2-codes
+   */
+  public static ValueSet countryCodes() {
+    return createValueSet("/v1-valuesets/country-2-codes.json");
   }
 
   // Hidden constructor
