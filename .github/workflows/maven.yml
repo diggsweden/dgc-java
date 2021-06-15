@@ -21,5 +21,7 @@ jobs:
       with:
         java-version: '11'
         distribution: 'adopt'
-    - name: Build with Maven
+    - name: Build with Maven for Java 11
       run: mvn -B package --file pom.xml
+    - name: Build with Maven for Java 8
+      run: mvn -B package -P!default,j8-build --file pom.xml
