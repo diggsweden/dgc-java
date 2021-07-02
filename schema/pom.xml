@@ -6,7 +6,7 @@
   <parent>
     <groupId>se.digg.dgc</groupId>
     <artifactId>dgc-parent</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.2-SNAPSHOT</version>
   </parent>  
 
   <artifactId>dgc-schema</artifactId>

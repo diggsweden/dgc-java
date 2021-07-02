@@ -67,7 +67,6 @@ public class Barcode {
     this.width = width;
     this.height = height;
     this.payload = Optional.ofNullable(payload).orElseThrow(() -> new IllegalArgumentException("payload must not be null"));
-
     if (this.width <= 0) {
       throw new IllegalArgumentException("width must be a positive integer");
     }

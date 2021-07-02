@@ -87,8 +87,8 @@ public class DefaultBarcodeCreator implements BarcodeCreator {
       try (final ByteArrayOutputStream stream = new ByteArrayOutputStream()) {
         MatrixToImageWriter.writeToStream(bitMatrix, imageFormat.getName(), stream);
         byte[] bytes = stream.toByteArray();
-        return new Barcode(this.type, bytes, this.imageFormat, this.toSvgImage(bitMatrix), this.widthAndHeight, this.widthAndHeight,
-          contents);
+        return new Barcode(this.type, bytes, this.imageFormat, this.toSvgImage(bitMatrix), 
+          bitMatrix.getWidth(), bitMatrix.getHeight(), contents);
       }
       catch (final IOException e) {
         throw new BarcodeException("Failed to create barcode - " + e.getMessage(), e);
@@ -184,13 +184,16 @@ public class DefaultBarcodeCreator implements BarcodeCreator {
    * <p>
    * {@value #DEFAULT_WIDTH_AND_HEIGHT} is the default.
    * </p>
+   * <p>
+   * If 0 is supplied the smallest possible size will be choosen for the generated code.
+   * </p>
    * 
    * @param widthAndHeight
    *          the width/height
    */
   public void setWidthAndHeight(final int widthAndHeight) {
-    if (widthAndHeight <= 0) {
-      throw new IllegalArgumentException("widthAndHeight must be greater than 0");
+    if (widthAndHeight < 0) {
+      throw new IllegalArgumentException("widthAndHeight must not be less than 0");
     }
     this.widthAndHeight = widthAndHeight;
   }
