@@ -115,7 +115,9 @@ public class DefaultBarcodeCreator implements BarcodeCreator {
       .append(width)
       .append(" ")
       .append(height)
-      .append("\">")
+      .append("\"")
+      .append(" shape-rendering=\"crispEdges\"")
+      .append(">")
       .append(System.lineSeparator());
 
     BitArray row = new BitArray(width);
