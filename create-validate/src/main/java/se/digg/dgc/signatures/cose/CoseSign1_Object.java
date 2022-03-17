@@ -320,6 +320,29 @@ public class CoseSign1_Object {
   }
 
   /**
+   * A utility method that gets a copy of the signature
+   *
+   * @return a Signature copy or null if no signature is available
+   */
+  public byte[] getSignature() {
+    return this.signature != null ? this.signature.clone() : null;
+  }
+
+  /**
+   * A utility method that gets the signature algorithm
+   *
+   * @return the SignatureAlgorithm or null if no signature algorithm is available
+   */
+  public SignatureAlgorithm getSignatureAlgorithm() {
+    final CBORObject registeredAlgorithm =
+        this.protectedAttributes.get(HeaderParameterKey.ALG.getCborObject());
+    if (registeredAlgorithm == null) {
+      return null;
+    }
+    return SignatureAlgorithm.fromCborObject(registeredAlgorithm);
+  }
+
+  /**
    * Verifies the signature of the COSE_Sign1 object.
    * <p>
    * Note: This method only verifies the signature. Not the payload.
@@ -350,11 +373,10 @@ public class CoseSign1_Object {
 
     // First find out which algorithm to use by searching for the algorithm ID in the protected attributes.
     //
-    final CBORObject registeredAlgorithm = this.protectedAttributes.get(HeaderParameterKey.ALG.getCborObject());
-    if (registeredAlgorithm == null) {
+    final SignatureAlgorithm algorithm = getSignatureAlgorithm();
+    if(algorithm == null) {
       throw new SignatureException("No algorithm ID stored in protected attributes - cannot sign");
     }
-    final SignatureAlgorithm algorithm = SignatureAlgorithm.fromCborObject(registeredAlgorithm);
 
     byte[] signatureToVerify = this.signature;
 
