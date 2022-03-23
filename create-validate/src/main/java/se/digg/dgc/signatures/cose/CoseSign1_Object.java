@@ -373,8 +373,8 @@ public class CoseSign1_Object {
 
     // First find out which algorithm to use by searching for the algorithm ID in the protected attributes.
     //
-    final SignatureAlgorithm algorithm = getSignatureAlgorithm();
-    if(algorithm == null) {
+    final SignatureAlgorithm algorithm = this.getSignatureAlgorithm();
+    if (algorithm == null) {
       throw new SignatureException("No algorithm ID stored in protected attributes - cannot sign");
     }
 
