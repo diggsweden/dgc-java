@@ -5,7 +5,7 @@
 
   <groupId>se.digg.dgc</groupId>
   <artifactId>dgc-parent</artifactId>
-  <version>1.0.2-SNAPSHOT</version>
+  <version>1.0.2</version>
   <packaging>pom</packaging>
 
   <name>DIGG :: EU Digital Covid Certificate :: DCC Java</name>
@@ -53,7 +53,7 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>        
     
     <!-- Versions on dependencies -->
-    <jackson.version>2.11.4</jackson.version>
+    <jackson.version>2.13.2</jackson.version>
     <slf4j.version>1.7.30</slf4j.version>
     <junit.version>4.13.1</junit.version>
   </properties>
@@ -78,7 +78,7 @@
       <dependency>
         <groupId>com.fasterxml.jackson.core</groupId>
         <artifactId>jackson-databind</artifactId>
-        <version>${jackson.version}</version>
+        <version>2.13.2.1</version>
       </dependency>
   
       <dependency>
@@ -97,7 +97,7 @@
       <dependency>
         <groupId>com.upokecenter</groupId>
         <artifactId>cbor</artifactId>
-        <version>4.4.1</version>
+        <version>4.5.2</version>
       </dependency>
       
       <!-- Test -->
@@ -153,7 +153,7 @@
 
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.8.1</version>
+        <version>3.10.1</version>
         <configuration>
           <source>${java.version}</source>
           <target>${java.version}</target>
@@ -163,7 +163,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
-        <version>3.2.0</version>
+        <version>3.2.2</version>
       </plugin>
 
       <plugin>
@@ -181,7 +181,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-enforcer-plugin</artifactId>
-        <version>3.0.0-M3</version>
+        <version>3.0.0</version>
         <executions>
           <execution>
             <id>enforce</id>
@@ -238,7 +238,7 @@
           <plugin>
             <groupId>org.sonatype.plugins</groupId>
             <artifactId>nexus-staging-maven-plugin</artifactId>
-            <version>1.6.7</version>
+            <version>1.6.12</version>
             <extensions>true</extensions>
             <configuration>
               <serverId>ossrh</serverId>
@@ -290,7 +290,7 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-javadoc-plugin</artifactId>
-            <version>3.2.0</version>
+            <version>3.3.2</version>
             <executions>
               <execution>
                 <id>attach-javadoc</id>
