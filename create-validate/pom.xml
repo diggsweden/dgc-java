@@ -6,7 +6,7 @@
   <parent>
     <groupId>se.digg.dgc</groupId>
     <artifactId>dgc-parent</artifactId>
-    <version>1.0.2-SNAPSHOT</version>
+    <version>1.0.2</version>
   </parent>  
 
   <artifactId>dgc-create-validate</artifactId>
@@ -53,8 +53,8 @@
 
   <properties>
     <!-- Versions on dependencies -->
-    <bouncy-castle.version>1.68</bouncy-castle.version>
-    <xmlsec.version>2.2.1</xmlsec.version>    
+    <bouncy-castle.version>1.70</bouncy-castle.version>
+    <xmlsec.version>2.3.0</xmlsec.version>    
     <zxing.version>3.4.1</zxing.version>
   </properties>
 
@@ -102,7 +102,7 @@
     <dependency>
       <groupId>com.nimbusds</groupId>
       <artifactId>nimbus-jose-jwt</artifactId>
-      <version>8.20.2</version>
+      <version>9.21</version>
     </dependency>
     
     <!-- Barcodes -->
