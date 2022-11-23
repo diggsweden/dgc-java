@@ -6,7 +6,7 @@
   <parent>
     <groupId>se.digg.dgc</groupId>
     <artifactId>dgc-parent</artifactId>
-    <version>1.0.2</version>
+    <version>1.0.3-SNAPSHOT</version>
   </parent>  
 
   <artifactId>dgc-create-validate</artifactId>
@@ -137,21 +137,21 @@
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-core</artifactId>
-      <version>[5.0.0.RELEASE,)</version>
+      <version>[5.0.0.RELEASE,6.0.0)</version>
       <optional>true</optional>  
     </dependency>
     
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-beans</artifactId>
-      <version>[5.0.0.RELEASE,)</version>
+      <version>[5.0.0.RELEASE,6.0.0)</version>
       <optional>true</optional>
     </dependency>
             
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-context</artifactId>
-      <version>[5.0.0.RELEASE,)</version>
+      <version>[5.0.0.RELEASE,6.0.0)</version>
       <optional>true</optional>
     </dependency>
     
