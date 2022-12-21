@@ -207,8 +207,8 @@ public class Cwt {
   /**
    * Sets the "nbf" (not before) claim.
    * 
-   * @param exp
-   *          the not before time
+   * @param nbf
+   *          the "not before" time
    */
   public void setNotBefore(final Instant nbf) {
     this.cwtObject.set(5, instantConverter.ToCBORObject(nbf));
@@ -443,7 +443,7 @@ public class Cwt {
      * Sets the "nbf" claim.
      * 
      * @param nbf
-     *          the not before time
+     *          the "not before" time
      * @return the builder
      */
     public CwtBuilder notBefore(final Instant nbf) {

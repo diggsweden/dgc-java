@@ -27,11 +27,11 @@ public class UVCIChecksumCalculator {
   /**
    * Calculates the control character for the supplied input. Note that the input must only contain characters from the
    * {@link #LUHN_MOD_N_CHARSET}.
-   * 
+   *
    * <p>
-   * Implementation stolen from https://en.wikipedia.org/wiki/Luhn_mod_N_algorithm#Algorithm_in_Java.
+   * Implementation stolen from <a href="https://en.wikipedia.org/wiki/Luhn_mod_N_algorithm#Algorithm_in_Java">Wikipedia</a>.
    * </p>
-   * 
+   *
    * @param input
    *          the input
    * @return the checksum control character

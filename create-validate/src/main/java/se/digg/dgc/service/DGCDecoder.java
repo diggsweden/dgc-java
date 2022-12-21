@@ -35,7 +35,7 @@ public interface DGCDecoder {
    *           if the DCC has expired
    * @throws IOException
    *           for errors decoding data, for example CBOR related errors
-   * @see #decodeBarcodeToBytes(byte[])
+   * @see #decodeRawToBytes(byte[])
    */
   DigitalCovidCertificate decode(final String base45)
       throws DGCSchemaException, SignatureException, CertificateExpiredException, IOException;
@@ -52,7 +52,7 @@ public interface DGCDecoder {
    *           if the DCC has expired
    * @throws IOException
    *           for errors decoding data, for example CBOR related errors
-   * @see #decodeBarcode(byte[])
+   * @see #decodeRaw(byte[])
    */
   byte[] decodeToBytes(final String base45) throws SignatureException, CertificateExpiredException, IOException;
 
