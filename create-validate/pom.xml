@@ -54,7 +54,7 @@
   <properties>
     <!-- Versions on dependencies -->
     <bouncy-castle.version>1.70</bouncy-castle.version>
-    <xmlsec.version>2.3.0</xmlsec.version>    
+    <xmlsec.version>3.0.1</xmlsec.version>
     <zxing.version>3.4.1</zxing.version>
   </properties>
 
@@ -102,7 +102,7 @@
     <dependency>
       <groupId>com.nimbusds</groupId>
       <artifactId>nimbus-jose-jwt</artifactId>
-      <version>9.21</version>
+      <version>9.25.6</version>
     </dependency>
     
     <!-- Barcodes -->
@@ -167,7 +167,7 @@
       
       <properties>
         <java.version>11</java.version>
-        <credentials-support.version>1.0.1</credentials-support.version>
+        <credentials-support.version>1.2.4</credentials-support.version>
       </properties>
       
       <dependencies>
@@ -243,6 +243,7 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-javadoc-plugin</artifactId>
+            <version>3.3.2</version>
             <executions>
               <execution>
                 <id>attach-javadoc</id>
@@ -255,7 +256,7 @@
               <doctitle>EU Digital Covid Certificate - Issuance and Validation - ${project.version}</doctitle>
               <windowtitle>EU Digital Covid Certificate - Issuance and Validation - ${project.version}</windowtitle>
               <detectJavaApiLink>true</detectJavaApiLink>
-              <additionalparam>-Xdoclint:all -Xdoclint:-missing</additionalparam>
+              <doclint>all,-missing</doclint>
               <additionalOptions>-Xdoclint:all -Xdoclint:-missing</additionalOptions>
               <additionalJOptions>
                 <additionalJOption>-Xdoclint:all</additionalJOption>
