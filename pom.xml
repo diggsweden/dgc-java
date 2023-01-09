@@ -5,7 +5,7 @@
 
   <groupId>se.digg.dgc</groupId>
   <artifactId>dgc-parent</artifactId>
-  <version>1.0.3-SNAPSHOT</version>
+  <version>1.0.3</version>
   <packaging>pom</packaging>
 
   <name>DIGG :: EU Digital Covid Certificate :: DCC Java</name>
