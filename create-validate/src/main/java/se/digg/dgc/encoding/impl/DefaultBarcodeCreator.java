@@ -158,7 +158,7 @@ public class DefaultBarcodeCreator implements BarcodeCreator {
   /**
    * Sets the type of barcodes to create.
    * <p>
-   * {@value #DEFAULT_TYPE} is the default.
+   * {@link #DEFAULT_TYPE} is the default.
    * </p>
    * 
    * @param type
@@ -171,7 +171,7 @@ public class DefaultBarcodeCreator implements BarcodeCreator {
   /**
    * Sets the image format for barcodes created.
    * <p>
-   * {@value #DEFAULT_IMAGE_FORMAT} is the default.
+   * {@link #DEFAULT_IMAGE_FORMAT} is the default.
    * </p>
    * 
    * @param imageFormat

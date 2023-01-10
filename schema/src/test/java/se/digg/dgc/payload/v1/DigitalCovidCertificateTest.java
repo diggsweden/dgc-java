@@ -86,7 +86,7 @@ public class DigitalCovidCertificateTest {
   }
 
   /**
-   * Support for serializing/deserializing of {@link LocalData} doesn't come for free in FasterXML so we'll test this a
+   * Support for serializing/deserializing of {@link LocalDate} doesn't come for free in FasterXML so we'll test this a
    * bit extra.
    * 
    * @throws Exception

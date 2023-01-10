@@ -163,7 +163,7 @@ public class Barcode {
    * }
    * </pre>
    * 
-   * @return
+   * @return image as html ready base64 string
    */
   public String toBase64Image() {
     return String.format("data:image/%s;base64, %s",

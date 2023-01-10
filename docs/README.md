@@ -80,5 +80,5 @@ The **dgc-create-validate** library offers a barcode (QR) implementation using t
 
 -----
 
-Copyright &copy; 2021-2022, [Myndigheten för digital förvaltning - Swedish Agency for Digital Government (DIGG)](http://www.digg.se). Licensed under the MIT license.
+Copyright &copy; 2021-2023, [Myndigheten för digital förvaltning - Swedish Agency for Digital Government (DIGG)](http://www.digg.se). Licensed under the MIT license.
 
