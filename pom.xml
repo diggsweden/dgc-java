@@ -238,6 +238,15 @@
       
       <build>
         <finalName>${project.artifactId}-java8-${project.version}</finalName>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-jar-plugin</artifactId>
+            <configuration>
+              <classifier>java8</classifier>
+            </configuration>
+          </plugin>
+        </plugins>
       </build>
       
     </profile>
